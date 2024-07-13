@@ -19,20 +19,39 @@ console.log(scene);
 
 const loader = new GLTFLoader();
 
-let paddle1, paddle2, ball, topWall, bottomWall, boundry, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN;
+//lights & shadows
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+
+//Create a DirectionalLight and turn on shadows for the light
+const light = new THREE.DirectionalLight(0xFFA500, 5);
+light.position.set( -1, 1, -2 ); //default; light shining from top left
+light.castShadow = true; // default false
+scene.add( light );
+let paddle1, paddle2, ball, plane, topWall, bottomWall, boundry, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN;
 
 // Charger les modèles
-loader.load('models/model.glb', function(gltf) {
+loader.load('models/model2.glb', function(gltf) {
     scene.add(gltf.scene);
 
     // Récupérer les objets de la scène glTF
+    plane = gltf.scene.getObjectByName('Plane');
+    plane.material.color.set(0x000000);
+    plane.material.receiveShadow = true;
+    plane.castShadow = true;
     paddle1 = gltf.scene.getObjectByName('Paddle');
+    paddle1.castShadow = true;
     paddle2 = gltf.scene.getObjectByName('Paddle001');
+    paddle1.castShadow = true;
+    paddle2.castShadow = true;
     ball = gltf.scene.getObjectByName('Ball');
+    ball.castShadow = true;
     topWall = gltf.scene.getObjectByName('Wall');
     bottomWall = gltf.scene.getObjectByName('Wall001');
+    topWall.castShadow = true;
+    bottomWall.castShadow = true;
     boundry = gltf.scene.getObjectByName('Boundry');
-    gltf.scene.getObjectByName('Plane').visible = false;
     p1WIN = gltf.scene.getObjectByName('P1WIN');
     p2WIN = gltf.scene.getObjectByName('P2WIN');
     scoreP1object.push(gltf.scene.getObjectByName('0_L'));
@@ -61,13 +80,12 @@ loader.load('models/model.glb', function(gltf) {
     console.error(error);
 });
 
-//lights
 
-const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
-scene.add( light );
+
 
 let ballSpeed = { x: 0.1, z: 0.1 };
-let paddleSpeed = 1;
+console.log(ballSpeed);
+let paddleSpeed = 0.5;
 
 function animate() {
     requestAnimationFrame(animate);
@@ -75,8 +93,8 @@ function animate() {
 
     if (ball && paddle1 && paddle2) {
         // Déplacement de la balle
-        ball.position.x -= ballSpeed.x;
-        ball.position.z -= ballSpeed.z;
+        ball.position.x += ballSpeed.x;
+        ball.position.z += ballSpeed.z;
         
 
         //Collision avec les murs
@@ -86,18 +104,13 @@ function animate() {
         //console.log(ball.position.z, topWall.position.z);
 
         // Collision avec les raquettes
-        if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 5 / 2 && ball.position.z >= paddle1.position.z - 5 / 2) {
+        if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
             ballSpeed.x *= -1;
         }
-        if (ball.position.x >= paddle2.position.x - 1 && ball.position.z <= paddle2.position.z + 5 / 2 && ball.position.z >= paddle2.position.z - 5 / 2) {
+        if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
             ballSpeed.x *= -1;
         }
-        // if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 1 && ball.position.z >= paddle1.position.z - 1) {
-        //     ballSpeed.x *= -1;
-        // }
-        // if (ball.position.x >= paddle2.position.x - 1 && ball.position.z <= paddle2.position.z + 1 && ball.position.z >= paddle2.position.z - 1) {
-        //     ballSpeed.x *= -1;
-        // }
+        
         // Point marqué
         if (ball.position.x <= paddle1.position.x){
             ball.position.set(0, 0, 0);
