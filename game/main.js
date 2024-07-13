@@ -1,5 +1,5 @@
-import * as THREE from './node_modules/three/build/three.module.js';
-import { GLTFLoader } from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
@@ -66,7 +66,7 @@ loader.load('models/model.glb', function(gltf) {
 const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
 scene.add( light );
 
-let ballSpeed = { x: 0.08, z: 0.08 };
+let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 1;
 
 function animate() {
@@ -83,7 +83,7 @@ function animate() {
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
             ballSpeed.z *= -1;
         }
-        console.log(ball.position.z, topWall.position.z);
+        //console.log(ball.position.z, topWall.position.z);
 
         // Collision avec les raquettes
         if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 1 && ball.position.z >= paddle1.position.z - 1) {
@@ -120,7 +120,7 @@ function animate() {
 
 
 
-        console.log(ball.position.x, paddle2.position.x);
+        //console.log(ball.position.x, paddle2.position.x);
      
 
     }
