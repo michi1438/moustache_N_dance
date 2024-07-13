@@ -66,7 +66,7 @@ loader.load('models/model.glb', function(gltf) {
 const light = new THREE.AmbientLight( 0x404040, 15 ); // soft white light
 scene.add( light );
 
-let ballSpeed = { x: 0.2, z: 0.2 };
+let ballSpeed = { x: 0.1, z: 0.1 };
 let paddleSpeed = 1;
 
 function animate() {
@@ -75,8 +75,8 @@ function animate() {
 
     if (ball && paddle1 && paddle2) {
         // Déplacement de la balle
-        ball.position.x += ballSpeed.x;
-        ball.position.z += ballSpeed.z;
+        ball.position.x -= ballSpeed.x;
+        ball.position.z -= ballSpeed.z;
         
 
         //Collision avec les murs
@@ -86,12 +86,18 @@ function animate() {
         //console.log(ball.position.z, topWall.position.z);
 
         // Collision avec les raquettes
-        if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 1 && ball.position.z >= paddle1.position.z - 1) {
+        if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 5 / 2 && ball.position.z >= paddle1.position.z - 5 / 2) {
             ballSpeed.x *= -1;
         }
-        if (ball.position.x >= paddle2.position.x - 1 && ball.position.z <= paddle2.position.z + 1 && ball.position.z >= paddle2.position.z - 1) {
+        if (ball.position.x >= paddle2.position.x - 1 && ball.position.z <= paddle2.position.z + 5 / 2 && ball.position.z >= paddle2.position.z - 5 / 2) {
             ballSpeed.x *= -1;
         }
+        // if (ball.position.x <= paddle1.position.x + 1 && ball.position.z <= paddle1.position.z + 1 && ball.position.z >= paddle1.position.z - 1) {
+        //     ballSpeed.x *= -1;
+        // }
+        // if (ball.position.x >= paddle2.position.x - 1 && ball.position.z <= paddle2.position.z + 1 && ball.position.z >= paddle2.position.z - 1) {
+        //     ballSpeed.x *= -1;
+        // }
         // Point marqué
         if (ball.position.x <= paddle1.position.x){
             ball.position.set(0, 0, 0);
