@@ -85,7 +85,7 @@ loader.load('models/model2.glb', function(gltf) {
 
 let ballSpeed = { x: 0.1, z: 0.1 };
 console.log(ballSpeed);
-let paddleSpeed = 0.5;
+let paddleSpeed = 1;
 
 function animate() {
     requestAnimationFrame(animate);
@@ -151,16 +151,24 @@ document.addEventListener('keydown', (event) => {
     if (paddle1 && paddle2) {
         switch (event.key) {
             case 'ArrowUp':
-                paddle2.position.z -= paddleSpeed;
+                if (paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle2.position.z -= paddleSpeed;
+                }
                 break;
             case 'ArrowDown':
-                paddle2.position.z += paddleSpeed;
+                if (paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle2.position.z += paddleSpeed;
+                }
                 break;
             case 'z':
-                paddle1.position.z -= paddleSpeed;
+                if (paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle1.position.z -= paddleSpeed;
+                }
                 break;
             case 's':
-                paddle1.position.z += paddleSpeed;
+                if (paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle1.position.z += paddleSpeed;
+                }
                 break;
         }
     }
