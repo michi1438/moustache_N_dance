@@ -83,7 +83,7 @@ loader.load('models/model2.glb', function(gltf) {
 
 
 
-let ballSpeed = { x: 0.1, z: 0.1 };
+let ballSpeed = { x: 0.2, z: 0.2 };
 console.log(ballSpeed);
 let paddleSpeed = 1;
 
