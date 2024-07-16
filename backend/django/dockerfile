@@ -1,0 +1,33 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    dockerfile                                         :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
+#    Updated: 2024/07/16 10:46:04 by mguerga          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+FROM alpine:3.20.1
+
+RUN apk update && \
+	apk add --no-cache py3-django py3-psycopg py3-psycopg2
+
+#git clone git://github.com/zostera/django-bootstrap5.git
+RUN	django-admin startproject mysite && \
+	cd mysite && chmod 744 manage.py
+
+COPY settings.py /mysite/mysite/.
+COPY django_init.sh /mysite/.
+COPY urls.py /mysite/mysite/.
+
+
+#EXPOSE 5432
+
+RUN touch debug.log && ln -sf /dev/stdout ./debug.log 
+
+WORKDIR /mysite
+
+CMD ["sh", "django_init.sh"]

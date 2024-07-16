@@ -1,0 +1,44 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    compose.yaml                                       :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
+#    Updated: 2024/07/16 18:25:22 by lzito            ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+services:
+
+  postgre:
+    volumes:
+      - SHARE:/etc/data
+    build: backend/postgre/
+    container_name: postgre
+    networks: ["backend_nw"]
+    restart: on-failure
+
+  django:
+    volumes:
+      - SHARE:/etc/data
+    depends_on:
+      - postgre
+    build: backend/django/
+    container_name: django 
+    networks: ["backend_nw"]
+    ports:
+      - "8000:8000"
+    restart: on-failure
+
+networks:
+  backend_nw:
+
+volumes:
+  SHARE:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/$USER/data/SHARE
