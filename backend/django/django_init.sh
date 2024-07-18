@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sleep 10
+
 echo "Create migrations"
 python3 ../manage.py makemigrations
 echo "============================"
