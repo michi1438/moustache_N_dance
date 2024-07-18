@@ -9,23 +9,23 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see                                                                                                                                                               
 https://docs.djangoproject.com/en/4.2/ref/settings/                                                                                                                                                               
 """                                                                                                                                                                                                               
-                                                                                                                                                                                                                  
+
+import os                                                                                                                                                                                                                  
 from pathlib import Path                                                                                                                                                                                          
                                                                                                                                                                                                                   
 # Build paths inside the project like this: BASE_DIR / 'subdir'.                                                                                                                                                  
 BASE_DIR = Path(__file__).resolve().parent.parent                                                                                                                                                                 
                                                                                                                                                                                                                   
-                                                                                                                                                                                                                  
 # Quick-start development settings - unsuitable for production                                                                                                                                                    
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/                                                                                                                                           
                                                                                                                                                                                                                   
 # SECURITY WARNING: keep the secret key used in production secret!                                                                                                                                                
-SECRET_KEY = 'django-insecure-em#$nk)r9_c6jo#viip9d4vsi)1x5wucd(c%(w!6(*ve^f_z75'                                                                                                                                 
+SECRET_KEY = os.environ.get('DJ_SECRETKEY')                                                                                                                                 
                                                                                                                                                                                                                   
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
 DEBUG = True                                                                                                                                                                                                      
                                                                                                                                                                                                                   
-ALLOWED_HOSTS = []                                                                                                                                                                                                
+ALLOWED_HOSTS = ['*']                                                                                                                                                                                                
                                                                                                                                                                                                                   
                                                                                                                                                                                                                   
 # Application definition                                                                                                                                                                                          
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',                                                                                                                                                                                    
     'django.contrib.messages',                                                                                                                                                                                    
     'django.contrib.staticfiles',                                                                                                                                                                                 
+    'django_bootstrap5',
 ]                                                                                                                                                                                                                 
 
 LOGGING = {
@@ -97,11 +98,11 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {                                                                                                                                                                                                     
     "default": {                                                                                                                                                                                                  
         "ENGINE": "django.db.backends.postgresql",                                                                                                                                                                
-        "NAME": "postgres",                                                                                                                                                                                       
-        "USER": "post_user",                                                                                                                                                                                      
-        "PASSWORD": "",                                                                                                                                                                                 
-        "HOST": "postgre",                                                                                                                                                                                        
-        "PORT": "5432",                                                                                                                                                                                           
+        "NAME": os.environ.get('PG_DB'),                                                                                                                                                                                       
+        "USER": os.environ.get('PG_USER'),                                                                                                                                                                                      
+        "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),                                                                                                                                                                                 
+        "HOST": os.environ.get('PG_HOST'),                                                                                                                                                                                        
+        "PORT": os.environ.get('PG_PORT'),                                                                                                                                                                                           
     }                                                                                                                                                                                                             
 }                                                                                                                                                                                                                 
                                                                                                                                                                                                                   

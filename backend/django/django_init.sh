@@ -1,5 +1,16 @@
-python manage.py makemigrations
-python manage.py migrate
-DJANGO_SUPERUSER_USERNAME=root DJANGO_SUPERUSER_PASSWORD=toor \
-    python manage.py createsuperuser --email=admin@admin.com --noinput
-python manage.py runserver 0.0.0.0:8000
+#!/bin/bash
+
+echo "Create migrations"
+python3 ../manage.py makemigrations
+echo "============================"
+
+echo "Migrate"
+python3 ../manage.py migrate
+echo "============================"
+
+echo "Create Super User"
+python3 ../manage.py createsuperuser --email=admin@admin.com --noinput
+echo "============================"
+
+echo "Start server"
+python3 ../manage.py runserver 0.0.0.0:8000

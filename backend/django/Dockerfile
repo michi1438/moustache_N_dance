@@ -1,34 +1,28 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    dockerfile                                         :+:      :+:    :+:    #
+#    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/15 11:48:15 by mguerga          ###   ########.fr        #
+#    Updated: 2024/07/18 17:13:45 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM alpine:3.20.1
+FROM python:3.12-slim
 
-RUN apk update && \
-	apk add --no-cache postgresql16 py3-psycopg && \
-	adduser -D post_user && \
-	mkdir -p /run/postgresql/ && \
-	chown post_user:post_user /run/postgresql/
+ENV	PYTHONUNBUFFERED 1
 
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-USER post_user
+EXPOSE 8000
 
-RUN mkdir -p /home/post_user/postDB/ && \
-	touch /home/post_user/post.log && \
-	pg_ctl init -D home/post_user/postDB/ -l /home/post_user/post.log && \
-	ln -sf /dev/stdout /home/post_user/post.log
+RUN	django-admin startproject mysite
 
-COPY pg_hba.conf /home/post_user/postDB/.
-COPY postgresql.conf /home/post_user/postDB/.
+WORKDIR /mysite/mysite
 
-EXPOSE 5432
+COPY . .
 
-CMD ["postgres16", "-D", "/home/post_user/postDB", "-h", "*" ]
+CMD ["bash","django_init.sh"]

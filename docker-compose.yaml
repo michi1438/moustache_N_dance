@@ -1,44 +1,47 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    compose.yaml                                       :+:      :+:    :+:    #
+#    docker-compose.yaml                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/16 18:25:22 by lzito            ###   ########.fr        #
+#    Updated: 2024/07/18 15:06:23 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+version: '3.3'
 services:
 
-  postgre:
+  postgres:
+    container_name: postgres
+    env_file: "./backend/.env"
+    image: postgres:16.3-alpine
     volumes:
-      - SHARE:/etc/data
-    build: backend/postgre/
-    container_name: postgre
-    networks: ["backend_nw"]
+      - db_vol:/var/lib/postgresql/data
+    networks:
+      - backend_nw
     restart: on-failure
 
   django:
-    volumes:
-      - SHARE:/etc/data
-    depends_on:
-      - postgre
-    build: backend/django/
     container_name: django 
-    networks: ["backend_nw"]
+    env_file: "./backend/.env"
+    build: backend/django/
+    networks:
+      - backend_nw
     ports:
       - "8000:8000"
     restart: on-failure
+    depends_on:
+      - postgres
 
 networks:
   backend_nw:
 
 volumes:
-  SHARE:
+  db_vol:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/$USER/data/SHARE
+      device: /home/$USER/data/db
