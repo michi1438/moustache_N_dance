@@ -107,14 +107,14 @@ let isModelLoaded = false;
 let isConfigReady = false;
 let gameConfig = {};
 
-loader.load('models/modelSimpson.glb', function(gltf) {
+loader.load('models/modelMoustache.glb', function(gltf) {
     scene.add(gltf.scene);
 
     plane = gltf.scene.getObjectByName('Plane');
-    //plane.material.color.set(0x000);
+    plane.material.color.set(0x000);
   
     plane.material.receiveShadow = true;
-    plane.receiveShadow = true;
+    //plane.receiveShadow = true;
 
     paddle1 = gltf.scene.getObjectByName('Paddle1');
     paddle1.castShadow = true;
