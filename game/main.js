@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { showQuestion } from './menu.js';
 
 // Afficher le menu
-showQuestion();
+//showQuestion();
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -51,7 +51,7 @@ spotLight.penumbra = 0.3;
 spotLight.position.set( 45, 10, 20);
 spotLight.castShadow = true;
 spotLight.shadow.camera.near = 8;
-spotLight.shadow.camera.far = 50;
+spotLight.shadow.camera.far = 100;
 spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 scene.add( spotLight );
@@ -65,7 +65,7 @@ spotLight2.penumbra = 0.3;
 spotLight2.position.set( -45, 10, -20);
 spotLight2.castShadow = true;
 spotLight2.shadow.camera.near = 8;
-spotLight2.shadow.camera.far = 50;
+spotLight2.shadow.camera.far = 100;
 spotLight2.shadow.mapSize.width = 1024;
 spotLight2.shadow.mapSize.height = 1024;
 scene.add( spotLight2 );
@@ -78,18 +78,42 @@ const audioLoader = new THREE.AudioLoader();
 
 const listener = new THREE.AudioListener();
 camera.add( listener );
+let sound, sound1, sound2, sound3;
+
+audioLoader.load( 'sounds/salut.mp3', function ( buffer ) {
+    sound = new THREE.Audio( listener );
+    sound.setBuffer( buffer );
+    sound.setVolume( 0.1 );
+});
+audioLoader.load( 'sounds/homer-woohoo.mp3', function ( buffer ) {
+        sound1 = new THREE.Audio( listener );
+        sound1.setBuffer( buffer );
+        sound1.setVolume( 0.1 );
+});
+audioLoader.load( 'sounds/homer_doh.mp3', function ( buffer ) {
+    sound2 = new THREE.Audio( listener );
+    sound2.setBuffer( buffer );
+    sound2.setVolume( 0.1 );
+});
+audioLoader.load( 'sounds/c_nul_homer.mp3', function ( buffer ) {
+    sound3 = new THREE.Audio( listener );
+    sound3.setBuffer( buffer );
+    sound3.setLoop( false );
+    sound3.setVolume( 0.1 );
+});
+let soundPlayed = false;
 
 let isModelLoaded = false;
 let isConfigReady = false;
 let gameConfig = {};
 
-loader.load('models/modelMoustache.glb', function(gltf) {
+loader.load('models/modelSimpson.glb', function(gltf) {
     scene.add(gltf.scene);
 
     plane = gltf.scene.getObjectByName('Plane');
-    plane.material.color.set(0x000);
+    //plane.material.color.set(0x000);
   
-    //plane.material.receiveShadow = true;
+    plane.material.receiveShadow = true;
     plane.receiveShadow = true;
 
     paddle1 = gltf.scene.getObjectByName('Paddle1');
@@ -99,7 +123,7 @@ loader.load('models/modelMoustache.glb', function(gltf) {
     paddle2.castShadow = true;
 
     ball = gltf.scene.getObjectByName('Ball');
-    ball.castShadow = true;
+    //ball.castShadow = true;
 
     topWall = gltf.scene.getObjectByName('WallT');
     bottomWall = gltf.scene.getObjectByName('WallB');
@@ -158,63 +182,114 @@ loader.load('models/modelMoustache.glb', function(gltf) {
     console.error(error);
 });
 
+let go = false;
+
 window.startGame = function(config) {
     gameConfig = config;
     isConfigReady = true;
+
+    let countdown = 3;
+    let countdownDisplay = document.getElementById('countdownDisplay');
+    countdownDisplay.id = 'countdownDisplay';
+    //document.body.appendChild(countdownDisplay);
+    
+    let countdownInterval = setInterval(() => {
+        countdownDisplay.innerText = countdown;
+        countdown--;
+    
+        if (countdown < 0) {
+            countdownDisplay.innerText = 'GO';
+            clearInterval(countdownInterval);
+    
+            // After a short delay, remove the 'GO' message
+            setTimeout(() => {
+                countdownDisplay.remove();
+                go = true;
+            }, 1000);
+        }
+    }, 1000)
     maybeStartGame();
+    sound.play();
 }
 
 function maybeStartGame() {
     if (isModelLoaded && isConfigReady) {
         // Start the animation loop
-        console.log('Starting game with configuration:', gameConfig);
         animate();
     }
 }
 
-let ballSpeed = { x: 0.2, z: 0.2 };
-let paddleSpeed = 1;
+let ballSpeed = { x: 0.3, z: 0.3 };
+let paddleSpeed = 0.3;
 
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
 
     if (ball && paddle1 && paddle2) {
-        ball.position.x += ballSpeed.x;
-        ball.position.z += ballSpeed.z;
-        
+        if(go) {
+            ball.position.x += ballSpeed.x;
+            ball.position.z += ballSpeed.z;
+        }
         //collision murs
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
             ballSpeed.z *= -1;
+            
         }
         //collision paddle1 et paddle2
         if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
-            ballSpeed.x *= -1;
+            ballSpeed.x *= -1.05;
+            sound1.play();
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
-            ballSpeed.x *= -1;
+            ballSpeed.x *= -1.05;
+            sound1.play();
         }
 
         if (ball.position.x <= paddle1.position.x) {
             ball.position.set(0, 0, 0);
+            ballSpeed = { x: 0.3, z: 0.3 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP2++;
+            sound2.play();
             scoreP2object[scoreP2 - 1].visible = false;
             scoreP2object[scoreP2].visible = true;
         } else if (ball.position.x >= paddle2.position.x) {
             ball.position.set(0, 0, 0);
+            ballSpeed = { x: 0.3, z: 0.3 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP1++;
+            sound2.play();
             scoreP1object[scoreP1 - 1].visible = false;
             scoreP1object[scoreP1].visible = true;
         } else if (scoreP1 == 5 || scoreP2 == 5) {
             ball.position.set(0, 0, 0);
+            if (!soundPlayed) {
+                setTimeout(() => {
+                    sound3.play();
+                }, 1000);
+                soundPlayed = true;
+            }
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
             } else {
                 p2WIN.visible = true;
+            }
+        }
+        if (paddle1 && paddle2) {
+            if (keys['ArrowUp'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                paddle2.position.z -= paddleSpeed;
+            } 
+            if (keys['ArrowDown'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                paddle2.position.z += paddleSpeed;
+            } 
+            if (keys['z'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                paddle1.position.z -= paddleSpeed;
+            } 
+            if (keys['s'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                paddle1.position.z += paddleSpeed;
             }
         }
     }
@@ -222,29 +297,12 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+let keys = {};
+
 document.addEventListener('keydown', (event) => {
-    if (paddle1 && paddle2) {
-        switch (event.key) {
-            case 'ArrowUp':
-                if (paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                    paddle2.position.z -= paddleSpeed;
-                }
-                break;
-            case 'ArrowDown':
-                if (paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                    paddle2.position.z += paddleSpeed;
-                }
-                break;
-            case 'z':
-                if (paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                    paddle1.position.z -= paddleSpeed;
-                }
-                break;
-            case 's':
-                if (paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                    paddle1.position.z += paddleSpeed;
-                }
-                break;
-        }
-    }
+    keys[event.key] = true;
+});
+
+document.addEventListener('keyup', (event) => {
+    keys[event.key] = false;
 });
