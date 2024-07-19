@@ -47,7 +47,7 @@ scene.add( dirLight );
 let spotLight = new THREE.SpotLight( 0xff6666, 10000 );
 spotLight.name = 'Spot Light';
 spotLight.angle = Math.PI / 5;
-spotLight.penumbra = 0.2;
+spotLight.penumbra = 0.3;
 spotLight.position.set( 45, 10, 20);
 spotLight.castShadow = true;
 spotLight.shadow.camera.near = 8;
@@ -114,7 +114,7 @@ loader.load('models/modelMoustache.glb', function(gltf) {
     plane.material.color.set(0x000);
   
     plane.material.receiveShadow = true;
-    //plane.receiveShadow = true;
+    plane.receiveShadow = true;
 
     paddle1 = gltf.scene.getObjectByName('Paddle1');
     paddle1.castShadow = true;
