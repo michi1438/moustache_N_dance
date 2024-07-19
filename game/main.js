@@ -47,7 +47,7 @@ scene.add( dirLight );
 let spotLight = new THREE.SpotLight( 0xff6666, 10000 );
 spotLight.name = 'Spot Light';
 spotLight.angle = Math.PI / 5;
-spotLight.penumbra = 0.3;
+spotLight.penumbra = 0.2;
 spotLight.position.set( 45, 10, 20);
 spotLight.castShadow = true;
 spotLight.shadow.camera.near = 8;
@@ -61,7 +61,7 @@ scene.add( spotLight );
 let spotLight2 = new THREE.SpotLight( 0x6666ff, 10000 );
 spotLight2.name = 'Spot Light';
 spotLight2.angle = Math.PI / 5;
-spotLight2.penumbra = 0.3;
+spotLight2.penumbra = 0.2;
 spotLight2.position.set( -45, 10, -20);
 spotLight2.castShadow = true;
 spotLight2.shadow.camera.near = 8;
@@ -219,7 +219,7 @@ function maybeStartGame() {
     }
 }
 
-let ballSpeed = { x: 0.3, z: 0.3 };
+let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.3;
 
 function animate() {
@@ -238,17 +238,17 @@ function animate() {
         }
         //collision paddle1 et paddle2
         if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
-            ballSpeed.x *= -1.05;
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
             sound1.play();
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
-            ballSpeed.x *= -1.05;
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
             sound1.play();
+            console.log(ballSpeed);
         }
-
         if (ball.position.x <= paddle1.position.x) {
             ball.position.set(0, 0, 0);
-            ballSpeed = { x: 0.3, z: 0.3 };
+            ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP2++;
@@ -257,7 +257,7 @@ function animate() {
             scoreP2object[scoreP2].visible = true;
         } else if (ball.position.x >= paddle2.position.x) {
             ball.position.set(0, 0, 0);
-            ballSpeed = { x: 0.3, z: 0.3 };
+            ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP1++;
