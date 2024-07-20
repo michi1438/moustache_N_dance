@@ -18,11 +18,7 @@
         .options li { cursor: pointer; padding: 10px; background: #eee; margin-bottom: 5px; }
         .options li:hover { background: #ccc; }
         /*countdown au milieu de l'ecran en gros*/
-        @keyframes countdownEffect {
-          0% { color: rgb(255, 255, 255); transform: translate(-50%, -50%) scale(1) translate(-50%, -50%);}
-          50% { color: rgba(255, 255, 255, 0.856); transform: translate(-50%, -50%) scale(0.75) translate(-50%, -50%);}
-          100% { color: rgba(255, 255, 255, 0.704); transform: translate(-50%, -50%) scale(0.5) translate(-50%, -50%);}
-        }
+        
         #countdownDisplay {
           position: absolute;
           top: 50%;
@@ -33,7 +29,7 @@
           color: #fff;
           padding: 20px;
           border-radius: 10px;
-          animation: countdownEffect 1s infinite;
+          text-shadow: 5px 5px 8px #000000;
         }
     </style>
     <script type="importmap">
@@ -52,6 +48,7 @@
       </div>
     <div id="countdownDisplay"></div>
     <script type="module" src="main.js"></script>
+    <script type="module" src="menu.js"></script>
    
 </body>
 </html>

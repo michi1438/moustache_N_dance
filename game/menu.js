@@ -1,3 +1,5 @@
+
+
 const configMenu = document.getElementById('config-menu');
 const questionContainer = document.getElementById('question-container');
 const optionsContainer = document.getElementById('options-container');
@@ -28,7 +30,7 @@ export function showQuestion() {
     const currentQuestion = questions[currentQuestionIndex];
     questionContainer.textContent = currentQuestion.question;
     optionsContainer.innerHTML = '';
-
+    
     currentQuestion.options.forEach(option => {
         const li = document.createElement('li');
         li.textContent = option;
@@ -40,7 +42,7 @@ export function showQuestion() {
 function selectOption(option) {
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
-
+    
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
         showQuestion();
@@ -55,7 +57,7 @@ function selectOption(option) {
 configMenu.style.display = 'block';
 showQuestion();
 
-export function startGame(config) {
+function startGame(config) {
     console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
