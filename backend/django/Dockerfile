@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/18 17:13:45 by lzito            ###   ########.fr        #
+#    Updated: 2024/07/23 20:09:57 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,8 +21,13 @@ EXPOSE 8000
 
 RUN	django-admin startproject mysite
 
-WORKDIR /mysite/mysite
+WORKDIR /mysite
 
-COPY . .
+RUN python3 manage.py startapp players
+RUN python3 manage.py startapp pong
 
-CMD ["bash","django_init.sh"]
+COPY ./mysite ./mysite
+COPY ./players ./players
+COPY ./pong ./pong
+
+CMD ["bash","./mysite/django_init.sh"]
