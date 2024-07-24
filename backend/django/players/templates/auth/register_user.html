@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if form.errors %}
+
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+		Erreur dans le formulaire...
+	  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+
+{% endif %}
+
+	<h1>Register</h1>
+	<br/>
+	<div class="container">
+		<form action="{% url 'register' %}" method=POST>
+			{% csrf_token %}
+
+			{{ form.as_p }}
+
+			<br/><br/>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+{% endblock %}
