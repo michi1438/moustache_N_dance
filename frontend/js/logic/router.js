@@ -1,5 +1,12 @@
 // Importe la View de chaque page
-import renderTwoPlayers from "../views/viewTwoPlayers.js"
+import renderPongLocal from "../views/viewPongLocal.js"
+import renderLogin from "../views/viewLogin.js"
+import renderLogout from "../views/viewLogout.js"
+import renderPongOnline from "../views/viewPongOnline.js"
+import renderGameHistory from "../views/ViewGameHistory.js"
+import render404_error from "../views/view404_error.js"
+import renderStats from "../views/viewStats.js"
+import renderUserInfo from "../views/viewUserInfo.js"
 
 
 // Importe le script de chaque page qui gere le load et listener
@@ -27,6 +34,62 @@ const routes = {
 		// load: handleIndex.loadIndex,
 		// listener: handleIndex.listenerIndex
 	},
+	"login": {
+		title: "Login",
+		path: "/login/",
+		view: renderLogin,
+		// load: handleLogin.loadLogin,
+		// listener: handleLogin.listenerLogin
+	},
+	"logout": {
+		title: "Logout",
+		path: "/logout/",
+		view: renderLogout,
+		// load: handleLogout.loadLogout,
+		// listener: handleLogout.listenerLogout
+	},
+	"ponglocal": {
+		title: "Pong Local",
+		path: "/ponglocal/",
+		view: renderPongLocal,
+		// load: handlePongLocal.loadPongLocal,
+		// listener: handlePongLocal.listenerPongLocal
+	},
+	"pongonline": {
+		title: "Pong Online",
+		path: "/pongonline/",
+		view: renderPongOnline,
+		// load: handlePongOnline.loadPongOnline,
+		// listener: handlePongOnline.listenePongOnline
+	},
+	"gamehistory": {
+		title: "Game History",
+		path: "/gamehistory/",
+		view: renderGameHistory,
+		// load: handleGameHistory.loadGameHistory,
+		// listener: handleGameHistory.listenerGameHistory
+	},
+	"404_error": {
+		title: "404 error",
+		path: "/404_error/",
+		view: render404_error,
+		// load: handle404_error.load404_error,
+		// listener: handle404_error.listener404_error
+	},
+	"stats": {
+		title: "Stats",
+		path: "/stats/",
+		view: renderStats,
+		// load: handleStats.loadStats,
+		// listener: handleStats.listenerStats
+	},
+	"userinfo": {
+		title: "User Info",
+		path: "/userinfo/",
+		view: renderUserInfo,
+		// load: handleUserInfo.loadUserInfo,
+		// listener: handleUserInfo.listenerUserInfo
+	},
 
 };
 
@@ -40,19 +103,19 @@ const routes = {
 export default async function router(value) {
 
 	var page = routes[value];
-	document.getElementById("main__content").innerHTML = page.view();
-	if (!page)
-		return;
+	
+	if (page)
+		document.getElementById("main__content").innerHTML = page.view();
 
 	// if (await page.load() === 1) {
 	// 	document.getElementById("main__content").innerHTML = page.view();
 
-	// 	// document.getElementById("topbar__profile--username").textContent =
-	// 	// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-	// 	// document.getElementById("topbar__profile--avatar").src =
-	// 	// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-	// 	// document.getElementById("topbar__profile--avatar").alt =
-	// 	// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
+	// 	document.getElementById("topbar__profile--username").textContent =
+	// 		sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
+	// 	document.getElementById("topbar__profile--avatar").src =
+	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
+	// 	document.getElementById("topbar__profile--avatar").alt =
+	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
 
 	// 	document.title = page.title;
 
@@ -61,16 +124,60 @@ export default async function router(value) {
 	// 	page.listener();
 	// }
 	else {
-		console.log("page.load(): Error, redirect to login page");
-		// router("login");
+		console.log("Error Page not found");
+		router("404_error");
 	}
+};
+
+/**
+ * Event listener for window.onload event
+ * Load the page that the user is currently on
+ * If the user is logged in, load the page that the user is currently on
+ * If the user is not logged in, redirect to the login page
+*/
+window.onload = async function()
+{
+	router("index")
+	// const currentPath = window.location.pathname;
+
+	// var found = false
+
+	// for (const route in routes)
+	// {
+	// 	if (routes[route].path === currentPath)
+	// 	{
+	// 		if (await routes[route].load() === 1)
+	// 		{
+
+	// 			found = true
+	// 			document.getElementById('main__content').innerHTML = routes[route].view();  // Render the HTML content for the page
+
+	// 			document.getElementById("topbar__profile--username").textContent =
+	// 				sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
+	// 			document.getElementById("topbar__profile--avatar").src =
+	// 				sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
+	// 			document.getElementById("topbar__profile--avatar").alt =
+	// 				sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
+
+	// 			document.title = routes[route].title;
+	// 			routes[route].listener();  // Attach event listeners
+	// 		}
+	// 		else
+	// 			router("login");
+	// 		return;
+	// 	}
+	// }
+	// if (found == false)
+	// {
+	// 	router("404_error")
+	// }
 };
 
 /**
  * Event listener for DOMContentLoaded event
  * If the user is on the index page, index specific logic is executed
  * Attach event listener to the 'logout' button
- * Attach event listeners on all buttons with the class 'dropdown-item' i.e. all buttons that redirect to another "page"
+ * Attach event listeners on all buttons with the class 'nav__item' i.e. all buttons that redirect to another "page"
 */
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -79,9 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	// 	load42Profile(code);
 	// }
 
-	if (window.location.pathname === "/") {
-		loadIndex();
-	}
+	// if (window.location.pathname === "/") {
+	// 	loadIndex();
+	// }
 
 	// document.getElementById("topbar__logout").addEventListener("click", (e) => {
 	// 	e.preventDefault();
@@ -91,9 +198,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.querySelectorAll(".nav__item").forEach(element => {
 		element.addEventListener("click", (e) => {
 			e.preventDefault();
-
-			if (element.value !== window.location.pathname.replaceAll("/", "")) {
+			if (element.value) {
 				router(element.value);
+			}
+			else {
+				console.log("Error Page not found");
+				router("404_error");
 			}
 		})
 	});
