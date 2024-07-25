@@ -78,7 +78,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [                                                                                                                                                                                                     
     {                                                                                                                                                                                                             
         'BACKEND': 'django.template.backends.django.DjangoTemplates',                                                                                                                                             
-        'DIRS': [],                                                                                                                                                                                               
+        'DIRS': [ BASE_DIR / 'mysite/templates' ],                                                                                                                                                                                               
         'APP_DIRS': True,                                                                                                                                                                                         
         'OPTIONS': {                                                                                                                                                                                              
             'context_processors': [                                                                                                                                                                               
@@ -90,6 +90,8 @@ TEMPLATES = [
         },                                                                                                                                                                                                        
     },                                                                                                                                                                                                            
 ]                                                                                                                                                                                                                 
+
+LOGIN_URL = 'players/login'
                                                                                                                                                                                                                   
 WSGI_APPLICATION = 'mysite.wsgi.application'                                                                                                                                                                      
                                                                                                                                                                                                                   

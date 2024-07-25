@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/18 16:07:46 by lzito            ###   ########.fr        #
+#    Updated: 2024/07/25 18:50:39 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,4 +42,6 @@ log:
 
 re: 	fclean all
 
-.PHONY: all makedir build up down clean fclean ps log re
+rebuild: build up
+
+.PHONY: all makedir build up down clean fclean ps log re rebuild

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<h1>2FA</h1>
+	<br/>
+	<div class="container">
+		<form action="" method=POST>
+			{% csrf_token %}
+		  <div class="mb-3">
+			<label for="otp" class="form-label">OTP code</label>
+			<input type="text" class="form-control" name="otp" required>
+		  </div>
+		  <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+{% endblock %}
