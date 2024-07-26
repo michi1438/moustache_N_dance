@@ -394,11 +394,11 @@ function animate() {
         //collision paddle1 et paddle2
         if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
             sound1.play();
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
             sound1.play();
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
         }
         //point marqué
         if (ball.position.x <= paddle1.position.x) {
