@@ -19,6 +19,7 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.3;
 
 function initGame () {
+    console.log("Initializing game...");
 //Camera
     camera.position.set(0, 30, 20);
     controls.update();
@@ -132,9 +133,11 @@ function initGame () {
     p1WIN.visible = false;
     p2WIN.visible = false;
     isConfigReady = true;
+    console.log("isConfigReady set to true");
 }
 
 function initGameSimpson () {
+    console.log("Initializing game...");
     //Camera
         camera.position.set(0, 30, 20);
         controls.update();
@@ -145,7 +148,7 @@ function initGameSimpson () {
     //Lights & shadows
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
+        let dirLight = new THREE.DirectionalLight( 0xfffff0, 2 );
         dirLight.name = 'Dir. Light';
         dirLight.position.set( 0, 10, 0 );
         dirLight.castShadow = true;
@@ -158,9 +161,9 @@ function initGameSimpson () {
         dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         scene.add( dirLight );
-        //scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+        scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
     
-        let spotLight = new THREE.SpotLight( 0xff6666, 10000 );
+        let spotLight = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight.name = 'Spot Light';
         spotLight.angle = Math.PI / 5;
         spotLight.penumbra = 0.3;
@@ -171,9 +174,9 @@ function initGameSimpson () {
         spotLight.shadow.mapSize.width = 1024;
         spotLight.shadow.mapSize.height = 1024;
         scene.add( spotLight );
-        //scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+        scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
     
-        let spotLight2 = new THREE.SpotLight( 0x6666ff, 10000 );
+        let spotLight2 = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight2.name = 'Spot Light';
         spotLight2.angle = Math.PI / 5;
         spotLight2.penumbra = 0.2;
@@ -184,7 +187,7 @@ function initGameSimpson () {
         spotLight2.shadow.mapSize.width = 1024;
         spotLight2.shadow.mapSize.height = 1024;
         scene.add( spotLight2 );
-        //scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
+        scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
     
     //audio
     
@@ -249,87 +252,100 @@ function initGameSimpson () {
         p1WIN.visible = false;
         p2WIN.visible = false;
         isConfigReady = true;
+        console.log("isConfigReady set to true");
     }
 
-window.startGame = function(config) {
-    if (config['Map'] == 'Simpson') {
-        modelPath = 'models/modelSimpson.glb';
-        loader.load(modelPath, function(gltf) {
-            scene.add(gltf.scene);
-        
-            plane = gltf.scene.getObjectByName('Plane');
-            paddle1 = gltf.scene.getObjectByName('Paddle1');
-            paddle2 = gltf.scene.getObjectByName('Paddle2');
-            ball = gltf.scene.getObjectByName('Ball');
-            topWall = gltf.scene.getObjectByName('WallT');
-            bottomWall = gltf.scene.getObjectByName('WallB');
-            p1WIN = gltf.scene.getObjectByName('P1WIN');
-            p2WIN = gltf.scene.getObjectByName('P2WIN');
-            title = gltf.scene.getObjectByName('title');
+    window.startGame = function(config) {
+        if (config['Map'] == 'Simpson') {
+            modelPath = 'models/modelSimpson.glb';
+    
+            new Promise((resolve, reject) => {
+                loader.load(modelPath, function(gltf) {
+                    scene.add(gltf.scene);
             
-            scoreP1object.push(gltf.scene.getObjectByName('0_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('1_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('2_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('3_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('4_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('5_L'));
-            
-            scoreP2object.push(gltf.scene.getObjectByName('0_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('1_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('2_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('3_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('4_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('5_R'));
-            
-            isModelLoaded = true;
-        
-            //maybeStartGame();
-        }, undefined, function(error) {
-            console.error(error);
-        });
-        if(isModelLoaded)
-            initGameSimpson();
-    }
-    else {
-        modelPath = 'models/modelMoustache.glb';
-        loader.load(modelPath, function(gltf) {
-            scene.add(gltf.scene);
-        
-            plane = gltf.scene.getObjectByName('Plane');
-            paddle1 = gltf.scene.getObjectByName('Paddle1');
-            paddle2 = gltf.scene.getObjectByName('Paddle2');
-            ball = gltf.scene.getObjectByName('Ball');
-            topWall = gltf.scene.getObjectByName('WallT');
-            bottomWall = gltf.scene.getObjectByName('WallB');
-            p1WIN = gltf.scene.getObjectByName('P1WIN');
-            p2WIN = gltf.scene.getObjectByName('P2WIN');
-            title = gltf.scene.getObjectByName('title');
-            
-            scoreP1object.push(gltf.scene.getObjectByName('0_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('1_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('2_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('3_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('4_L'));
-            scoreP1object.push(gltf.scene.getObjectByName('5_L'));
-            
-            scoreP2object.push(gltf.scene.getObjectByName('0_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('1_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('2_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('3_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('4_R'));
-            scoreP2object.push(gltf.scene.getObjectByName('5_R'));
-            
-            isModelLoaded = true;
-            //maybeStartGame();
-        }, undefined, function(error) {
-            console.error(error);
-        });
-        if(isModelLoaded){
-            console.log('initGame');
-            initGame();
-
+                    plane = gltf.scene.getObjectByName('Plane');
+                    paddle1 = gltf.scene.getObjectByName('Paddle1');
+                    paddle2 = gltf.scene.getObjectByName('Paddle2');
+                    ball = gltf.scene.getObjectByName('Ball');
+                    topWall = gltf.scene.getObjectByName('WallT');
+                    bottomWall = gltf.scene.getObjectByName('WallB');
+                    p1WIN = gltf.scene.getObjectByName('P1WIN');
+                    p2WIN = gltf.scene.getObjectByName('P2WIN');
+                    title = gltf.scene.getObjectByName('title');
+                
+                    scoreP1object.push(gltf.scene.getObjectByName('0_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('1_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('2_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('3_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('4_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('5_L'));
+                
+                    scoreP2object.push(gltf.scene.getObjectByName('0_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('1_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('2_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('3_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('4_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('5_R'));
+                    isModelLoaded = true;
+                    console.log("isModelLoaded set to true");
+                    resolve();
+                }, undefined, function(error) {
+                    console.error(error);
+                    reject(error);
+                });
+            }).then(() => {
+                if(isModelLoaded)
+                    initGameSimpson();
+            }).catch((error) => {
+                console.error('Failed to load model:', error);
+            });
         }
-          
+    else if (config['Map'] == 'Classique') {
+        modelPath = 'models/modelMoustache.glb';
+        new Promise((resolve, reject) => {
+            loader.load(modelPath, function(gltf) {
+            console.log("Model loaded:", gltf);
+                scene.add(gltf.scene);
+        
+            plane = gltf.scene.getObjectByName('Plane');
+            paddle1 = gltf.scene.getObjectByName('Paddle1');
+            paddle2 = gltf.scene.getObjectByName('Paddle2');
+            ball = gltf.scene.getObjectByName('Ball');
+            topWall = gltf.scene.getObjectByName('WallT');
+            bottomWall = gltf.scene.getObjectByName('WallB');
+            p1WIN = gltf.scene.getObjectByName('P1WIN');
+            p2WIN = gltf.scene.getObjectByName('P2WIN');
+            title = gltf.scene.getObjectByName('title');
+            
+            scoreP1object.push(gltf.scene.getObjectByName('0_L'));
+            scoreP1object.push(gltf.scene.getObjectByName('1_L'));
+            scoreP1object.push(gltf.scene.getObjectByName('2_L'));
+            scoreP1object.push(gltf.scene.getObjectByName('3_L'));
+            scoreP1object.push(gltf.scene.getObjectByName('4_L'));
+            scoreP1object.push(gltf.scene.getObjectByName('5_L'));
+            
+            scoreP2object.push(gltf.scene.getObjectByName('0_R'));
+            scoreP2object.push(gltf.scene.getObjectByName('1_R'));
+            scoreP2object.push(gltf.scene.getObjectByName('2_R'));
+            scoreP2object.push(gltf.scene.getObjectByName('3_R'));
+            scoreP2object.push(gltf.scene.getObjectByName('4_R'));
+            scoreP2object.push(gltf.scene.getObjectByName('5_R'));
+            isModelLoaded = true;
+            console.log("isModelLoaded set to true");
+            resolve();
+            }, undefined, function(error) {
+                console.error(error);
+                reject(error);
+            });
+        }).then(() => {
+            if(isModelLoaded)
+                initGame();
+
+        }).catch((error) => {
+            console.error('Failed to load modelsimps:', error);
+        }
+    );
+
     }
     
     let countdown = 3;
@@ -349,18 +365,16 @@ window.startGame = function(config) {
             }, 1000);
         }
     }, 1000)
-    //maybeStartGame();
-    if (isModelLoaded && isConfigReady) {
-        animate();
-        sound.play();
-    }
+    console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
+    let checkReadyInterval = setInterval(() => {
+        if (isModelLoaded && isConfigReady) {
+            console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
+            animate();
+            sound.play();
+            clearInterval(checkReadyInterval); // Clear the interval once conditions are met
+        }
+    }, 300); 
 }
-
-// function maybeStartGame(config) {
-//     if (isModelLoaded && isConfigReady) {
-//         animate();
-//     }
-// }
 
 
 function animate() {
@@ -379,41 +393,41 @@ function animate() {
         }
         //collision paddle1 et paddle2
         if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
             sound1.play();
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
             sound1.play();
+            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.15, -0.7), 0.7);
         }
         //point marqué
         if (ball.position.x <= paddle1.position.x) {
+            sound2.play();
             ball.position.set(0, 0, 0);
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP2++;
-            sound2.play();
             scoreP2object[scoreP2 - 1].visible = false;
             scoreP2object[scoreP2].visible = true;
         } else if (ball.position.x >= paddle2.position.x) {
+            sound2.play();
             ball.position.set(0, 0, 0);
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
             scoreP1++;
-            sound2.play();
             scoreP1object[scoreP1 - 1].visible = false;
             scoreP1object[scoreP1].visible = true;
         //fin de la partie
         } else if (scoreP1 == 5 || scoreP2 == 5) {
-            ball.position.set(0, 0, 0);
             if (!soundPlayed) {
                 setTimeout(() => {
                     sound3.play();
                 }, 1000);
                 soundPlayed = true;
             }
+            ball.position.set(0, 0, 0);
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
             } else {
@@ -449,3 +463,6 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keyup', (event) => {
     keys[event.key] = false;
 });
+
+
+
