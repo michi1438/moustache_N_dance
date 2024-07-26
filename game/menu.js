@@ -1,5 +1,3 @@
-
-
 const configMenu = document.getElementById('config-menu');
 const questionContainer = document.getElementById('question-container');
 const optionsContainer = document.getElementById('options-container');
@@ -15,7 +13,7 @@ const questions = [
     },
     {
         question: "Vitesse du jeu",
-        options: ["Lente", "Normale", "Rapide"]
+        options: ["Classique", "Progressive"]
     },
     {
         question: "Map",

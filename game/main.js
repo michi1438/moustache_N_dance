@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { showQuestion } from './menu.js';
 
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
@@ -16,7 +17,7 @@ let isModelLoaded = false;
 let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
-let paddleSpeed = 0.3;
+let paddleSpeed = 0.2;
 
 function initGame () {
     console.log("Initializing game...");
@@ -366,10 +367,17 @@ function initGameSimpson () {
         }
     }, 1000)
     console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
+    let vitesse;
+    if(config['Vitesse du jeu'] == 'Progressive') {
+        vitesse = true;
+    }
+    else {
+        vitesse = false;
+    }
     let checkReadyInterval = setInterval(() => {
         if (isModelLoaded && isConfigReady) {
             console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
-            animate();
+            animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
         }
@@ -377,11 +385,10 @@ function initGameSimpson () {
 }
 
 
-function animate() {
-    requestAnimationFrame(animate);
+function animate(vitesse) {
+    requestAnimationFrame(() => animate(vitesse));
     controls.update();
-    
-    if (ball && paddle1 && paddle2) {
+    if (ball && paddle1 && paddle2 ) {
         if(go) {
             ball.position.x += ballSpeed.x;
             ball.position.z += ballSpeed.z;
@@ -392,13 +399,23 @@ function animate() {
             
         }
         //collision paddle1 et paddle2
-        if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.2 / 2 && ball.position.z >= paddle1.position.z - 6.2 / 2) {
+        if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.4 / 2 && ball.position.z >= paddle1.position.z - 6.4 / 2) {
             sound1.play();
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+            if (vitesse == true) {
+                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+            }
+            else {
+                ballSpeed.x *= -1;
+            }
         }
-        if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.2 / 2 && ball.position.z >= paddle2.position.z - 6.2 / 2) {
+        if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
             sound1.play();
-            ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+            if (vitesse == true) {
+                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+            }
+            else {
+                ballSpeed.x *= -1;
+            }
         }
         //point marqué
         if (ball.position.x <= paddle1.position.x) {
