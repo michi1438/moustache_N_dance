@@ -105,7 +105,13 @@ export default async function router(value) {
 	var page = routes[value];
 	
 	if (page)
-		document.getElementById("main__content").innerHTML = page.view();
+		{
+			document.getElementById("main__content").innerHTML = page.view()
+			window.history.pushState({}, "", page.path);
+			document.title = page.title;
+			// console.log(window.location.pathname);
+		}
+
 
 	// if (await page.load() === 1) {
 	// 	document.getElementById("main__content").innerHTML = page.view();
@@ -137,40 +143,40 @@ export default async function router(value) {
 */
 window.onload = async function()
 {
-	router("index")
-	// const currentPath = window.location.pathname;
+	// router("index")
+	const currentPath = window.location.pathname;
+	// console.log(currentPath);
+	var found = false
 
-	// var found = false
+	for (const route in routes)
+	{
+		if (routes[route].path === currentPath)
+		{
+			// if (await routes[route].load() === 1)
+			// {
 
-	// for (const route in routes)
-	// {
-	// 	if (routes[route].path === currentPath)
-	// 	{
-	// 		if (await routes[route].load() === 1)
-	// 		{
+				found = true
+				document.getElementById('main__content').innerHTML = routes[route].view();  // Render the HTML content for the page
 
-	// 			found = true
-	// 			document.getElementById('main__content').innerHTML = routes[route].view();  // Render the HTML content for the page
+				// document.getElementById("topbar__profile--username").textContent =
+				// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
+				// document.getElementById("topbar__profile--avatar").src =
+				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
+				// document.getElementById("topbar__profile--avatar").alt =
+				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
 
-	// 			document.getElementById("topbar__profile--username").textContent =
-	// 				sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-	// 			document.getElementById("topbar__profile--avatar").src =
-	// 				sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-	// 			document.getElementById("topbar__profile--avatar").alt =
-	// 				sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
-	// 			document.title = routes[route].title;
-	// 			routes[route].listener();  // Attach event listeners
-	// 		}
-	// 		else
-	// 			router("login");
-	// 		return;
-	// 	}
-	// }
-	// if (found == false)
-	// {
-	// 	router("404_error")
-	// }
+				document.title = routes[route].title;
+				// routes[route].listener();  // Attach event listeners
+			// }
+			// else
+			// 	router("login");
+			return;
+		}
+	}
+	if (found == false)
+	{
+		router("404_error")
+	}
 };
 
 /**
@@ -198,15 +204,53 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.querySelectorAll(".nav__item").forEach(element => {
 		element.addEventListener("click", (e) => {
 			e.preventDefault();
-			if (element.value) {
+
+			if (element.value !== window.location.pathname.replaceAll("/", "")) {
 				router(element.value);
-			}
-			else {
-				console.log("Error Page not found");
-				router("404_error");
+				// console.log(window.location.pathname);
 			}
 		})
 	});
+});
+
+/**
+ * Event listener for popstate event
+ * A popstate event is fired when the active history entry changes
+*/
+window.addEventListener("popstate", async (e) => {
+	e.preventDefault();
+	// console.log(window.location.pathname);
+	// Get the current url, remove all '/' and if the url is null assign it to 'index'
+	let url = window.location.pathname.replaceAll("/", "");
+	if (url === "")
+		url = "index";
+
+	var page = routes[url];
+
+	if (page)
+	{
+		document.getElementById("main__content").innerHTML = page.view();
+		document.title = page.title;
+		return;
+	}
+
+
+	// if (await page.load() === 1) {
+		// document.getElementById("main__content").innerHTML = page.view();
+
+		// document.getElementById("topbar__profile--username").textContent =
+		// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
+		// document.getElementById("topbar__profile--avatar").src =
+		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
+		// document.getElementById("topbar__profile--avatar").alt =
+		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
+
+		// document.title = page.title;
+
+	// 	page.listener();
+	// }
+	// else
+	// 	loadIndex();
 });
 
 export { router }
