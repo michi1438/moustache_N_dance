@@ -6,17 +6,17 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/18 15:06:23 by lzito            ###   ########.fr        #
+#    Updated: 2024/07/30 11:42:13 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-version: '3.3'
+#version: '3.3' #PK ??
 services:
 
   postgres:
     container_name: postgres
     env_file: "./backend/.env"
-    image: postgres:16.3-alpine
+    build: backend/postgres/
     volumes:
       - db_vol:/var/lib/postgresql/data
     networks:

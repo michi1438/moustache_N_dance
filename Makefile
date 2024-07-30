@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/25 18:50:39 by lzito            ###   ########.fr        #
+#    Updated: 2024/07/30 12:58:21 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ makedir:
 		-@mkdir -p /home/$(USER)/data/db
 
 build:
-		@docker-compose -f docker-compose.yaml build
+		@docker-compose -f docker-compose.yaml build --progress=plain
 
 up: 	
 		@docker-compose -f docker-compose.yaml up -d
