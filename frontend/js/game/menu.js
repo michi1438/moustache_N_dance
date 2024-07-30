@@ -2,6 +2,9 @@ const configMenu = document.getElementById('config-menu');
 const questionContainer = document.getElementById('question-container');
 const optionsContainer = document.getElementById('options-container');
 
+
+console.log("hello");
+
 const questions = [
     {
         question: "Mode de jeu",
@@ -28,6 +31,7 @@ export function showQuestion() {
     const currentQuestion = questions[currentQuestionIndex];
     questionContainer.textContent = currentQuestion.question;
     optionsContainer.innerHTML = '';
+	console.log("test");
     
     currentQuestion.options.forEach(option => {
         const li = document.createElement('li');

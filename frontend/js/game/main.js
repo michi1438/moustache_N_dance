@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { showQuestion } from './menu.js';
 
 
 const scene = new THREE.Scene();
@@ -481,5 +480,71 @@ document.addEventListener('keyup', (event) => {
     keys[event.key] = false;
 });
 
+const questions = [
+    {
+        question: "Mode de jeu",
+        options: ["Jeu local", "Jeu en ligne"]
+    },
+    {
+        question: "Nombre de joueurs",
+        options: ["1 joueur", "2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
+    },
+    {
+        question: "Vitesse du jeu",
+        options: ["Classique", "Progressive"]
+    },
+    {
+        question: "Map",
+        options: ["Classique", "Simpson"]
+    }
+];
 
+let currentQuestionIndex = 0;
+let configuration = {};
+
+function listenerPongLocal() {
+	const questionContainer = document.getElementById('question-container');
+	const optionsContainer = document.getElementById('options-container');
+	configMenu.style.display = 'block';
+
+    const currentQuestion = questions[currentQuestionIndex];
+    questionContainer.textContent = currentQuestion.question;
+    optionsContainer.innerHTML = '';
+    
+    currentQuestion.options.forEach(option => {
+        const li = document.createElement('li');
+        li.textContent = option;
+        li.addEventListener('click', () => selectOption(option));
+        optionsContainer.appendChild(li);
+    });
+}
+
+function selectOption(option) {
+	const configMenu = document.getElementById('config-menu');
+    const currentQuestion = questions[currentQuestionIndex];
+    configuration[currentQuestion.question] = option;
+    
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+        showQuestion();
+    } else {
+        configMenu.style.display = 'none';
+        // Start the game with the selected configuration
+        console.log('Configuration:', configuration);
+        startGame(configuration);
+    }
+}
+
+function startGame(config) {
+    console.log('Starting game with configuration:', config);
+    // This function will be implemented in main.js
+    // You can call any initialization functions here
+    window.startGame(config);
+}
+
+
+export default {
+	listenerPongLocal,
+	// loadPongLocal
+};
 

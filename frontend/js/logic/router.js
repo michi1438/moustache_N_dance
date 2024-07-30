@@ -11,9 +11,11 @@ import renderUserInfo from "../views/viewUserInfo.js"
 
 // Importe le script de chaque page qui gere le load et listener
 //import handleXX from "./XX.js"
+import handlePongLocal from "../game/main.js"
 
 // Cas particulier pour index
 import handleIndex from "./index.js"
+
 
 
 /**
@@ -53,7 +55,7 @@ const routes = {
 		path: "/ponglocal/",
 		view: renderPongLocal,
 		// load: handlePongLocal.loadPongLocal,
-		// listener: handlePongLocal.listenerPongLocal
+		listener: handlePongLocal.listenerPongLocal
 	},
 	"pongonline": {
 		title: "Pong Online",
@@ -109,6 +111,7 @@ export default async function router(value) {
 			document.getElementById("main__content").innerHTML = page.view()
 			window.history.pushState({}, "", page.path);
 			document.title = page.title;
+			page.listener();
 			// console.log(window.location.pathname);
 		}
 
