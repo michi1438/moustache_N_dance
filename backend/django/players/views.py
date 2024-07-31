@@ -2,12 +2,53 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-
 from .utils import send_otp
 from datetime import datetime
 import pyotp
 from django.contrib.auth.models import User
 
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import Player
+from .serializers import PlayerSerializer
+
+
+@api_view(['GET', 'POST'])
+def getPlayers(request):
+
+    if request.method == 'GET':
+        players = Player.objects.all()
+        serializer = PlayerSerializer(players, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = PlayerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def getPlayer(request, id):
+    try:
+        player = Player.objects.get(pk=id)
+    except Player.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = PlayerSerializer(player)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = PlayerSerializer(player, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        player.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 def login_view(request):
     if request.method == "POST":

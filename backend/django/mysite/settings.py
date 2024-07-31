@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',                                                                                                                                                                                    
     'django.contrib.staticfiles',                                                                                                                                                                                 
     'django_bootstrap5',
+    'mysite',
     'players',
     'pong',
+    'rest_framework',
 ]                                                                                                                                                                                                                 
 
 LOGGING = {
