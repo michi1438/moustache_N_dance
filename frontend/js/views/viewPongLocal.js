@@ -14,11 +14,11 @@ export default function renderPongLocal() {
 					<ul id="options-container" role="button" class="options dropdown-menu"></ul>
       				</div>
 				</div>
-				<div id="countdownDisplay" class="position-absolute h2">
+				<div id="countdownDisplay" class="position-absolute h1">
 				</div>
-				<div class="text-bg-dark border border-black border-5">
-					<canvas id="board_two" width="650" height="480"></canvas>
+				<div id="board_two" class="text-bg-dark border border-black border-5">
 				</div>
+				
 			</div>
 			
 		</div>

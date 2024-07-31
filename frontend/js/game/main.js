@@ -4,10 +4,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
-renderer.setSize(650, 480);
+renderer.setSize(700, 500);
 const loader = new GLTFLoader();
 let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
 let soundPlayed = false;
@@ -531,7 +531,7 @@ function selectOption(option) {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         console.log('Configuration:', configuration);
-		document.getElementById('main__content').appendChild(renderer.domElement);
+		document.getElementById('board_two').appendChild(renderer.domElement);
         startGame(configuration);
     }
 }
