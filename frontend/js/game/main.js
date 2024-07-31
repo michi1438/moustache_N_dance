@@ -7,8 +7,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+renderer.setSize(650, 480);
 const loader = new GLTFLoader();
 let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
 let soundPlayed = false;
@@ -76,22 +75,22 @@ function initGame () {
     const listener = new THREE.AudioListener();
     camera.add( listener );
 
-    audioLoader.load( 'sounds/salut.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/salut.mp3', function ( buffer ) {
         sound = new THREE.Audio( listener );
         sound.setBuffer( buffer );
         sound.setVolume( 0.1 );
     });
-    audioLoader.load( 'sounds/homer-woohoo.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/homer-woohoo.mp3', function ( buffer ) {
             sound1 = new THREE.Audio( listener );
             sound1.setBuffer( buffer );
             sound1.setVolume( 0.1 );
     });
-    audioLoader.load( 'sounds/homer_doh.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/homer_doh.mp3', function ( buffer ) {
         sound2 = new THREE.Audio( listener );
         sound2.setBuffer( buffer );
         sound2.setVolume( 0.1 );
     });
-    audioLoader.load( 'sounds/c_nul_homer.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/c_nul_homer.mp3', function ( buffer ) {
         sound3 = new THREE.Audio( listener );
         sound3.setBuffer( buffer );
         sound3.setLoop( false );
@@ -195,22 +194,22 @@ function initGameSimpson () {
         const listener = new THREE.AudioListener();
         camera.add( listener );
     
-        audioLoader.load( 'sounds/salut.mp3', function ( buffer ) {
+        audioLoader.load( '/frontend/js/game/sounds/salut.mp3', function ( buffer ) {
             sound = new THREE.Audio( listener );
             sound.setBuffer( buffer );
             sound.setVolume( 0.1 );
         });
-        audioLoader.load( 'sounds/homer-woohoo.mp3', function ( buffer ) {
+        audioLoader.load( '/frontend/js/game/sounds/homer-woohoo.mp3', function ( buffer ) {
                 sound1 = new THREE.Audio( listener );
                 sound1.setBuffer( buffer );
                 sound1.setVolume( 0.1 );
         });
-        audioLoader.load( 'sounds/homer_doh.mp3', function ( buffer ) {
+        audioLoader.load( '/frontend/js/game/sounds/homer_doh.mp3', function ( buffer ) {
             sound2 = new THREE.Audio( listener );
             sound2.setBuffer( buffer );
             sound2.setVolume( 0.1 );
         });
-        audioLoader.load( 'sounds/c_nul_homer.mp3', function ( buffer ) {
+        audioLoader.load( '/frontend/js/game/sounds/c_nul_homer.mp3', function ( buffer ) {
             sound3 = new THREE.Audio( listener );
             sound3.setBuffer( buffer );
             sound3.setLoop( false );
@@ -257,7 +256,7 @@ function initGameSimpson () {
 
     window.startGame = function(config) {
         if (config['Map'] == 'Simpson') {
-            modelPath = 'models/modelSimpson.glb';
+            modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
             new Promise((resolve, reject) => {
                 loader.load(modelPath, function(gltf) {
@@ -301,7 +300,7 @@ function initGameSimpson () {
             });
         }
     else if (config['Map'] == 'Classique') {
-        modelPath = 'models/modelMoustache.glb';
+        modelPath = '/frontend/js/game/models/modelMoustache.glb';
         new Promise((resolve, reject) => {
             loader.load(modelPath, function(gltf) {
             console.log("Model loaded:", gltf);
@@ -503,6 +502,7 @@ let currentQuestionIndex = 0;
 let configuration = {};
 
 function listenerPongLocal() {
+	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
 	configMenu.style.display = 'block';
@@ -526,11 +526,12 @@ function selectOption(option) {
     
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        showQuestion();
+        listenerPongLocal();
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         console.log('Configuration:', configuration);
+		document.getElementById('main__content').appendChild(renderer.domElement);
         startGame(configuration);
     }
 }

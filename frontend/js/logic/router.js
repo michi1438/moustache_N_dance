@@ -34,7 +34,7 @@ const routes = {
 		path: "/",
 		view: handleIndex.renderIndex,
 		// load: handleIndex.loadIndex,
-		// listener: handleIndex.listenerIndex
+		listener: handleIndex.listenerIndex
 	},
 	"login": {
 		title: "Login",
