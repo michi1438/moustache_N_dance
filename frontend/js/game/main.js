@@ -451,16 +451,16 @@ function animate(vitesse) {
         }
         //gestion des paddles
         if (paddle1 && paddle2) {
-            if (keys['ArrowUp'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+            if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                 paddle2.position.z -= paddleSpeed;
             } 
-            if (keys['ArrowDown'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+            if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                 paddle2.position.z += paddleSpeed;
             } 
-            if (keys['z'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+            if (keys['q'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                 paddle1.position.z -= paddleSpeed;
             } 
-            if (keys['s'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+            if (keys['a'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                 paddle1.position.z += paddleSpeed;
             }
         }
@@ -514,6 +514,7 @@ function listenerPongLocal() {
     currentQuestion.options.forEach(option => {
         const li = document.createElement('li');
         li.textContent = option;
+		li.classList.add('btn');
         li.addEventListener('click', () => selectOption(option));
         optionsContainer.appendChild(li);
     });
