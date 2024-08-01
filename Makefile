@@ -6,7 +6,7 @@
 #    By: bkukaqi <bkukaqi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/30 11:57:34 by bkukaqi          ###   ########.fr        #
+#    Updated: 2024/08/01 10:18:13 by bkukaqi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,10 +23,6 @@ else
 endif
 
 export PATH_V := $(HOME)/data
-
-
-export STUDENT_DOMAIN = localhost
-
 
 all: 	makedir up
 
