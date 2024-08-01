@@ -515,6 +515,8 @@ function listenerPongLocal() {
         const li = document.createElement('li');
         li.textContent = option;
 		li.classList.add('btn');
+		li.classList.add('btn-outline-secondary');
+		li.classList.add('text-white');
         li.addEventListener('click', () => selectOption(option));
         optionsContainer.appendChild(li);
     });

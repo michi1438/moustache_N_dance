@@ -4,13 +4,15 @@ export default function renderLogin() {
 
 		<div id="login">
 			<div class="list-group d-flex align-items-center">
-				<div class="row my-4"></div>
+				<div class="row my-5"></div>
 				<div class="row my-2">
-					<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__login" id="btn__login">Login</button>
+					<button class="btn btn-lg btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__login" id="btn__login">Login</button>
 				</div>
 				<div class="row my-4"></div>
 				<div class="row my-2">
-					<button class="btn btn-outline-secondary text-light" id="btn__login--42">Login with 42</button>
+					<button class="btn btn-lg btn-outline-secondary text-light" id="btn__login--42">Login 
+					<img src="/frontend/img/42_logo.svg" id ="image42" alt="42" width="25" height="25"/>
+					</button>
 				</div>
 			</div>
 			<div class="modal fade" id="modal__login" aria-hidden="true">
@@ -18,7 +20,7 @@ export default function renderLogin() {
 					<div class="modal-content">
 						<div class="modal-header text-dark fw-bold fs-2">
 							<p class="col-11 modal-title"></p>
-							<button type="button" class="col-1 btn btn-outline-secondary" data-bs-dismiss="modal">X</button>
+							<button type="button" class="col-1 btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">X</button>
 						</div>
 						<div class="modal-body">
 							<form id="form__login" class="">
@@ -43,7 +45,7 @@ export default function renderLogin() {
 							</form>
 						</div>
 						<div class="modal-footer py-2">
-							<button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modal__createAccount" id="btn__createAccount">Register</button>
+							<button class="btn btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#modal__createAccount" id="btn__createAccount">Register</button>
 						</div>
 					</div>
 				</div>
@@ -53,7 +55,7 @@ export default function renderLogin() {
 					<div class="modal-content">
 						<div class="modal-header text-dark fw-bold fs-2">
 							<p class="col-11 modal-title"></p>
-							<button type="button" class="col-1 btn btn-outline-secondary" data-bs-dismiss="modal">X</button>
+							<button type="button" class="col-1 btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">X</button>
 						</div>
 						<div class="modal-body">
 							<form id="form__createAccount" class="">
