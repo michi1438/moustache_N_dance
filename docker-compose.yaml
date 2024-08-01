@@ -1,0 +1,65 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    docker-compose.yaml                                :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
+#    Updated: 2024/07/18 15:06:23 by lzito            ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+version: '3.3'
+services:
+
+  nginx:
+      container_name: nginx
+      build:
+        context: ./nginx/
+        dockerfile: Dockerfile
+      restart: unless-stopped
+      ports:
+        - 80:80
+        - 443:443
+      networks:
+        - ft_transcendence
+      env_file: .env
+      volumes:
+        - ./frontend/:/var/www/frontend/
+        # - ./backend/staticfiles/:/var/www/backend/staticfiles/
+
+  # postgres:
+  #   container_name: postgres
+  #   env_file: "./backend/.env"
+  #   image: postgres:16.3-alpine
+  #   volumes:
+  #     - db_vol:/var/lib/postgresql/data
+  #   networks:
+  #     - backend_nw
+  #   restart: on-failure
+
+  # django:
+  #   container_name: django 
+  #   env_file: "./backend/.env"
+  #   build: backend/django/
+  #   networks:
+  #     - backend_nw
+  #   ports:
+  #     - "8000:8000"
+  #   restart: on-failure
+  #   depends_on:
+  #     - postgres
+
+networks:
+  ft_transcendence:
+        driver: bridge
+  # backend_nw:
+
+# volumes:
+#   db_vol:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/$USER/data/db
