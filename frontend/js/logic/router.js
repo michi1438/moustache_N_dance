@@ -31,7 +31,7 @@ import handleIndex from "./index.js"
 */
 const routes = {
 	"index": {
-		title: "Main",
+		title: "Moustache & Dance",
 		path: "/",
 		view: handleIndex.renderIndex,
 		// load: handleIndex.loadIndex,

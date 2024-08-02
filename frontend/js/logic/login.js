@@ -22,6 +22,13 @@ async function connectUser(loginForm) {
 		return;
 	}
 
+	document.getElementById("login").textContent = "Logout";
+	document.getElementById("login").value = "logout";
+	var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
+	await modal.hide();
+	router("index");
+	document.getElementById("welcometxt").textContent = "Welcome " + input.username.value;
+
 	// const init = {
 	// 	method: 'POST',
 	// 	headers: {'Content-Type': 'application/json'},
@@ -87,7 +94,6 @@ async function createUser(createAccountForm) {
 
 	const usernameRegex = /^[a-zA-Z0-9@./+\-_]{1,150}$/g;
 	if (!input.username.value.match(usernameRegex)){
-		console.log("regex is false");
 		document.getElementById("form__createAccount--msg").textContent = "Invalid username";
 		document.getElementById("form__createAccount--msg").classList.add("text-danger");
 		return;
@@ -111,6 +117,12 @@ async function createUser(createAccountForm) {
 		password: input.password_one.value,
 		email: input.email.value,
 	};
+	
+	//TO DELETE !
+	console.log('User created with following credentials:');
+	console.log('Username:', inputValues.username);
+	console.log('Email:', inputValues.email);
+	console.log('Password:', inputValues.password);
 
 	// const init = {
 	// 	method: 'POST',

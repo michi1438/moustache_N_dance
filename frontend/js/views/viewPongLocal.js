@@ -18,9 +18,7 @@ export default function renderPongLocal() {
 				</div>
 				<div id="board_two">
 				</div>
-				
 			</div>
-			
 		</div>
 
 	`;
