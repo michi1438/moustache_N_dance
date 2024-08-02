@@ -12,23 +12,28 @@ mv /mysite2/* mysite/
 
 echo -n "pwd = "
 pwd
+echo -n "ls -la = "
+ls -la
 
+
+echo "Create APP=================="
 python3 manage.py startapp players
 python3 manage.py startapp pong
+echo "============================"
 
 mv /players ./players
 mv /pong ./pong
 
-echo "Create migrations"
+echo "Create migrations==========="
 python3 manage.py makemigrations
 python3 manage.py makemigrations players
 echo "============================"
 
-echo "Migrate"
+echo "Migrate====================="
 python3 manage.py migrate
 echo "============================"
 
-echo "Create Super User"
+echo "Create Super User==========="
 python3 manage.py createsuperuser --email=admin@admin.com --noinput
 echo "============================"
 

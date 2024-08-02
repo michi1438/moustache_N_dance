@@ -5,7 +5,7 @@ class User(models.Model):
     """A typical class defining a model, derived from the Model class."""
 
     # Fields
-    username = models.CharField(max_length=20, help_text='Enter Username')
+    username = models.CharField(max_length=20, help_text='Enter Username', primary_key=True)
     password = models.CharField(max_length=20, help_text='Enter Password')
     email = models.CharField(max_length=40, help_text='Enter Email')
     # …
