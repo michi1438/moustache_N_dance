@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+import { v4 as uuidv4 } from 'uuid';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -372,10 +372,11 @@ function initGameSimpson () {
     else {
         vitesse = false;
     }
+    console.log("Connected players:", connectedPlayers);
     let checkReadyInterval = setInterval(() => {
-        if (isModelLoaded && isConfigReady) {
+        if (connectedPlayers > 1 && isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
-            connectWebSocket();
+            //connectWebSocket();
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -542,13 +543,15 @@ function startGame(config) {
     //console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
+    connectWebSocket();
     window.startGame(config);
 }
 
 
-
+let gameID = uuidv4();
 let ws;
 let playerNumber;
+let connectedPlayers = 0;
 
 function connectWebSocket() {
     if (ws) {
@@ -565,6 +568,10 @@ function connectWebSocket() {
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
+            if (message.type === 'player') {
+                gameID = message.gameID; // Store the received gameID
+                console.log('Received gameID from server:', gameID);
+            }
             handleWebSocketMessage(message);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
@@ -581,7 +588,6 @@ function connectWebSocket() {
     };
 }
 
-let connectedPlayers = 0;
 
 function handleWebSocketMessage(message) {
     console.log('Message reçu:', message);
@@ -605,6 +611,11 @@ function handleWebSocketMessage(message) {
         playerNumber = message.playerNumber;
         connectedPlayers++;
             break;
+        case 'join':
+            if (message.gameID !== gameID) {
+                console.warn('Mismatched game ID', message.gameID, gameID);
+                ws.close();
+            }
         default:
             console.warn('Unhandled message type:', message.type);
     }
