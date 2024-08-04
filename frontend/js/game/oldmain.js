@@ -136,8 +136,6 @@ function initGame () {
 }
 
 function initGameSimpson () {
-    ws = new WebSocket('ws://localhost:3000');
-    ws.onmessage = (event) => handleWebSocketMessage(JSON.parse(event.data));
     console.log("Initializing game...");
     //Camera
         camera.position.set(0, 30, 20);
@@ -377,7 +375,6 @@ function initGameSimpson () {
     let checkReadyInterval = setInterval(() => {
         if (isModelLoaded && isConfigReady) {
             console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
-            connectWebSocket();
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -500,7 +497,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
-function listenerPongOnline() {
+function listenerPongLocal() {
 	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
@@ -526,7 +523,7 @@ function selectOption(option) {
     
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        listenerPongOnline();
+        listenerPongLocal();
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
@@ -544,111 +541,7 @@ function startGame(config) {
 }
 
 
-
-let ws;
-let playerNumber;
-
-function connectWebSocket() {
-    if (ws) {
-        console.log('WebSocket already connected');
-        return;
-    }
-
-    ws = new WebSocket('ws://localhost:3000');
-
-    ws.onopen = () => {
-        console.log('WebSocket connection opened');
-    };
-
-    ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleWebSocketMessage(message);
-    };
-
-    ws.onclose = () => {
-        console.log('WebSocket connection closed');
-        ws = null;
-    };
-
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
-}
-
-function handleWebSocketMessage(message) {
-    switch (message.type) {
-        case 'paddle':
-            if (message.player === 1) {
-                paddle1.position.z = message.position;
-            } else if (message.player === 2) {
-                paddle2.position.z = message.position;
-            }
-            break;
-        case 'score':
-            scoreP1 = message.scoreP1;
-            scoreP2 = message.scoreP2;
-            updateScoreDisplay();
-            break;
-        case 'gameOver':
-            handleGameOver(message.winner);
-            break;
-        case 'player': // Ajoutez ce cas pour gérer le type de message 'player'
-            playerNumber = message.playerNumber;
-            break;
-        default:
-            console.warn('Unhandled message type:', message.type);
-    }
-}
-
-function updateScoreDisplay() {
-    // Mettre à jour l'affichage du score ici
-    console.log('Score:', scoreP1, '-', scoreP2);
-}
-
-function handleGameOver(winner) {
-    // Gérer la fin de la partie ici
-    console.log('Game over! Winner:', winner);
-}
-
-document.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-    if(keys['a'] || keys['q'])
-        sendPaddlePosition(1);
-    else if(keys['o'] || keys['l'])
-        sendPaddlePosition(2);
-});
-
-document.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-    if(keys['a'] || keys['q'])
-        sendPaddlePosition(1);
-    else if(keys['o'] || keys['l'])
-        sendPaddlePosition(2);
-    
-});
-
-function sendPaddlePosition(playerNumber) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        let position;
-        if (playerNumber === 1) {
-            position = paddle1.position.z;
-        } else if (playerNumber === 2) {
-            position = paddle2.position.z;
-        }
-        
-        const message = {
-            type: 'paddle',
-            player: playerNumber,
-            position: position
-        };
-        
-        ws.send(JSON.stringify(message));
-        console.log('Sending paddle position:', message);
-    }
-}
-
-
 export default {
-    listenerPongOnline,
-    // loadPongLocal
+	listenerPongLocal,
+	// loadPongLocal
 };
