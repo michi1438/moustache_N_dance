@@ -11,11 +11,16 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify({ type: 'player', player: players.length }));
 
         ws.on('message', (message) => {
-            players.forEach((player) => {
-                if (player !== ws) {
-                    player.send(message);
-                }
-            });
+            try {
+                const parsedMessage = JSON.parse(message);
+                players.forEach((player) => {
+                    if (player !== ws) {
+                        player.send(JSON.stringify(parsedMessage));
+                    }
+                });
+            } catch (error) {
+                console.error('Invalid JSON received:', message);
+            }
         });
 
         ws.on('close', () => {

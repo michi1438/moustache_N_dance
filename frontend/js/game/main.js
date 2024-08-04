@@ -136,8 +136,6 @@ function initGame () {
 }
 
 function initGameSimpson () {
-    ws = new WebSocket('ws://localhost:3000');
-    ws.onmessage = (event) => handleWebSocketMessage(JSON.parse(event.data));
     console.log("Initializing game...");
     //Camera
         camera.position.set(0, 30, 20);
@@ -537,6 +535,10 @@ function selectOption(option) {
 }
 
 function startGame(config) {
+    // if (connectedPlayers < 2) {
+    //     console.log('Waiting for more players to connect...');
+    //     return;
+    // }
     console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
@@ -561,8 +563,12 @@ function connectWebSocket() {
     };
 
     ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleWebSocketMessage(message);
+        try {
+            const message = JSON.parse(event.data);
+            handleWebSocketMessage(message);
+        } catch (error) {
+            console.error('Invalid JSON:', event.data);
+        }
     };
 
     ws.onclose = () => {
@@ -574,6 +580,8 @@ function connectWebSocket() {
         console.error('WebSocket error:', error);
     };
 }
+
+let connectedPlayers = 0;
 
 function handleWebSocketMessage(message) {
     switch (message.type) {
@@ -593,7 +601,8 @@ function handleWebSocketMessage(message) {
             handleGameOver(message.winner);
             break;
         case 'player': // Ajoutez ce cas pour gérer le type de message 'player'
-            playerNumber = message.playerNumber;
+        playerNumber = message.playerNumber;
+        connectedPlayers++;
             break;
         default:
             console.warn('Unhandled message type:', message.type);
