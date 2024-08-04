@@ -18,13 +18,13 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
 function initGame () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
 //Camera
     camera.position.set(0, 30, 20);
     controls.update();
     camera.lookAt(0, 0, 0);
 
-    console.log(scene);
+    //console.log(scene);
 
 //Lights & shadows
     renderer.shadowMap.enabled = true;
@@ -132,17 +132,17 @@ function initGame () {
     p1WIN.visible = false;
     p2WIN.visible = false;
     isConfigReady = true;
-    console.log("isConfigReady set to true");
+    //console.log("isConfigReady set to true");
 }
 
 function initGameSimpson () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
     //Camera
         camera.position.set(0, 30, 20);
         controls.update();
         camera.lookAt(0, 0, 0);
     
-        console.log(scene);
+        //console.log(scene);
     
     //Lights & shadows
         renderer.shadowMap.enabled = true;
@@ -251,7 +251,7 @@ function initGameSimpson () {
         p1WIN.visible = false;
         p2WIN.visible = false;
         isConfigReady = true;
-        console.log("isConfigReady set to true");
+        //console.log("isConfigReady set to true");
     }
 
     window.startGame = function(config) {
@@ -286,7 +286,7 @@ function initGameSimpson () {
                     scoreP2object.push(gltf.scene.getObjectByName('4_R'));
                     scoreP2object.push(gltf.scene.getObjectByName('5_R'));
                     isModelLoaded = true;
-                    console.log("isModelLoaded set to true");
+                    //console.log("isModelLoaded set to true");
                     resolve();
                 }, undefined, function(error) {
                     console.error(error);
@@ -303,7 +303,7 @@ function initGameSimpson () {
         modelPath = '/frontend/js/game/models/modelMoustache.glb';
         new Promise((resolve, reject) => {
             loader.load(modelPath, function(gltf) {
-            console.log("Model loaded:", gltf);
+            //console.log("Model loaded:", gltf);
                 scene.add(gltf.scene);
         
             plane = gltf.scene.getObjectByName('Plane');
@@ -330,7 +330,7 @@ function initGameSimpson () {
             scoreP2object.push(gltf.scene.getObjectByName('4_R'));
             scoreP2object.push(gltf.scene.getObjectByName('5_R'));
             isModelLoaded = true;
-            console.log("isModelLoaded set to true");
+            //console.log("isModelLoaded set to true");
             resolve();
             }, undefined, function(error) {
                 console.error(error);
@@ -364,7 +364,7 @@ function initGameSimpson () {
             }, 1000);
         }
     }, 1000)
-    console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
+    //console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
         vitesse = true;
@@ -374,7 +374,7 @@ function initGameSimpson () {
     }
     let checkReadyInterval = setInterval(() => {
         if (isModelLoaded && isConfigReady) {
-            console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
+            //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             connectWebSocket();
             animate(vitesse);
             sound.play();
@@ -528,7 +528,7 @@ function selectOption(option) {
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
-        console.log('Configuration:', configuration);
+        //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
         startGame(configuration);
     }
@@ -539,7 +539,7 @@ function startGame(config) {
     //     console.log('Waiting for more players to connect...');
     //     return;
     // }
-    console.log('Starting game with configuration:', config);
+    //console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
     window.startGame(config);
@@ -584,6 +584,7 @@ function connectWebSocket() {
 let connectedPlayers = 0;
 
 function handleWebSocketMessage(message) {
+    console.log('Message reçu:', message);
     switch (message.type) {
         case 'paddle':
             if (message.player === 1) {

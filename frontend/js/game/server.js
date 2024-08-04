@@ -11,16 +11,11 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify({ type: 'player', player: players.length }));
 
         ws.on('message', (message) => {
-            try {
-                const parsedMessage = JSON.parse(message);
                 players.forEach((player) => {
                     if (player !== ws) {
-                        player.send(JSON.stringify(parsedMessage));
+                        player.send(JSON.stringify(message));
                     }
                 });
-            } catch (error) {
-                console.error('Invalid JSON received:', message);
-            }
         });
 
         ws.on('close', () => {
@@ -28,7 +23,6 @@ wss.on('connection', (ws) => {
         });
     } else {
         ws.send(JSON.stringify({ type: 'error', message: 'Game is full' }));
-        console.log(message);
         ws.close();
     }
 });
