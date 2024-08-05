@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/30 11:42:13 by mguerga          ###   ########.fr        #
+#    Updated: 2024/08/05 13:02:56 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,11 +29,20 @@ services:
     build: backend/django/
     networks:
       - backend_nw
-    ports:
-      - "8000:8000"
     restart: on-failure
     depends_on:
       - postgres
+
+  nginx:
+    container_name: nginx 
+    build: backend/nginx/
+    networks:
+      - backend_nw
+    ports:
+      - "443:443"
+    restart: on-failure
+    depends_on:
+      - django 
 
 networks:
   backend_nw:

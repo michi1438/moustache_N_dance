@@ -1,29 +1,21 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Dockerfile                                         :+:      :+:    :+:    #
+#    dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/02 18:14:18 by mguerga          ###   ########.fr        #
+#    Created: 2024/08/02 18:05:59 by mguerga           #+#    #+#              #
+#    Updated: 2024/08/05 12:16:29 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM python:3.12-slim
+FROM nginx:1.27.0-alpine 
 
-ENV	PYTHONUNBUFFERED 1
+COPY create_certs.sh /.
 
-COPY requirements.txt .
-COPY ./mysite /mysite2
-COPY ./players /players
-COPY ./pong /pong
+RUN apk add --no-cache openssl && \
+	rm /etc/nginx/conf.d/default.conf && \
+	sh /create_certs.sh	
 
-RUN apt-get update && \
-	apt-get install wait-for-it && \
-	pip install --upgrade pip && \
-	pip install --no-cache-dir -r requirements.txt
-
-EXPOSE 8001
-
-CMD ["bash","/mysite2/django_init.sh"]
+COPY nginx.conf /etc/nginx/conf.d/

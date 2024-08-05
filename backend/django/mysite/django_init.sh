@@ -37,5 +37,8 @@ echo "Create Super User==========="
 python3 manage.py createsuperuser --email=admin@admin.com --noinput
 echo "============================"
 
-echo "Start server"
-python3 manage.py runserver 0.0.0.0:8000
+echo "Start WSGI-gunicorn"
+gunicorn --preload --proxy-protocol mysite.wsgi:application -b 0.0.0.0:8001
+
+#echo "Start server"
+#python3 manage.py runserver 0.0.0.0:8001

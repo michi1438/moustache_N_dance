@@ -94,8 +94,8 @@ TEMPLATES = [
 LOGIN_URL = 'players/login'
                                                                                                                                                                                                                   
 WSGI_APPLICATION = 'mysite.wsgi.application'                                                                                                                                                                      
-                                                                                                                                                                                                                  
-                                                                                                                                                                                                                  
+CSRF_TRUSTED_ORIGINS = ["https://mysite"]                                                                                                                                                                                                                  
+
 # Database                                                                                                                                                                                                        
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases                                                                                                                                                   
                                                                                                                                                                                                                   
