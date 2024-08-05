@@ -13,6 +13,7 @@ import renderUserInfo from "../views/viewUserInfo.js"
 //import handleXX from "./XX.js"
 import handlePongLocal from "../game/main.js"
 import handleLogin from "./login.js"
+import handleUserInfo from "./userinfo.js"
 
 // Cas particulier pour index
 import handleIndex from "./index.js"
@@ -91,7 +92,7 @@ const routes = {
 		path: "/userinfo/",
 		view: renderUserInfo,
 		// load: handleUserInfo.loadUserInfo,
-		// listener: handleUserInfo.listenerUserInfo
+		listener: handleUserInfo.listenerUserInfo
 	},
 
 };
