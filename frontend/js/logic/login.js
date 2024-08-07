@@ -27,7 +27,7 @@ async function connectUser(loginForm) {
 	var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
 	await modal.hide();
 	router("index");
-	document.getElementById("welcometxt").textContent = "Welcome " + input.username.value;
+	document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 
 	// const init = {
 	// 	method: 'POST',
@@ -120,9 +120,9 @@ async function createUser(createAccountForm) {
 	
 	//TO DELETE !
 	console.log('User created with following credentials:');
-	console.log('Username:', inputValues.username);
-	console.log('Email:', inputValues.email);
-	console.log('Password:', inputValues.password);
+	sessionStorage.setItem("username", inputValues.username);
+	sessionStorage.setItem("email", inputValues.email);
+	sessionStorage.setItem("password", inputValues.password);
 
 	// const init = {
 	// 	method: 'POST',

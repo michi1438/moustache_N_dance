@@ -15,6 +15,8 @@ function renderIndex() {
 
 function listenerIndex() {
 
+	document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username"); //TO DELETE !
+
 };
 
 // async function loadIndex()
