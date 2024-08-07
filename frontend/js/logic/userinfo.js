@@ -264,8 +264,8 @@ async function updateAvatar() {
 	msgElement.classList.remove("text-danger");
 	msgElement.classList.remove("text-info");
 
-	sessionStorage.setItem("avatar", document.getElementById("form__update--avatar--input").files[0]);
-	sessionStorage.setItem("avatar2", "/frontend/img/avatar.png"); //to delete
+	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__update--avatar--input").files[0]));
+
 
 	// 		msgElement.textContent = "Ton nouvel avatar à été sauvegardé.";
 	// 		msgElement.classList.remove("text-danger");
