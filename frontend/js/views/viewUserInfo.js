@@ -26,11 +26,11 @@ export default function renderUserInfo() {
 								<button type="button" class="col-1 btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">X</button>
 							</div>
 							<div class="modal-body">
-								<form id="form__update--avatar">
-									<div id="form__update--avatar--msg" class=""></div>
-									<input type="file" class="input__field text-dark border" id="form__update--avatar--input" name="avatar">
+								<form id="form__updateAvatar">
+									<div id="form__updateAvatar--msg" class=""></div>
+									<input type="file" class="input__field text-dark border" id="form__updateAvatar--input" name="avatar">
 									<br>
-									<button class="btn btn-dark mt-1" type="submit" id="form__update--avatar--btn">
+									<button class="btn btn-dark mt-1" type="submit" id="form__updateAvatar--btn">
 										Change
 									</button>
 								</form>

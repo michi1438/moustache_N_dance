@@ -9,7 +9,7 @@ async function updateNickname(nicknameForm) {
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
-	msgElement.classList.remove("text-info");
+	msgElement.classList.remove("text-success");
 
 	const input = nicknameForm.elements;
 
@@ -20,13 +20,10 @@ async function updateNickname(nicknameForm) {
 		return;
 	}
 
-	sessionStorage.setItem("nickname", input.nickname.value);
-
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
-
-	// 		window.location.reload();
+	sessionStorage.setItem("nickname", input.nickname.value); // TO DELETE AFTER BACKEND !
+	msgElement.textContent = "Nickname changed"; // TO DELETE AFTER BACKEND !
+	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
+	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	// const init = {
 	// 	method: 'PATCH',
@@ -57,9 +54,9 @@ async function updateNickname(nicknameForm) {
 
 	// 		sessionStorage.setItem("nickname", data.nickname);
 
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
+	// 		msgElement.textContent = "Nickname changed";
 	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
+	// 		msgElement.classList.add("text-success");
 
 	// 		window.location.reload();
 	// 	}
@@ -76,7 +73,7 @@ async function updateUsername(usernameForm) {
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
-	msgElement.classList.remove("text-info");
+	msgElement.classList.remove("text-success");
 
 	const input = usernameForm.elements;
 
@@ -87,13 +84,10 @@ async function updateUsername(usernameForm) {
 		return;
 	}
 
-	sessionStorage.setItem("username", input.username.value);
-
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
-
-	// 		window.location.reload();
+	sessionStorage.setItem("username", input.username.value); // TO DELETE AFTER BACKEND !
+	msgElement.textContent = "Username changed"; // TO DELETE AFTER BACKEND !
+	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
+	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	// const init = {
 	// 	method: 'PATCH',
@@ -101,7 +95,7 @@ async function updateUsername(usernameForm) {
 	// 		'Content-Type': 'application/json',
 	// 		'X-CSRFToken': csrftoken,
 	// 	},
-	// 	body: JSON.stringify({nickname: input.nickname.value}),
+	// 	body: JSON.stringify({username: input.username.value}),
 	// };
 
 	// try {
@@ -122,11 +116,11 @@ async function updateUsername(usernameForm) {
 	// 	if (response.status === 200) {
 	// 		const data = await response.json();
 
-	// 		sessionStorage.setItem("nickname", data.nickname);
+	// 		sessionStorage.setItem("username", data.username);
 
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
+	// 		msgElement.textContent = "Username changed";
 	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
+	// 		msgElement.classList.add("text-success");
 
 	// 		window.location.reload();
 	// 	}
@@ -143,7 +137,7 @@ async function updateEmail(emailForm) {
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
-	msgElement.classList.remove("text-info");
+	msgElement.classList.remove("text-success");
 
 	const input = emailForm.elements;
 
@@ -153,13 +147,10 @@ async function updateEmail(emailForm) {
 		return;
 	}
 
-	sessionStorage.setItem("email", input.email.value);
-
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
-
-	// 		window.location.reload();
+	sessionStorage.setItem("email", input.email.value); // TO DELETE AFTER BACKEND !
+	msgElement.textContent = "Email changed"; // TO DELETE AFTER BACKEND !
+	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
+	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	// const init = {
 	// 	method: 'PATCH',
@@ -167,7 +158,7 @@ async function updateEmail(emailForm) {
 	// 		'Content-Type': 'application/json',
 	// 		'X-CSRFToken': csrftoken,
 	// 	},
-	// 	body: JSON.stringify({nickname: input.nickname.value}),
+	// 	body: JSON.stringify({email: input.email.value}),
 	// };
 
 	// try {
@@ -188,11 +179,11 @@ async function updateEmail(emailForm) {
 	// 	if (response.status === 200) {
 	// 		const data = await response.json();
 
-	// 		sessionStorage.setItem("nickname", data.nickname);
+	// 		sessionStorage.setItem("email", data.email);
 
-	// 		msgElement.textContent = "Ton nouveau nickname à été sauvegardé.";
+	// 		msgElement.textContent = "Email changed";
 	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
+	// 		msgElement.classList.add("text-success");
 
 	// 		window.location.reload();
 	// 	}
@@ -210,7 +201,7 @@ async function updatePassword(passwordForm) {
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
-	msgElement.classList.remove("text-info");
+	msgElement.classList.remove("text-success");
 
 	if (input["password_one"].value !== input["password_two"].value || !input.password_one.value) {
 		msgElement.textContent = "Password not confirmed";
@@ -219,7 +210,10 @@ async function updatePassword(passwordForm) {
 		return;
 	}
 
-	sessionStorage.setItem("password", input.password_one.value);
+	sessionStorage.setItem("password", input.password_one.value); // TO DELETE AFTER BACKEND !
+	msgElement.textContent = "Password changed"; // TO DELETE AFTER BACKEND !
+	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
+	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	// const init = {
 	// 	method: 'PATCH',
@@ -246,9 +240,9 @@ async function updatePassword(passwordForm) {
 	// 	if (response.status === 200) {
 	// 		const data = await response.json();
 
-	// 		msgElement.textContent = "Ton nouveau mot de passe à été sauvegardé.";
+	// 		msgElement.textContent = "Password changed";
 	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
+	// 		msgElement.classList.add("text-success");
 	// 	}
 	// } catch (e) {
 	// 	console.error(e);
@@ -257,21 +251,17 @@ async function updatePassword(passwordForm) {
 
 async function updateAvatar() {
 
-	const msgElement = document.getElementById("form__update--avatar--msg");
+	const msgElement = document.getElementById("form__updateAvatar--msg");
 
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
-	msgElement.classList.remove("text-info");
+	msgElement.classList.remove("text-success");
 
-	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__update--avatar--input").files[0]));
-
-
-	// 		msgElement.textContent = "Ton nouvel avatar à été sauvegardé.";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
-
-			// window.location.reload();
+	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); // TO DELETE AFTER BACKEND !
+	msgElement.textContent = "Avatar changed"; // TO DELETE AFTER BACKEND !
+	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
+	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	// const init = {
 	// 	method: 'PATCH',
@@ -299,9 +289,9 @@ async function updateAvatar() {
 
 	// 		sessionStorage.setItem("avatar", data.avatar);
 
-	// 		msgElement.textContent = "Ton nouvel avatar à été sauvegardé.";
+	// 		msgElement.textContent = "Avatar changed";
 	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-info");
+	// 		msgElement.classList.add("text-success");
 
 	// 		window.location.reload();
 	// 	}
@@ -313,7 +303,7 @@ async function updateAvatar() {
 function listenerUserInfo() {
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
-		sessionStorage.getItem("avatar") : "/frontend/img/avatar.png"; //to change to "avatar"
+		sessionStorage.getItem("avatar") : "/frontend/img/avatar.png";
 	document.getElementById("update__username--big").textContent = sessionStorage.getItem("username");
 	document.getElementById("update__nickname--big").textContent = sessionStorage.getItem("nickname");
 	document.getElementById("update__email--big").textContent = sessionStorage.getItem("email");
@@ -321,8 +311,45 @@ function listenerUserInfo() {
 	const nicknameForm = document.getElementById("form__updateNickname");
 	const usernameForm = document.getElementById("form__updateUsername");
 	const passwordForm = document.getElementById("form__updatePassword");
-	const avatarForm = document.getElementById("form__update--avatar");
+	const avatarForm = document.getElementById("form__updateAvatar");
 	const emailForm = document.getElementById("form__updateEmail");
+
+	// Reset all fields (input and error) from the form when the modal pass to hidden
+	document.getElementById("modal__updateAvatar").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		avatarForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__updateAvatar--msg").textContent = "";
+		});
+		});
+	document.getElementById("modal__updateNickname").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		nicknameForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__updateNickname--msg").textContent = "";
+		});
+		});
+	document.getElementById("modal__updateUsername").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		usernameForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__updateUsername--msg").textContent = "";
+		});
+			});
+	document.getElementById("modal__updateEmail").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		emailForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__updateEmail--msg").textContent = "";
+		});
+			});
+	document.getElementById("modal__updatePassword").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		passwordForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__updatePassword--msg").textContent = "";
+		});
+			});
 
 	nicknameForm.addEventListener("submit", e => {
 		e.preventDefault();
