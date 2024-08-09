@@ -1,8 +1,7 @@
 # Utiliser une image Node.js comme base
 FROM node:14
 
-# Créer le répertoire de travail
-WORKDIR /usr/src/app
+
 
 # Copier les fichiers package.json et package-lock.json
 COPY package*.json ./

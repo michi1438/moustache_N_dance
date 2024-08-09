@@ -41,6 +41,8 @@ services:
       - ft_transcendence
     volumes:
       - ssl-certs:/etc/nginx/ssl
+    depends_on:
+      - nginx
     
   # postgres:
   #   container_name: postgres
