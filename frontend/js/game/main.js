@@ -559,7 +559,7 @@ function connectWebSocket() {
         return;
     }
 
-    ws = new WebSocket('ws://localhost:3000');
+    ws = new WebSocket('wss://localhost:3000');
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
@@ -585,6 +585,7 @@ function connectWebSocket() {
 
     ws.onerror = (error) => {
         console.error('WebSocket error:', error);
+        alert('WebSocket connection failed. Please check the server status.');
     };
 }
 

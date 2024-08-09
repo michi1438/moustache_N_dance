@@ -10,9 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
-version: '3.3'
+# version: '3.3'
 services:
-
   nginx:
       container_name: nginx
       build:
@@ -28,7 +27,21 @@ services:
       volumes:
         - ./frontend/:/var/www/frontend/
         # - ./backend/staticfiles/:/var/www/backend/staticfiles/
+        - ssl-certs:/etc/nginx/ssl
 
+  game:
+    container_name: game
+    build:
+      context: ./frontend/js/game/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    networks:
+      - ft_transcendence
+    volumes:
+      - ssl-certs:/etc/nginx/ssl
+    
   # postgres:
   #   container_name: postgres
   #   env_file: "./backend/.env"
@@ -55,6 +68,9 @@ networks:
   ft_transcendence:
         driver: bridge
   # backend_nw:
+volumes:
+  ssl-certs:
+    driver: local
 
 # volumes:
 #   db_vol:
