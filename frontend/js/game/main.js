@@ -17,6 +17,11 @@ let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
+let gameID = uuidv4();
+let ws;
+let playerNumber;
+let connectedPlayers = 0;
+
 function initGame () {
     //console.log("Initializing game...");
 //Camera
@@ -350,20 +355,8 @@ function initGameSimpson () {
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
     countdownDisplay.id = 'countdownDisplay';
-    
-    let countdownInterval = setInterval(() => {
-        countdownDisplay.innerText = countdown;
-        countdown--;
-        
-        if (countdown < 0) {
-            countdownDisplay.innerText = 'GO';
-            clearInterval(countdownInterval);
-            setTimeout(() => {
-                countdownDisplay.remove();
-                go = true;
-            }, 1000);
-        }
-    }, 1000)
+ 
+
     //console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
@@ -372,11 +365,24 @@ function initGameSimpson () {
     else {
         vitesse = false;
     }
-    console.log("Connected players:", connectedPlayers);
+    //console.log("Connected players:", connectedPlayers);
     let checkReadyInterval = setInterval(() => {
         if (connectedPlayers > 1 && isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocket();
+            let countdownInterval = setInterval(() => {
+                countdownDisplay.innerText = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    countdownDisplay.innerText = 'GO';
+                    clearInterval(countdownInterval);
+                    setTimeout(() => {
+                        countdownDisplay.remove();
+                        go = true;
+                    }, 1000);
+                }
+            }, 1000);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -471,15 +477,6 @@ function animate(vitesse) {
     renderer.render(scene, camera);
 }
 
-let keys = {};
-
-document.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-});
-
-document.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-});
 
 const questions = [
     {
@@ -548,10 +545,7 @@ function startGame(config) {
 }
 
 
-let gameID = uuidv4();
-let ws;
-let playerNumber;
-let connectedPlayers = 0;
+
 
 function connectWebSocket() {
     if (ws) {
@@ -593,11 +587,20 @@ function connectWebSocket() {
 function handleWebSocketMessage(message) {
     console.log('Message reçu:', message);
     switch (message.type) {
+        case 'clientCount':
+            //console.log('Connected clients:', message.count);
+            connectedPlayers = message.count;
+            break;
+        case 'player': // Ajoutez ce cas pour gérer le type de message 'player'
+        playerNumber = message.playerNumber;
+            break;
         case 'paddle':
             if (message.player === 1) {
                 paddle1.position.z = message.position;
+                //console.log('Position paddle1:', paddle1.position.z);
             } else if (message.player === 2) {
                 paddle2.position.z = message.position;
+                //console.log('Position paddle2:', paddle2.position.z);
             }
             break;
         case 'score':
@@ -607,10 +610,6 @@ function handleWebSocketMessage(message) {
             break;
         case 'gameOver':
             handleGameOver(message.winner);
-            break;
-        case 'player': // Ajoutez ce cas pour gérer le type de message 'player'
-        playerNumber = message.playerNumber;
-        connectedPlayers++;
             break;
         case 'join':
             if (message.gameID !== gameID) {
@@ -631,6 +630,8 @@ function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
 }
+
+let keys = {};
 
 document.addEventListener('keydown', (event) => {
     keys[event.key] = true;
@@ -666,6 +667,9 @@ function sendPaddlePosition(playerNumber) {
         
         ws.send(JSON.stringify(message));
         console.log('Sending paddle position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    
     }
 }
 

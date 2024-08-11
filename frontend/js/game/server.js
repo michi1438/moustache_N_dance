@@ -22,9 +22,13 @@ wss.on('connection', (ws) => {
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
+            broadcast(ws, data);
             switch (data.type) {
                 case 'join':
                     ws.gameID = data.gameID;
+                    break;
+                case 'paddle':
+                    console.log('Paddle message reçu:', data); // Ajoutez ce log pour vérifier les messages de type 'paddle'
                     break;
                 // Handle other message types
             }
@@ -33,11 +37,29 @@ wss.on('connection', (ws) => {
         ws.on('close', () => {
             players = players.filter((player) => player !== ws);
         });
+
+        // Vérifiez si le nombre de clients connectés est égal à 2
+        if (wss.clients.size === 2) {
+            const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            });
+        }
     } else {
         ws.send(JSON.stringify({ type: 'error', message: 'Game is full' }));
         ws.close();
     }
 });
+
+function broadcast(sender, message) {
+    wss.clients.forEach(client => {
+        if (client !== sender && client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(message));
+        }
+    });
+}
 
 server.listen(3000, () => {
     console.log('WebSocket server is running on wss://localhost:3000');
