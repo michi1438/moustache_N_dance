@@ -23,15 +23,6 @@ wss.on('connection', (ws) => {
         ws.on('message', (message) => {
             const data = JSON.parse(message);
             broadcast(ws, data);
-            switch (data.type) {
-                case 'join':
-                    ws.gameID = data.gameID;
-                    break;
-                case 'paddle':
-                    console.log('Paddle message reçu:', data); // Ajoutez ce log pour vérifier les messages de type 'paddle'
-                    break;
-                // Handle other message types
-            }
         });
 
         ws.on('close', () => {

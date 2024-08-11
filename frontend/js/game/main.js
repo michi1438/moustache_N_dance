@@ -383,6 +383,7 @@ function initGameSimpson () {
                     }, 1000);
                 }
             }, 1000);
+            console.log("playerNumber:", playerNumber);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -459,17 +460,21 @@ function animate(vitesse) {
         }
         //gestion des paddles
         if (paddle1 && paddle2) {
-            if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle2.position.z -= paddleSpeed;
-            } 
-            if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle2.position.z += paddleSpeed;
-            } 
-            if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle1.position.z -= paddleSpeed;
-            } 
-            if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle1.position.z += paddleSpeed;
+            if(playerNumber == 2) {
+                if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle2.position.z -= paddleSpeed;
+                } 
+                if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle2.position.z += paddleSpeed;
+                } 
+            }
+            if(playerNumber == 1) {
+                if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle1.position.z -= paddleSpeed;
+                } 
+                if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle1.position.z += paddleSpeed;
+                }
             }
         }
     }
@@ -581,6 +586,8 @@ function connectWebSocket() {
         console.error('WebSocket error:', error);
         alert('WebSocket connection failed. Please check the server status.');
     };
+
+    setInterval(sendBallPosition, 100);
 }
 
 
@@ -591,8 +598,8 @@ function handleWebSocketMessage(message) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'player': // Ajoutez ce cas pour gérer le type de message 'player'
-        playerNumber = message.playerNumber;
+        case 'player': 
+            playerNumber = message.player;
             break;
         case 'paddle':
             if (message.player === 1) {
@@ -602,6 +609,12 @@ function handleWebSocketMessage(message) {
                 paddle2.position.z = message.position;
                 //console.log('Position paddle2:', paddle2.position.z);
             }
+            break;
+        case 'ball':
+            ball.position.x = message.position.x;
+            ball.position.z = message.position.z;
+            ballSpeed.x = message.speed.x;
+            ballSpeed.z = message.speed.z;
             break;
         case 'score':
             scoreP1 = message.scoreP1;
@@ -670,6 +683,21 @@ function sendPaddlePosition(playerNumber) {
     } else {
         console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     
+    }
+}
+
+function sendBallPosition() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'ball',
+            position: { x: ball.position.x, z: ball.position.z },
+            speed: { x: ballSpeed.x, z: ballSpeed.z }
+        };
+        
+        ws.send(JSON.stringify(message));
+        console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     }
 }
 
