@@ -399,6 +399,12 @@ function animate(vitesse) {
         if(go) {
             ball.position.x += ballSpeed.x;
             ball.position.z += ballSpeed.z;
+            if(playerNumber == 1){
+                setInterval(sendPaddlePosition(1), 100);
+                setInterval(sendBallPosition, 100);
+            } else {
+                setInterval(sendPaddlePosition(2), 100);
+            }
         }
         //collision murs
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
@@ -587,12 +593,17 @@ function connectWebSocket() {
         alert('WebSocket connection failed. Please check the server status.');
     };
 
-    setInterval(sendBallPosition, 100);
+    
 }
 
 
 function handleWebSocketMessage(message) {
-    console.log('Message reçu:', message);
+    //console.log('Message reçu:', message);
+    const now = Date.now();
+    const delay = now - message.timestamp;
+    if (delay > 100) { // Seuil de délai en millisecondes
+        ws.send(JSON.stringify({ type: 'sync', delay }));
+    }
     switch (message.type) {
         case 'clientCount':
             //console.log('Connected clients:', message.count);
@@ -616,11 +627,17 @@ function handleWebSocketMessage(message) {
             ballSpeed.x = message.speed.x;
             ballSpeed.z = message.speed.z;
             break;
-        case 'score':
-            scoreP1 = message.scoreP1;
-            scoreP2 = message.scoreP2;
-            updateScoreDisplay();
+        case 'adjustDelay':
+            const adjustDelay = message.delay;
+            setTimeout(() => {
+                // Appliquer le délai
+            }, adjustDelay);
             break;
+        // case 'score':
+        //     scoreP1 = message.scoreP1;
+        //     scoreP2 = message.scoreP2;
+        //     updateScoreDisplay();
+        //     break;
         case 'gameOver':
             handleGameOver(message.winner);
             break;
@@ -648,19 +665,10 @@ let keys = {};
 
 document.addEventListener('keydown', (event) => {
     keys[event.key] = true;
-    if(keys['a'] || keys['q'])
-        sendPaddlePosition(1);
-    else if(keys['o'] || keys['l'])
-        sendPaddlePosition(2);
 });
 
 document.addEventListener('keyup', (event) => {
     keys[event.key] = false;
-    if(keys['a'] || keys['q'])
-        sendPaddlePosition(1);
-    else if(keys['o'] || keys['l'])
-        sendPaddlePosition(2);
-    
 });
 
 function sendPaddlePosition(playerNumber) {
@@ -679,11 +687,12 @@ function sendPaddlePosition(playerNumber) {
         };
         
         ws.send(JSON.stringify(message));
-        console.log('Sending paddle position:', message);
-    } else {
-        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+        //console.log('Sending paddle position:', message);
+    } 
+    // else {
+    //     console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     
-    }
+    // }
 }
 
 function sendBallPosition() {
@@ -695,7 +704,7 @@ function sendBallPosition() {
         };
         
         ws.send(JSON.stringify(message));
-        console.log('Sending ball position:', message);
+        //console.log('Sending ball position:', message);
     } else {
         console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     }
