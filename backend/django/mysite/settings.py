@@ -42,6 +42,14 @@ INSTALLED_APPS = [
     'pong',
 ]                                                                                                                                                                                                                 
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -107,6 +115,11 @@ DATABASES = {
         "PASSWORD": os.environ.get('POSTGRES_PASSWORD'),                                                                                                                                                                                 
         "HOST": os.environ.get('PG_HOST'),                                                                                                                                                                                        
         "PORT": os.environ.get('PG_PORT'),                                                                                                                                                                                           
+        "OPTIONS": {
+            'sslmode': 'require',
+            'sslcert': '/cert.pem',
+            'sslkey': '/cert.key',
+            },
     }                                                                                                                                                                                                             
 }                                                                                                                                                                                                                 
                                                                                                                                                                                                                   

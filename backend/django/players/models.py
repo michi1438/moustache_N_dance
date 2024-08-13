@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.hashers import make_password
+
 
 class User(models.Model):
     """A typical class defining a model, derived from the Model class."""
@@ -15,6 +17,10 @@ class User(models.Model):
         ordering = ['username']
 
     # Methods
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
     def get_absolute_url(self):
         """Returns the URL to access a particular instance of MyModelName."""
         return reverse('model-detail-view', args=[str(self.id)])

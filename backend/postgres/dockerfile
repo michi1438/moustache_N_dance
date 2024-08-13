@@ -6,17 +6,20 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/02 18:09:48 by mguerga          ###   ########.fr        #
+#    Updated: 2024/08/12 15:00:23 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM alpine:3.20.1
 
+COPY create_certs.sh /.
+
 RUN apk update && \
-	apk add --no-cache postgresql16 postgresql16-contrib && \
+	apk add --no-cache postgresql16 postgresql16-contrib openssl && \
 	adduser -D post_user && \
 	mkdir -p /run/postgresql/ && \
-	chown post_user:post_user /run/postgresql/
+	sh /create_certs.sh	 && \
+	chown post_user:post_user /run/postgresql/ /cert.key /cert.pem
 
 USER post_user
 

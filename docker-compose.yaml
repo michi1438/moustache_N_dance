@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/05 13:02:56 by mguerga          ###   ########.fr        #
+#    Updated: 2024/08/06 12:16:39 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,6 +46,7 @@ services:
 
 networks:
   backend_nw:
+    name: backend_nw
 
 volumes:
   db_vol:
