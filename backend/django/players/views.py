@@ -7,7 +7,6 @@ from .utils import send_otp
 from datetime import datetime
 import pyotp
 from django.contrib.auth.models import User
-from . import models
 
 
 def login_view(request):
