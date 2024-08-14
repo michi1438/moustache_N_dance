@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
+#    By: robin <robin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/07/30 12:58:21 by mguerga          ###   ########.fr        #
+#    Updated: 2024/08/14 15:42:54 by robin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 all: 	makedir up
 
 makedir: 
-		-@mkdir -p /home/$(USER)/data/db
+		-@mkdir -p $(HOME)/data/db
 
 build:
 		@docker-compose -f docker-compose.yaml build --progress=plain
@@ -32,7 +32,7 @@ clean:
 		-@docker network rm $$(docker network ls -q) 2>/dev/null
 
 fclean: clean
-		@sudo rm -rf /home/$(USER)/data
+		@sudo rm -rf $(HOME)/data
 
 ps:
 		@docker ps -a 
