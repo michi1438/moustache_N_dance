@@ -1,10 +1,4 @@
 from django.contrib import admin
-from .models import User
+from .models import Player
 
-class MyAdminSite(admin.AdminSite):
-    site_header = "Monty Python administration"
-
-
-admin_site = MyAdminSite(name="myadmin")
-
-admin.site.register(User)
+admin.site.register(Player)
