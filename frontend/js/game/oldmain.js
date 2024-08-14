@@ -350,6 +350,7 @@ function initGameSimpson () {
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
     countdownDisplay.id = 'countdownDisplay';
+    console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     
     let countdownInterval = setInterval(() => {
         countdownDisplay.innerText = countdown;
@@ -364,7 +365,6 @@ function initGameSimpson () {
             }, 1000);
         }
     }, 1000)
-    console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
         vitesse = true;
