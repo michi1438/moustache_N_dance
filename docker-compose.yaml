@@ -43,6 +43,8 @@ services:
     restart: on-failure
     depends_on:
       - django 
+    volumes:
+      - ./frontend/:/var/www/frontend/
 
 networks:
   backend_nw:
@@ -54,4 +56,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/$USER/data/db
+      device: $HOME/data/db
