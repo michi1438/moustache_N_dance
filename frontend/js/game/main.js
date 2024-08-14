@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+import { v4 as uuidv4 } from 'uuid';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -17,14 +17,19 @@ let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
+let gameID = uuidv4();
+let ws;
+let playerNumber;
+let connectedPlayers = 0;
+
 function initGame () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
 //Camera
     camera.position.set(0, 30, 20);
     controls.update();
     camera.lookAt(0, 0, 0);
 
-    console.log(scene);
+    //console.log(scene);
 
 //Lights & shadows
     renderer.shadowMap.enabled = true;
@@ -132,17 +137,17 @@ function initGame () {
     p1WIN.visible = false;
     p2WIN.visible = false;
     isConfigReady = true;
-    console.log("isConfigReady set to true");
+    //console.log("isConfigReady set to true");
 }
 
 function initGameSimpson () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
     //Camera
         camera.position.set(0, 30, 20);
         controls.update();
         camera.lookAt(0, 0, 0);
     
-        console.log(scene);
+        //console.log(scene);
     
     //Lights & shadows
         renderer.shadowMap.enabled = true;
@@ -251,7 +256,7 @@ function initGameSimpson () {
         p1WIN.visible = false;
         p2WIN.visible = false;
         isConfigReady = true;
-        console.log("isConfigReady set to true");
+        //console.log("isConfigReady set to true");
     }
 
     window.startGame = function(config) {
@@ -286,7 +291,7 @@ function initGameSimpson () {
                     scoreP2object.push(gltf.scene.getObjectByName('4_R'));
                     scoreP2object.push(gltf.scene.getObjectByName('5_R'));
                     isModelLoaded = true;
-                    console.log("isModelLoaded set to true");
+                    //console.log("isModelLoaded set to true");
                     resolve();
                 }, undefined, function(error) {
                     console.error(error);
@@ -303,7 +308,7 @@ function initGameSimpson () {
         modelPath = '/frontend/js/game/models/modelMoustache.glb';
         new Promise((resolve, reject) => {
             loader.load(modelPath, function(gltf) {
-            console.log("Model loaded:", gltf);
+            //console.log("Model loaded:", gltf);
                 scene.add(gltf.scene);
         
             plane = gltf.scene.getObjectByName('Plane');
@@ -330,7 +335,7 @@ function initGameSimpson () {
             scoreP2object.push(gltf.scene.getObjectByName('4_R'));
             scoreP2object.push(gltf.scene.getObjectByName('5_R'));
             isModelLoaded = true;
-            console.log("isModelLoaded set to true");
+            //console.log("isModelLoaded set to true");
             resolve();
             }, undefined, function(error) {
                 console.error(error);
@@ -350,21 +355,9 @@ function initGameSimpson () {
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
     countdownDisplay.id = 'countdownDisplay';
-    
-    let countdownInterval = setInterval(() => {
-        countdownDisplay.innerText = countdown;
-        countdown--;
-        
-        if (countdown < 0) {
-            countdownDisplay.innerText = 'GO';
-            clearInterval(countdownInterval);
-            setTimeout(() => {
-                countdownDisplay.remove();
-                go = true;
-            }, 1000);
-        }
-    }, 1000)
-    console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
+ 
+
+    //console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
         vitesse = true;
@@ -372,9 +365,25 @@ function initGameSimpson () {
     else {
         vitesse = false;
     }
+    //console.log("Connected players:", connectedPlayers);
     let checkReadyInterval = setInterval(() => {
-        if (isModelLoaded && isConfigReady) {
-            console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
+        if (connectedPlayers > 1 && isModelLoaded && isConfigReady) {
+            //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
+            //connectWebSocket();
+            let countdownInterval = setInterval(() => {
+                countdownDisplay.innerText = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    countdownDisplay.innerText = 'GO';
+                    clearInterval(countdownInterval);
+                    setTimeout(() => {
+                        countdownDisplay.remove();
+                        go = true;
+                    }, 1000);
+                }
+            }, 1000);
+            console.log("playerNumber:", playerNumber);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -390,6 +399,12 @@ function animate(vitesse) {
         if(go) {
             ball.position.x += ballSpeed.x;
             ball.position.z += ballSpeed.z;
+            if(playerNumber == 1){
+                setInterval(sendPaddlePosition(1), 100);
+                setInterval(sendBallPosition, 100);
+            } else {
+                setInterval(sendPaddlePosition(2), 100);
+            }
         }
         //collision murs
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
@@ -451,17 +466,21 @@ function animate(vitesse) {
         }
         //gestion des paddles
         if (paddle1 && paddle2) {
-            if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle2.position.z -= paddleSpeed;
-            } 
-            if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle2.position.z += paddleSpeed;
-            } 
-            if (keys['q'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle1.position.z -= paddleSpeed;
-            } 
-            if (keys['a'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle1.position.z += paddleSpeed;
+            if(playerNumber == 2) {
+                if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle2.position.z -= paddleSpeed;
+                } 
+                if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle2.position.z += paddleSpeed;
+                } 
+            }
+            if(playerNumber == 1) {
+                if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    paddle1.position.z -= paddleSpeed;
+                } 
+                if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    paddle1.position.z += paddleSpeed;
+                }
             }
         }
     }
@@ -469,24 +488,11 @@ function animate(vitesse) {
     renderer.render(scene, camera);
 }
 
-let keys = {};
-
-document.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-});
-
-document.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-});
 
 const questions = [
     {
-        question: "Mode de jeu",
-        options: ["Jeu local", "Jeu en ligne"]
-    },
-    {
         question: "Nombre de joueurs",
-        options: ["1 joueur", "2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
+        options: ["2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
     },
     {
         question: "Vitesse du jeu",
@@ -501,7 +507,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
-function listenerPongLocal() {
+function listenerPongOnline() {
 	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
@@ -530,26 +536,185 @@ function selectOption(option) {
     
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        listenerPongLocal();
+        listenerPongOnline();
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
-        console.log('Configuration:', configuration);
+        //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
         startGame(configuration);
     }
 }
 
 function startGame(config) {
-    console.log('Starting game with configuration:', config);
+    // if (connectedPlayers < 2) {
+    //     console.log('Waiting for more players to connect...');
+    //     return;
+    // }
+    //console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
+    connectWebSocket();
     window.startGame(config);
 }
 
 
-export default {
-	listenerPongLocal,
-	// loadPongLocal
-};
 
+
+function connectWebSocket() {
+    if (ws) {
+        console.log('WebSocket already connected');
+        return;
+    }
+
+    ws = new WebSocket('wss://localhost:3000');
+
+    ws.onopen = () => {
+        console.log('WebSocket connection opened');
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const message = JSON.parse(event.data);
+            if (message.type === 'player') {
+                gameID = message.gameID; // Store the received gameID
+                console.log('Received gameID from server:', gameID);
+            }
+            handleWebSocketMessage(message);
+        } catch (error) {
+            console.error('Invalid JSON:', event.data);
+        }
+    };
+
+    ws.onclose = () => {
+        console.log('WebSocket connection closed');
+        ws = null;
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        alert('WebSocket connection failed. Please check the server status.');
+    };
+
+    
+}
+
+
+function handleWebSocketMessage(message) {
+    //console.log('Message reçu:', message);
+    const now = Date.now();
+    const delay = now - message.timestamp;
+    if (delay > 100) { // Seuil de délai en millisecondes
+        ws.send(JSON.stringify({ type: 'sync', delay }));
+    }
+    switch (message.type) {
+        case 'clientCount':
+            //console.log('Connected clients:', message.count);
+            connectedPlayers = message.count;
+            break;
+        case 'player': 
+            playerNumber = message.player;
+            break;
+        case 'paddle':
+            if (message.player === 1) {
+                paddle1.position.z = message.position;
+                //console.log('Position paddle1:', paddle1.position.z);
+            } else if (message.player === 2) {
+                paddle2.position.z = message.position;
+                //console.log('Position paddle2:', paddle2.position.z);
+            }
+            break;
+        case 'ball':
+            ball.position.x = message.position.x;
+            ball.position.z = message.position.z;
+            ballSpeed.x = message.speed.x;
+            ballSpeed.z = message.speed.z;
+            break;
+        case 'adjustDelay':
+            const adjustDelay = message.delay;
+            setTimeout(() => {
+                // Appliquer le délai
+            }, adjustDelay);
+            break;
+        // case 'score':
+        //     scoreP1 = message.scoreP1;
+        //     scoreP2 = message.scoreP2;
+        //     updateScoreDisplay();
+        //     break;
+        case 'gameOver':
+            handleGameOver(message.winner);
+            break;
+        case 'join':
+            if (message.gameID !== gameID) {
+                console.warn('Mismatched game ID', message.gameID, gameID);
+                ws.close();
+            }
+        default:
+            console.warn('Unhandled message type:', message.type);
+    }
+}
+
+function updateScoreDisplay() {
+    // Mettre à jour l'affichage du score ici
+    console.log('Score:', scoreP1, '-', scoreP2);
+}
+
+function handleGameOver(winner) {
+    // Gérer la fin de la partie ici
+    console.log('Game over! Winner:', winner);
+}
+
+let keys = {};
+
+document.addEventListener('keydown', (event) => {
+    keys[event.key] = true;
+});
+
+document.addEventListener('keyup', (event) => {
+    keys[event.key] = false;
+});
+
+function sendPaddlePosition(playerNumber) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        let position;
+        if (playerNumber === 1) {
+            position = paddle1.position.z;
+        } else if (playerNumber === 2) {
+            position = paddle2.position.z;
+        }
+        
+        const message = {
+            type: 'paddle',
+            player: playerNumber,
+            position: position
+        };
+        
+        ws.send(JSON.stringify(message));
+        //console.log('Sending paddle position:', message);
+    } 
+    // else {
+    //     console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    
+    // }
+}
+
+function sendBallPosition() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'ball',
+            position: { x: ball.position.x, z: ball.position.z },
+            speed: { x: ballSpeed.x, z: ballSpeed.z }
+        };
+        
+        ws.send(JSON.stringify(message));
+        //console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    }
+}
+
+
+export default {
+    listenerPongOnline,
+    // loadPongLocal
+};

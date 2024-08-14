@@ -1,8 +1,8 @@
 // Importe la View de chaque page
 import renderPongLocal from "../views/viewPongLocal.js"
+import renderPongOnline from "../views/viewPongOnline.js"
 import renderLogin from "../views/viewLogin.js"
 import renderLogout from "../views/viewLogout.js"
-import renderPongOnline from "../views/viewPongOnline.js"
 import renderGameHistory from "../views/ViewGameHistory.js"
 import render404_error from "../views/view404_error.js"
 import renderStats from "../views/viewStats.js"
@@ -11,14 +11,12 @@ import renderUserInfo from "../views/viewUserInfo.js"
 
 // Importe le script de chaque page qui gere le load et listener
 //import handleXX from "./XX.js"
-import handlePongLocal from "../game/main.js"
+import handlePongLocal from "../game/oldmain.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
-
+import handlePongOnline from "../game/main.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
-
-
 
 /**
  * Routes object
@@ -64,7 +62,7 @@ const routes = {
 		path: "/pongonline/",
 		view: renderPongOnline,
 		// load: handlePongOnline.loadPongOnline,
-		// listener: handlePongOnline.listenePongOnline
+		listener: handlePongOnline.listenerPongOnline
 	},
 	"gamehistory": {
 		title: "Game History",

@@ -49,6 +49,69 @@ services:
 networks:
   backend_nw:
     name: backend_nw
+# version: '3.3'
+services:
+  nginx:
+      container_name: nginx
+      build:
+        context: ./nginx/
+        dockerfile: Dockerfile
+      restart: unless-stopped
+      ports:
+        - 80:80
+        - 443:443
+      networks:
+        - ft_transcendence
+      env_file: .env
+      volumes:
+        - ./frontend/:/var/www/frontend/
+        # - ./backend/staticfiles/:/var/www/backend/staticfiles/
+        - ssl-certs:/etc/nginx/ssl
+
+  game:
+    container_name: game
+    build:
+      context: ./frontend/js/game/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    networks:
+      - ft_transcendence
+    volumes:
+      - ssl-certs:/etc/nginx/ssl
+    depends_on:
+      - nginx
+    
+  # postgres:
+  #   container_name: postgres
+  #   env_file: "./backend/.env"
+  #   image: postgres:16.3-alpine
+  #   volumes:
+  #     - db_vol:/var/lib/postgresql/data
+  #   networks:
+  #     - backend_nw
+  #   restart: on-failure
+
+  # django:
+  #   container_name: django 
+  #   env_file: "./backend/.env"
+  #   build: backend/django/
+  #   networks:
+  #     - backend_nw
+  #   ports:
+  #     - "8000:8000"
+  #   restart: on-failure
+  #   depends_on:
+  #     - postgres
+
+networks:
+  ft_transcendence:
+        driver: bridge
+  # backend_nw:
+volumes:
+  ssl-certs:
+    driver: local
 
 volumes:
   db_vol:
