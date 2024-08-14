@@ -12,7 +12,6 @@
 
 #version: '3.3' #PK ??
 services:
-
   postgres:
     container_name: postgres
     env_file: "./backend/.env"
@@ -45,8 +44,9 @@ services:
       - django 
     volumes:
       - ./frontend/:/var/www/frontend/
+      - ssl-certs:/etc/nginx/ssl
     
-   game:
+  game:
     container_name: game
     build:
       context: ./frontend/js/game/
@@ -55,7 +55,7 @@ services:
     ports:
       - 3000:3000
     networks:
-      - ft_transcendence
+      - backend_nw
     volumes:
       - ssl-certs:/etc/nginx/ssl
     depends_on:
@@ -72,3 +72,5 @@ volumes:
       type: none
       o: bind
       device: $HOME/data/db
+  ssl-certs:
+    driver : local
