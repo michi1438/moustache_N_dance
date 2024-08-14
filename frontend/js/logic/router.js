@@ -12,6 +12,8 @@ import renderUserInfo from "../views/viewUserInfo.js"
 // Importe le script de chaque page qui gere le load et listener
 //import handleXX from "./XX.js"
 import handlePongLocal from "../game/main.js"
+import handleLogin from "./login.js"
+import handleUserInfo from "./userinfo.js"
 
 // Cas particulier pour index
 import handleIndex from "./index.js"
@@ -30,7 +32,7 @@ import handleIndex from "./index.js"
 */
 const routes = {
 	"index": {
-		title: "Main",
+		title: "Moustache & Dance",
 		path: "/",
 		view: handleIndex.renderIndex,
 		// load: handleIndex.loadIndex,
@@ -41,7 +43,7 @@ const routes = {
 		path: "/login/",
 		view: renderLogin,
 		// load: handleLogin.loadLogin,
-		// listener: handleLogin.listenerLogin
+		listener: handleLogin.listenerLogin
 	},
 	"logout": {
 		title: "Logout",
@@ -90,7 +92,7 @@ const routes = {
 		path: "/userinfo/",
 		view: renderUserInfo,
 		// load: handleUserInfo.loadUserInfo,
-		// listener: handleUserInfo.listenerUserInfo
+		listener: handleUserInfo.listenerUserInfo
 	},
 
 };

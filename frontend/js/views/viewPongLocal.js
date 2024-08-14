@@ -11,16 +11,14 @@ export default function renderPongLocal() {
 				<div class="position-absolute">
 					<div id="config-menu" class="nav-item dropdow">
 					<div id="question-container" class="nav-link dropdown-toggle question" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"></div>
-					<ul id="options-container" class="options dropdown-menu"></ul>
+					<ul id="options-container" class="options dropdown-menu bg-dark border-dark"></ul>
       				</div>
 				</div>
 				<div id="countdownDisplay" class="position-absolute h1">
 				</div>
-				<div id="board_two" class="text-bg-dark border border-black border-5">
+				<div id="board_two">
 				</div>
-				
 			</div>
-			
 		</div>
 
 	`;
