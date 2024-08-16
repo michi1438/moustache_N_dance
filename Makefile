@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: robin <robin@student.42.fr>                +#+  +:+       +#+         #
+#    By: bkukaqi <bkukaqi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/14 16:37:20 by robin            ###   ########.fr        #
+#    Updated: 2024/08/16 15:54:28 by bkukaqi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ clean:
 		-@docker network rm $$(docker network ls -q) 2>/dev/null
 
 fclean: clean
-		@sudo rm -rf $(HOME)/data
+		rm -rf $(HOME)/data
 
 ps:
 		@docker ps -a 

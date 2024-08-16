@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Player
-from .serializers import PlayerSerializer
+from .serializers import *
 
 
 @api_view(['GET', 'POST'])
@@ -50,21 +50,46 @@ def getPlayer(request, id):
         player.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['POST', 'GET', 'PUT', 'DELETE'])
 def login_view(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            send_otp(request)
-            request.session['username'] = username
-            return redirect('otp')
-        else:
-            messages.success(request, ("OUAICH T'ES QUI TOI !?"))
-            return redirect('login')
+	try:
+		serializer = LoginSerializer(data=request.data, context = {'request': request})
+		serializer.is_valid(raise_exception=True)
+	except serializers.ValidationError:
+		return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
-    else:
-        return render(request, 'auth/login.html', {})
+	# user = serializer.validated_data['user']
+	# # Player.check_inactive_players()
+	# try:
+	# 	player = Player.objects.get(owner=user)
+	# except Player.DoesNotExist:
+	# 	return Response("Utilisateur inexistant.", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+	# if (player.status == "ONLINE" or player.status == "PLAYING"):
+	# 	return Response({"Erreur" : "Le joueur est deja loggé."}, status=status.HTTP_401_UNAUTHORIZED)
+	# login(request, user)
+	# player.status = "ONLINE"
+	# player.save()
+
+	# user_data = self.request.user
+	# serializer_data = DataSerializer(user_data)
+	# return Response(data=serializer_data.data, status=status.HTTP_202_ACCEPTED)
+
+# def login_view(request):
+#     if request.method == "POST":
+#         username = request.POST["username"]
+#         password = request.POST["password"]
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             send_otp(request)
+#             request.session['username'] = username
+#             return redirect('otp')
+#         else:
+#             messages.success(request, ("OUAICH T'ES QUI TOI !?"))
+#             return redirect('login')
+
+#     else:
+#         return render(request, 'auth/login.html', {})
 
 def otp_view(request):
     if request.method == "POST":

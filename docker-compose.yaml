@@ -17,7 +17,7 @@ services:
     env_file: "./backend/.env"
     build: backend/postgres/
     volumes:
-      - db_vol:/home/post_user/postDB/
+      - db_vol:/var/lib/postgresql/data/
     networks:
       - backend_nw
     restart: on-failure
