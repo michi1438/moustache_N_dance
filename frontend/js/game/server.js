@@ -22,17 +22,7 @@ wss.on('connection', (ws) => {
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
-            if (data.type === 'sync') {
-                // Ajuster les délais pour les clients
-                const delay = data.delay;
-                wss.clients.forEach(client => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({ type: 'adjustDelay', delay }));
-                    }
-                });
-            } else {
-                broadcast(ws, data);
-            }
+            broadcast(ws, data);
         });
 
         ws.on('close', () => {
@@ -55,7 +45,7 @@ wss.on('connection', (ws) => {
 });
 
 function broadcast(sender, message) {
-    const data = JSON.stringify({message});
+    const data = JSON.stringify(message);
     wss.clients.forEach(client => {
         if (client !== sender && client.readyState === WebSocket.OPEN) {
             client.send(data);

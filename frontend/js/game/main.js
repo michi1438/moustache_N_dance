@@ -399,16 +399,11 @@ function animate(vitesse) {
         if(go) {
             ball.position.x += ballSpeed.x;
             ball.position.z += ballSpeed.z;
-            if(playerNumber == 1){
-                setInterval(sendPaddlePosition(1), 100);
-                setInterval(sendBallPosition, 100);
-            } else {
-                setInterval(sendPaddlePosition(2), 100);
-            }
         }
         //collision murs
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
             ballSpeed.z *= -1;
+            sendBallPosition();
             
         }
         //collision paddle1 et paddle2
@@ -416,18 +411,22 @@ function animate(vitesse) {
             sound1.play();
             if (vitesse == true) {
                 ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                sendBallPosition();
             }
             else {
                 ballSpeed.x *= -1;
+                sendBallPosition();
             }
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
             sound1.play();
             if (vitesse == true) {
                 ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                sendBallPosition();
             }
             else {
                 ballSpeed.x *= -1;
+                sendBallPosition();
             }
         }
         //point marqué
@@ -440,6 +439,7 @@ function animate(vitesse) {
             scoreP2++;
             scoreP2object[scoreP2 - 1].visible = false;
             scoreP2object[scoreP2].visible = true;
+            sendBallPosition();
         } else if (ball.position.x >= paddle2.position.x) {
             sound2.play();
             ball.position.set(0, 0, 0);
@@ -449,6 +449,7 @@ function animate(vitesse) {
             scoreP1++;
             scoreP1object[scoreP1 - 1].visible = false;
             scoreP1object[scoreP1].visible = true;
+            sendBallPosition();
         //fin de la partie
         } else if (scoreP1 == 5 || scoreP2 == 5) {
             if (!soundPlayed) {
@@ -458,6 +459,8 @@ function animate(vitesse) {
                 soundPlayed = true;
             }
             ball.position.set(0, 0, 0);
+            ballSpeed = { x: 0, z: 0 };
+            sendBallPosition();
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
             } else {
@@ -469,17 +472,21 @@ function animate(vitesse) {
             if(playerNumber == 2) {
                 if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                     paddle2.position.z -= paddleSpeed;
+                    sendPaddlePosition(2);
                 } 
                 if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                     paddle2.position.z += paddleSpeed;
+                    sendPaddlePosition(2);
                 } 
             }
             if(playerNumber == 1) {
                 if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                     paddle1.position.z -= paddleSpeed;
+                    sendPaddlePosition(1);
                 } 
                 if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                     paddle1.position.z += paddleSpeed;
+                    sendPaddlePosition(1);
                 }
             }
         }
