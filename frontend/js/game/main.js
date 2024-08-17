@@ -601,11 +601,10 @@ function connectWebSocket() {
 
 
 function handleWebSocketMessage(message) {
-    //console.log('Message reçu:', message);
-    const now = Date.now();
-    const delay = now - message.timestamp;
-    if (delay > 100) { // Seuil de délai en millisecondes
-        ws.send(JSON.stringify({ type: 'sync', delay }));
+    console.log('Message reçu:', message);
+    if (!message.type) {
+        console.warn('Received message without type:', message);
+        return;
     }
     switch (message.type) {
         case 'clientCount':
@@ -629,12 +628,6 @@ function handleWebSocketMessage(message) {
             ball.position.z = message.position.z;
             ballSpeed.x = message.speed.x;
             ballSpeed.z = message.speed.z;
-            break;
-        case 'adjustDelay':
-            const adjustDelay = message.delay;
-            setTimeout(() => {
-                // Appliquer le délai
-            }, adjustDelay);
             break;
         // case 'score':
         //     scoreP1 = message.scoreP1;
@@ -692,10 +685,10 @@ function sendPaddlePosition(playerNumber) {
         ws.send(JSON.stringify(message));
         //console.log('Sending paddle position:', message);
     } 
-    // else {
-    //     console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     
-    // }
+    }
 }
 
 function sendBallPosition() {

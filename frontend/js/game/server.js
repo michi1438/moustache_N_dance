@@ -39,7 +39,7 @@ wss.on('connection', (ws) => {
             players = players.filter((player) => player !== ws);
         });
 
-        // Vérifiez si le nombre de clients connectés est égal à 2
+        //Vérifiez si le nombre de clients connectés est égal à 2
         if (wss.clients.size === 2) {
             const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
             wss.clients.forEach(client => {
@@ -55,8 +55,7 @@ wss.on('connection', (ws) => {
 });
 
 function broadcast(sender, message) {
-    const timestamp = Date.now();
-    const data = JSON.stringify({ ...message, timestamp });
+    const data = JSON.stringify({message});
     wss.clients.forEach(client => {
         if (client !== sender && client.readyState === WebSocket.OPEN) {
             client.send(data);
