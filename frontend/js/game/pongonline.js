@@ -80,22 +80,22 @@ function initGame () {
     const listener = new THREE.AudioListener();
     camera.add( listener );
 
-    audioLoader.load( '/frontend/js/game/sounds/salut.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/obi-wan-hello-there.mp3', function ( buffer ) {
         sound = new THREE.Audio( listener );
         sound.setBuffer( buffer );
         sound.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer-woohoo.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bouncing-effect.mp3', function ( buffer ) {
             sound1 = new THREE.Audio( listener );
             sound1.setBuffer( buffer );
             sound1.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer_doh.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bruh.mp3', function ( buffer ) {
         sound2 = new THREE.Audio( listener );
         sound2.setBuffer( buffer );
         sound2.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/c_nul_homer.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/yeah-boiii-i-i-i.mp3', function ( buffer ) {
         sound3 = new THREE.Audio( listener );
         sound3.setBuffer( buffer );
         sound3.setLoop( false );
