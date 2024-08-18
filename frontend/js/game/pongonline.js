@@ -152,7 +152,7 @@ function initGameSimpson () {
     //Lights & shadows
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        let dirLight = new THREE.DirectionalLight( 0xfffff0, 2 );
+        let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
         dirLight.name = 'Dir. Light';
         dirLight.position.set( 0, 10, 0 );
         dirLight.castShadow = true;
@@ -165,7 +165,7 @@ function initGameSimpson () {
         dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         scene.add( dirLight );
-        scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
     
         let spotLight = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight.name = 'Spot Light';
@@ -178,7 +178,7 @@ function initGameSimpson () {
         spotLight.shadow.mapSize.width = 1024;
         spotLight.shadow.mapSize.height = 1024;
         scene.add( spotLight );
-        scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
     
         let spotLight2 = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight2.name = 'Spot Light';
@@ -191,7 +191,7 @@ function initGameSimpson () {
         spotLight2.shadow.mapSize.width = 1024;
         spotLight2.shadow.mapSize.height = 1024;
         scene.add( spotLight2 );
-        scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
     
     //audio
     
