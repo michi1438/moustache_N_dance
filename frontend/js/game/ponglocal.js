@@ -254,8 +254,7 @@ function initGameSimpson () {
         console.log("isConfigReady set to true");
     }
 
-    window.startGame = function(config) {
-        console.log("COUCOU LES VOISINOUX");
+    window.Game = function(config) {
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
@@ -530,17 +529,9 @@ function selectOption(option) {
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
-        startGame(configuration);
+        window.Game(configuration);
     }
 }
-
-function startGame(config) {
-    console.log('Starting game with configuration:', config);
-    // This function will be implemented in main.js
-    // You can call any initialization functions here
-    window.startGame(config);
-}
-
 
 export default {
 	listenerPongLocal,
