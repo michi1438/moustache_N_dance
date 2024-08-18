@@ -255,6 +255,7 @@ function initGameSimpson () {
     }
 
     window.startGame = function(config) {
+        console.log("COUCOU LES VOISINOUX");
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
@@ -527,7 +528,7 @@ function selectOption(option) {
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
-        console.log('Configuration:', configuration);
+        //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
         startGame(configuration);
     }
