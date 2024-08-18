@@ -393,7 +393,7 @@ function initGameSimpson () {
 
 
 function animate(vitesse) {
-    requestAnimationFrame(() => animate(vitesse));
+    let animationId = requestAnimationFrame(() => animate(vitesse));
     controls.update();
     if (ball && paddle1 && paddle2 ) {
         if(go) {
@@ -465,8 +465,10 @@ function animate(vitesse) {
             sendBallPosition();
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
+                handleGameOver(1, animationId);
             } else {
                 p2WIN.visible = true;
+                handleGameOver(2, animationId);
             }
         }
         //gestion des paddles
@@ -497,6 +499,15 @@ function animate(vitesse) {
     renderer.render(scene, camera);
 }
 
+let keys = {};
+
+document.addEventListener('keydown', (event) => {
+    keys[event.key] = true;
+});
+
+document.addEventListener('keyup', (event) => {
+    keys[event.key] = false;
+});
 
 const questions = [
     {
@@ -643,9 +654,6 @@ function handleWebSocketMessage(message) {
             scoreP2 = message.scoreP2;
             //updateScoreDisplay();
             break;
-        case 'gameOver':
-            handleGameOver(message.winner);
-            break;
         case 'join':
             if (message.gameID !== gameID) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
@@ -661,20 +669,22 @@ function handleWebSocketMessage(message) {
 //     console.log('Score:', scoreP1, '-', scoreP2);
 // }
 
-function handleGameOver(winner) {
+function handleGameOver(winner, animationId) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
+
+    // Réinitialiser le jeu
+
+    cancelAnimationFrame(animationId);
+    //afficher un bouton pour rejouer
+
+    // Afficher le score final
+    // Afficher un message de félicitations
+    // Afficher un message de défaite
+    
+
 }
 
-let keys = {};
-
-document.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-});
-
-document.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-});
 
 function sendPaddlePosition(playerNumber) {
     if (ws && ws.readyState === WebSocket.OPEN) {
