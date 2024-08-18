@@ -436,7 +436,8 @@ function animate(vitesse) {
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP2++;
+            //scoreP2++;
+            sendScore(2);
             scoreP2object[scoreP2 - 1].visible = false;
             scoreP2object[scoreP2].visible = true;
             sendBallPosition();
@@ -446,7 +447,8 @@ function animate(vitesse) {
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP1++;
+            //scoreP1++;
+            sendScore(1);
             scoreP1object[scoreP1 - 1].visible = false;
             scoreP1object[scoreP1].visible = true;
             sendBallPosition();
@@ -636,11 +638,11 @@ function handleWebSocketMessage(message) {
             ballSpeed.x = message.speed.x;
             ballSpeed.z = message.speed.z;
             break;
-        // case 'score':
-        //     scoreP1 = message.scoreP1;
-        //     scoreP2 = message.scoreP2;
-        //     updateScoreDisplay();
-        //     break;
+        case 'score':
+            scoreP1 = message.scoreP1;
+            scoreP2 = message.scoreP2;
+            //updateScoreDisplay();
+            break;
         case 'gameOver':
             handleGameOver(message.winner);
             break;
@@ -654,10 +656,10 @@ function handleWebSocketMessage(message) {
     }
 }
 
-function updateScoreDisplay() {
-    // Mettre à jour l'affichage du score ici
-    console.log('Score:', scoreP1, '-', scoreP2);
-}
+// function updateScoreDisplay() {
+//     // Mettre à jour l'affichage du score ici
+//     console.log('Score:', scoreP1, '-', scoreP2);
+// }
 
 function handleGameOver(winner) {
     // Gérer la fin de la partie ici
@@ -708,6 +710,26 @@ function sendBallPosition() {
         
         ws.send(JSON.stringify(message));
         //console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    }
+}
+
+function sendScore(playerNumber) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        if(playerNumber === 1) {
+            scoreP1++;
+        }
+        else {
+            scoreP2++;
+        }
+        const message = {
+            type: 'score',
+            scoreP1: scoreP1,
+            scoreP2: scoreP2
+        };
+        ws.send(JSON.stringify(message));
+        //console.log('Sending score:', message);
     } else {
         console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     }
