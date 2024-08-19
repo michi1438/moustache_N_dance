@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
+#    By: bkukaqi <bkukaqi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/12 14:43:34 by mguerga          ###   ########.fr        #
+#    Updated: 2024/08/19 10:28:10 by bkukaqi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,6 +28,6 @@ RUN apt-get update && \
 	pip install --no-cache-dir -r requirements.txt && \
 	sh /create_certs.sh	
 
-EXPOSE 8001
+EXPOSE 8000
 
 CMD ["bash","/mysite2/django_init.sh"]

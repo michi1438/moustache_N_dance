@@ -314,6 +314,30 @@ function listenerUserInfo() {
 	const avatarForm = document.getElementById("form__updateAvatar");
 	const emailForm = document.getElementById("form__updateEmail");
 
+	var xValues = ["Wins", "Losses"];
+	var yValues = [70, 30];
+	var barColors = [
+	"#1e7145",
+	"#fe8d63",
+	];
+
+	new Chart("StatChart", {
+	type: "pie",
+	data: {
+		labels: xValues,
+		datasets: [{
+		backgroundColor: barColors,
+		data: yValues
+		}]
+	},
+	options: {
+		title: {
+		display: false,
+		text: "Stat"
+		}
+	}
+	});
+
 	// Reset all fields (input and error) from the form when the modal pass to hidden
 	document.getElementById("modal__updateAvatar").addEventListener("hidden.bs.modal", e => {
 		e.preventDefault();

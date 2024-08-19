@@ -32,6 +32,7 @@ RUN openssl req -x509 -nodes \
 # Create necessary directories for nginx and frontend
 RUN mkdir -p /var/www/frontend/
 # RUN mkdir -p /var/www/backend/staticfiles/
+RUN mkdir -p /var/www/backend/staticfiles/
 
 # Copy the conf file in conf directory to the /etc/nginx/ directory and overwrite the default configuration file
 COPY nginx.conf /etc/nginx/nginx.conf

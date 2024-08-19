@@ -511,6 +511,9 @@ function listenerPongLocal() {
         const li = document.createElement('li');
         li.textContent = option;
 		li.classList.add('btn');
+		li.classList.add('btn-outline-secondary');
+		li.classList.add('text-white');
+		li.classList.add('d-block');
         li.addEventListener('click', () => selectOption(option));
         optionsContainer.appendChild(li);
     });
@@ -525,16 +528,18 @@ function selectOption(option) {
     if (currentQuestionIndex < questions.length) {
         listenerPongLocal();
     } else {
+		currentQuestionIndex = 0;
+		// 	document.parentNode.getElementById('board_two').removeChild(renderer.domElement);
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
-        console.log('Configuration:', configuration);
+        //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
         startGame(configuration);
     }
 }
 
 function startGame(config) {
-    console.log('Starting game with configuration:', config);
+    //console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
     window.startGame(config);

@@ -25,8 +25,21 @@ SECRET_KEY = os.environ.get('DJ_SECRETKEY')
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
 DEBUG = True                                                                                                                                                                                                      
                                                                                                                                                                                                                   
-ALLOWED_HOSTS = ['*']                                                                                                                                                                                                
-                                                                                                                                                                                                                  
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+
+ALLOWED_HOSTS_HTTPS = [f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS")]
+ALLOWED_HOSTS_HTTP = [f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS")]
+
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
+CSRF_ALLOWED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_DOMAIN = None
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+SITE_ID = 1                                                                                                                                                                                                                                                                                                                                                                                                                
                                                                                                                                                                                                                   
 # Application definition                                                                                                                                                                                          
                                                                                                                                                                                                                   
@@ -104,7 +117,12 @@ TEMPLATES = [
 LOGIN_URL = 'players/login'
                                                                                                                                                                                                                   
 WSGI_APPLICATION = 'mysite.wsgi.application'                                                                                                                                                                      
-CSRF_TRUSTED_ORIGINS = ["https://mysite"]                                                                                                                                                                                                                  
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database                                                                                                                                                                                                        
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases                                                                                                                                                   
@@ -159,7 +177,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)                                                                                                                                                                          
 # https://docs.djangoproject.com/en/4.2/howto/static-files/                                                                                                                                                       
                                                                                                                                                                                                                   
-STATIC_URL = 'static/'                                                                                                                                                                                            
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = 'static/'  
+
+MEDIA_URL = ""
+MEDIA_ROOT = os.path.join(BASE_DIR, "")
                                                                                                                                                                                                                   
 # Default primary key field type                                                                                                                                                                                  
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field                                                                                                                                          

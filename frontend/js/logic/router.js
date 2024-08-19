@@ -146,7 +146,6 @@ export default async function router(value) {
 */
 window.onload = async function()
 {
-	// router("index")
 	const currentPath = window.location.pathname;
 	// console.log(currentPath);
 	var found = false
@@ -171,10 +170,11 @@ window.onload = async function()
 				document.title = routes[route].title;
 				// routes[route].listener();  // Attach event listeners
 			// }
-			// else
-			// 	router("login");
-			return;
+			
 		}
+		else
+			router("login");
+			return;
 	}
 	if (found == false)
 	{

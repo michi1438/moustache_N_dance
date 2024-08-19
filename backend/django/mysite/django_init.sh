@@ -29,6 +29,10 @@ python3 manage.py makemigrations
 python3 manage.py makemigrations players
 echo "============================"
 
+echo "Create staticfiles==========="
+python3 manage.py collectstatic --noinput
+echo "============================"
+
 echo "Migrate====================="
 python3 manage.py migrate
 echo "============================"
@@ -38,7 +42,7 @@ python3 manage.py createsuperuser --email=admin@admin.com --noinput
 echo "============================"
 
 echo "Start WSGI-gunicorn"
-gunicorn --preload --proxy-protocol --certfile="/cert.pem" --keyfile="/cert.key" mysite.wsgi:application -b 0.0.0.0:8001
+gunicorn --preload --proxy-protocol --certfile="/cert.pem" --keyfile="/cert.key" mysite.wsgi:application -b 0.0.0.0:8000
 
 
 #echo "Start server"

@@ -240,33 +240,33 @@ function listenerLogin() {
 	});
 };
 
-// async function loadLogin() {
+async function loadLogin() {
 
-// 	document.querySelectorAll(".dropdown-item").forEach(btn => {
-// 		btn.setAttribute("disabled", true);
-// 	});
-// 	document.getElementById("topbar__logout").setAttribute("disabled", true);
+	// document.querySelectorAll(".dropdown-item").forEach(btn => {
+	// 	btn.setAttribute("disabled", true);
+	// });
+	// document.getElementById("topbar__logout").setAttribute("disabled", true);
 
-// 	try {
-// 		let hostnameport = "https://" + window.location.host
-// 		const response = await fetch(hostnameport + '/api/index/');
+	try {
+		let hostnameport = "https://" + window.location.host
+		const response = await fetch(hostnameport + '/api/players/login');
 
-// 		if (response.status === 202) {
+		if (response.status === 202) {
 
-// 			document.querySelectorAll(".dropdown-item").forEach(btn => {
-// 				btn.removeAttribute("disabled");
-// 			});
-// 			document.getElementById("topbar__logout").removeAttribute("disabled");
+			// document.querySelectorAll(".dropdown-item").forEach(btn => {
+			// 	btn.removeAttribute("disabled");
+			// });
+			// document.getElementById("topbar__logout").removeAttribute("disabled");
 
-// 			router("index");
-// 		}
-// 		return 1;
-// 	} catch (e) {
-// 		console.error(e);
-// 	}
-// };
+			router("index");
+		}
+		return 1;
+	} catch (e) {
+		console.error(e);
+	}
+};
 
 export default {
 	listenerLogin,
-	// loadLogin
+	loadLogin
 };

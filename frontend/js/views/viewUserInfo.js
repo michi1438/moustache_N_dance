@@ -151,12 +151,13 @@ export default function renderUserInfo() {
 		</div>
 		<div class="row text-center py-4">
 			<div id="updateinfo">
-			<div class="list-group d-flex align-items-center">
-				<div class="row my-5"></div>
-				<div class="row my-2">
-					<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__updatePassword" id="btn__updatePasswordt">Change Password
+				<div class="list-group d-flex align-items-center">
+					<div class="row my-4"></div>
+					<div class="row my-2">
+						<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__updatePassword" id="btn__updatePasswordt">Change Password
+					</div>
+					<div class="row my-5"></div>
 				</div>
-				<div class="row my-4"></div>
 			</div>
 			<div class="modal fade" id="modal__updatePassword" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered text-center">
@@ -188,6 +189,24 @@ export default function renderUserInfo() {
 						</div>
 					</div>
 				</div>
+		</div>
+		<div class="row align-items-center">
+			<div class="col-6 text-center">
+				<canvas id="StatChart" style="width:100%;max-width:700px"></canvas>
+			</div>
+			<div class="col-6 text-start">
+				<div class="row my-3">
+					<div class="col">
+						Games:
+						<div id="games" class="fw-bold"></div>
+					</div>
+					<div class="col">
+						Dates:
+						<div id="games_dates" class="fw-bold"></div>
+					</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	`;
 };
