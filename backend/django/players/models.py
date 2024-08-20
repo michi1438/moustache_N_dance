@@ -37,3 +37,16 @@ class Player(models.Model):
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name
+
+# class Player(models.Model):
+# 	owner = models.OneToOneField('auth.User', related_name='Player', on_delete=models.CASCADE)
+# 	nickname = models.CharField(max_length=20)
+# 	avatar = models.ImageField(max_length=200, default="", upload_to='')
+
+# 	# def set_offline_if_inactive(self, threshold):
+# 	# 	if self.status == 'ONLINE' and (timezone.now() - self.last_activity).total_seconds() > threshold:
+# 	# 		self.status = 'OFFLINE'
+# 	# 		self.save()
+
+# 	def __str__(self):
+# 		return self.owner.username

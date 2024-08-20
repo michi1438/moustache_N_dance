@@ -71,9 +71,9 @@ def login_view(request):
 	# player.status = "ONLINE"
 	# player.save()
 
-	# user_data = self.request.user
-	# serializer_data = DataSerializer(user_data)
-	# return Response(data=serializer_data.data, status=status.HTTP_202_ACCEPTED)
+	user_data = self.request.user
+	serializer_data = DataSerializer(user_data)
+	return Response(data=serializer_data.data, status=status.HTTP_202_ACCEPTED)
 
 # def login_view(request):
 #     if request.method == "POST":
@@ -90,6 +90,28 @@ def login_view(request):
 
 #     else:
 #         return render(request, 'auth/login.html', {})
+
+@api_view(['POST', 'GET', 'PUT', 'DELETE'])
+def register_view(request):
+    # check if the request.data["username"] contains a _42 in the username
+    if '_42' in request.data['username'] or '@' in request.data['username'] or '+' in request.data['username']:
+        return Response({"username": "'_42','@' or '+' not allowed"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
+    mail_check = False
+    # check if the request.data["email"] contains a 42 in the mail
+    if '42' in request.data['email']:
+        mail_check = True
+
+    if mail_check == False :
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
+    return Response({"42 API" : "Username or email with 42"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
 
 def otp_view(request):
     if request.method == "POST":
@@ -127,19 +149,19 @@ def logout_view(request):
     messages.success(request, ("DECONNEXION REUSSIE ! GG !"))
     return redirect('login')
 
-def register_view(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(request, ("Registration successful!"))
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'auth/register.html', {
-        'form':form,
-        })
+# def register_view(request):
+#     if request.method == "POST":
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data['username']
+#             password = form.cleaned_data['password1']
+#             user = authenticate(username=username, password=password)
+#             login(request, user)
+#             messages.success(request, ("Registration successful!"))
+#             return redirect('home')
+#     else:
+#         form = UserCreationForm()
+#     return render(request, 'auth/register.html', {
+#         'form':form,
+#         })

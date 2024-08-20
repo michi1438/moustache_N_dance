@@ -27,8 +27,10 @@ DEBUG = True
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-ALLOWED_HOSTS_HTTPS = [f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS")]
-ALLOWED_HOSTS_HTTP = [f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS")]
+ALLOWED_HOSTS_HTTPS = [f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
+                        f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":10443"]
+ALLOWED_HOSTS_HTTP = [f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
+                        f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":10443"]
 
 CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
 CSRF_ALLOWED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP

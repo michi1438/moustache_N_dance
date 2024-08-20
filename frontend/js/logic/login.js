@@ -34,6 +34,12 @@ async function connectUser(loginForm) {
 
 		const response = await fetch(hostnameport + '/api/players/login', init); // will use another URL
 
+		if (!response.ok || response.status == 500) {
+			document.getElementById("form__login--errorMsg").textContent = "Erreur " + response.status;
+			document.getElementById("form__login--errorMsg").classList.add("text-danger");
+			document.getElementById("form__login--errorMsg").classList.remove("text-success");
+		}
+
 		if (!response.ok || response.status === 203) {
 			let errorMsg = await response.text();
 			errorMsg = JSON.parse(errorMsg);
@@ -110,58 +116,58 @@ async function createUser(createAccountForm) {
 	};
 	
 	//TO DELETE !
-	console.log('User created with following credentials:');
-	sessionStorage.setItem("username", inputValues.username);
-	sessionStorage.setItem("email", inputValues.email);
-	sessionStorage.setItem("password", inputValues.password);
+	// console.log('User created with following credentials:');
+	// sessionStorage.setItem("username", inputValues.username);
+	// sessionStorage.setItem("email", inputValues.email);
+	// sessionStorage.setItem("password", inputValues.password);
 
-	// const init = {
-	// 	method: 'POST',
-	// 	headers: {'Content-Type': 'application/json'},
-	// 	body: JSON.stringify(inputValues)
-	// };
+	const init = {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(inputValues)
+	};
 
-	// try {
-	// 	let hostnameport = "https://" + window.location.host;
+	try {
+		let hostnameport = "https://" + window.location.host;
 
-	// 	const response = await fetch(hostnameport + '/api/register/', init);
+		const response = await fetch(hostnameport + '/api/players/register', init);
 
-	// 	if (!response.ok || response.status == 500) {
-	// 		document.getElementById("form__createAccount--msg").textContent = "Erreur " + response.status;
-	// 		document.getElementById("form__createAccount--msg").classList.add("text-danger");
-	// 		document.getElementById("form__createAccount--msg").classList.remove("text-success");
-	// 	}
-	// 	else if (response.status == 203) {
-	// 		var errorMsg = await response.text();
-	// 		errorMsg = JSON.parse(errorMsg);
+		if (!response.ok || response.status == 500) {
+			document.getElementById("form__createAccount--msg").textContent = "Erreur " + response.status;
+			document.getElementById("form__createAccount--msg").classList.add("text-danger");
+			document.getElementById("form__createAccount--msg").classList.remove("text-success");
+		}
+		else if (response.status == 203) {
+			var errorMsg = await response.text();
+			errorMsg = JSON.parse(errorMsg);
 
-	// 		if (Object.keys(errorMsg)[0] == "42 API") {
-	// 			document.getElementById("form__createAccount--msg").textContent = Object.values(errorMsg);
-	// 		}
-	// 		else if (Object.keys(errorMsg)[0] == "username") {
-	// 			document.getElementById("form__createAccount--msg").textContent = "Invalid username"
-	// 			document.getElementById("form__input--usernameError").textContent = Object.values(errorMsg);
-	// 		}
-	// 		else if (Object.keys(errorMsg)[0] == "email") {
-	// 			document.getElementById("form__createAccount--msg").textContent = "Invalid email";
-	// 			document.getElementById("form__input--emailError").textContent = Object.values(errorMsg);
-	// 		}
-	// 		else if (Object.keys(errorMsg)[0] == "password") {
-	// 			document.getElementById("form__createAccount--msg").textContent = "Invalid password";
-	// 			document.getElementById("form__input--passwordError").textContent = Object.values(errorMsg);
-	// 		}
+			if (Object.keys(errorMsg)[0] == "42 API") {
+				document.getElementById("form__createAccount--msg").textContent = Object.values(errorMsg);
+			}
+			else if (Object.keys(errorMsg)[0] == "username") {
+				document.getElementById("form__createAccount--msg").textContent = "Invalid username"
+				document.getElementById("form__input--usernameError").textContent = Object.values(errorMsg);
+			}
+			else if (Object.keys(errorMsg)[0] == "email") {
+				document.getElementById("form__createAccount--msg").textContent = "Invalid email";
+				document.getElementById("form__input--emailError").textContent = Object.values(errorMsg);
+			}
+			else if (Object.keys(errorMsg)[0] == "password") {
+				document.getElementById("form__createAccount--msg").textContent = "Invalid password";
+				document.getElementById("form__input--passwordError").textContent = Object.values(errorMsg);
+			}
 
-	// 		document.getElementById("form__createAccount--msg").classList.add("text-danger");
-	// 		document.getElementById("form__createAccount--msg").classList.remove("text-success");
-	// 	}
-	// 	else if (response.status === 201) {
-	// 		document.getElementById("form__createAccount--msg").textContent = "User created. Please Log in";
-	// 		document.getElementById("form__createAccount--msg").classList.remove("text-danger");
-	// 		document.getElementById("form__createAccount--msg").classList.add("text-success");
-	// 	}
-	// } catch (e) {
-	// 	console.error("Error create user: ", e);
-	// }
+			document.getElementById("form__createAccount--msg").classList.add("text-danger");
+			document.getElementById("form__createAccount--msg").classList.remove("text-success");
+		}
+		else if (response.status === 201) {
+			document.getElementById("form__createAccount--msg").textContent = "User created. Please Log in";
+			document.getElementById("form__createAccount--msg").classList.remove("text-danger");
+			document.getElementById("form__createAccount--msg").classList.add("text-success");
+		}
+	} catch (e) {
+		console.error("Error create user: ", e);
+	}
 };
 
 // async function connectUser42() {

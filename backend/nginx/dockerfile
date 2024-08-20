@@ -41,7 +41,7 @@ COPY start_nginx.sh /usr/local/start_nginx.sh
 RUN chmod +x /usr/local/start_nginx.sh
 
 # Expose the port 443 for SSL
-EXPOSE 443
+EXPOSE 10443
 
 # CMD ["nginx", "-g", "daemon off;"]
 ENTRYPOINT [ "sh", "/usr/local/start_nginx.sh"]
