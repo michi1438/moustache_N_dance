@@ -56,14 +56,14 @@ async function connectUser(loginForm) {
 			}
 			return;
 		}
-		if (response.status === 202) {
+		if (response.status === 200) {
 			// login is successful -> redirect to profile
 
 			const data = await response.json();
 
 			sessionStorage.setItem("username", data["username"]);
-			sessionStorage.setItem("avatar", data["player"].avatar);
-			sessionStorage.setItem("nickname", data["player"].nickname);
+			//sessionStorage.setItem("avatar", data["player"].avatar);
+			//sessionStorage.setItem("nickname", data["player"].nickname);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');

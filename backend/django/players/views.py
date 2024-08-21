@@ -1,79 +1,98 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .utils import send_otp
 from datetime import datetime
 import pyotp
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.middleware.csrf import get_token
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from .models import Player
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+# from .models import Player
 from .serializers import *
 
+User = get_user_model()
 
-@api_view(['GET', 'POST'])
-def getPlayers(request):
+# @api_view(['GET', 'POST'])
+# def getPlayers(request):
 
-    if request.method == 'GET':
-        players = Player.objects.all()
-        serializer = PlayerSerializer(players, many=True)
-        return Response(serializer.data)
+#     if request.method == 'GET':
+#         players = Player.objects.all()
+#         serializer = PlayerSerializer(players, many=True)
+#         return Response(serializer.data)
 
-    elif request.method == 'POST':
-        serializer = PlayerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     elif request.method == 'POST':
+#         serializer = PlayerSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def getPlayer(request, id):
-    try:
-        player = Player.objects.get(pk=id)
-    except Player.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def getPlayer(request, id):
+#     try:
+#         player = Player.objects.get(pk=id)
+#     except Player.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = PlayerSerializer(player)
-        return Response(serializer.data)
+#     if request.method == 'GET':
+#         serializer = PlayerSerializer(player)
+#         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = PlayerSerializer(player, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     elif request.method == 'PUT':
+#         serializer = PlayerSerializer(player, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
-        player.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     elif request.method == 'DELETE':
+#         player.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST', 'GET', 'PUT', 'DELETE'])
-def login_view(request):
-	try:
-		serializer = LoginSerializer(data=request.data, context = {'request': request})
-		serializer.is_valid(raise_exception=True)
-	except serializers.ValidationError:
-		return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+class login_view(APIView):
+	permission_classes = [AllowAny]
 
-	# user = serializer.validated_data['user']
-	# # Player.check_inactive_players()
-	# try:
-	# 	player = Player.objects.get(owner=user)
-	# except Player.DoesNotExist:
-	# 	return Response("Utilisateur inexistant.", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-	# if (player.status == "ONLINE" or player.status == "PLAYING"):
-	# 	return Response({"Erreur" : "Le joueur est deja loggé."}, status=status.HTTP_401_UNAUTHORIZED)
-	# login(request, user)
-	# player.status = "ONLINE"
-	# player.save()
-
-	user_data = self.request.user
-	serializer_data = DataSerializer(user_data)
-	return Response(data=serializer_data.data, status=status.HTTP_202_ACCEPTED)
+	def post(self, request , *args, **kwargs):
+		try:
+			user = authenticate(
+				request,
+				username=request.data['username'],
+				password=request.data['password'],
+			)
+			if user is not None:
+				# if user.is_2fa_verified:
+				# 	# Si 2FA est activé, ne pas connecter l'utilisateur immédiatement
+				# 	return Response(
+				# 		{
+				# 			'message': '2FA is enabled. Please provide OTP.',
+				# 			'require_2fa': True,
+				# 			'user_id': user.id
+				# 		},
+				# 		status=status.HTTP_200_OK
+				# 	)
+				# else:
+					# Si 2FA n'est pas activé, connecter l'utilisateur normalement
+					login(request, user)
+					csrf_token = get_token(request)
+					print("csrf_token : ", csrf_token)
+					return Response(
+						{
+							'data': UserSerializer(user).data,
+							'crsfToken': csrf_token,
+							'message': 'User logged in successfully',
+						},
+						status=status.HTTP_200_OK
+					)
+			raise ValueError('Invalid credentials')
+		except Exception as e:
+			return Response(
+				{'message': f"{type(e).__name__}: {str(e)}"},
+				status=status.HTTP_401_UNAUTHORIZED
+			)
 
 # def login_view(request):
 #     if request.method == "POST":
@@ -91,26 +110,30 @@ def login_view(request):
 #     else:
 #         return render(request, 'auth/login.html', {})
 
-@api_view(['POST', 'GET', 'PUT', 'DELETE'])
-def register_view(request):
-    # check if the request.data["username"] contains a _42 in the username
-    if '_42' in request.data['username'] or '@' in request.data['username'] or '+' in request.data['username']:
-        return Response({"username": "'_42','@' or '+' not allowed"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+class register_view(APIView):
+	permission_classes = [AllowAny]
 
-    mail_check = False
-    # check if the request.data["email"] contains a 42 in the mail
-    if '42' in request.data['email']:
-        mail_check = True
+	def post(self, request, *args, **kwargs):
+		email = request.data.get('email')
+		username= request.data.get('username')
+		
+		if User.objects.filter(email=email).exists():
+			return Response(
+				{'email': 'Email already exists'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 
-    if mail_check == False :
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            if user:
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-
-    return Response({"42 API" : "Username or email with 42"}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+		serializer = UserSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(
+				{
+					'data': serializer.data,
+					'message': 'User registered successfully'
+				},
+				status=status.HTTP_201_CREATED
+			)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def otp_view(request):

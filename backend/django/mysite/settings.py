@@ -23,13 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJ_SECRETKEY')                                                                                                                                 
                                                                                                                                                                                                                   
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
-DEBUG = True                                                                                                                                                                                                      
+DEBUG = True
+
+AUTH_USER_MODEL = 'players.User'
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-ALLOWED_HOSTS_HTTPS = [f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
+ALLOWED_HOSTS_HTTPS = ["https://localhost", f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
                         f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":10443"]
-ALLOWED_HOSTS_HTTP = [f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
+ALLOWED_HOSTS_HTTP = ["http://localhost", f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
                         f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":10443"]
 
 CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
