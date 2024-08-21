@@ -10,23 +10,17 @@ cd mysite/
 
 mv /mysite2/* mysite/
 
-echo -n "pwd = "
-pwd
-echo -n "ls -la = "
-ls -la
-
-
 echo "Create APP=================="
-python3 manage.py startapp players
 python3 manage.py startapp pong
+python3 manage.py startapp players
 echo "============================"
 
 mv /players ./players
 mv /pong ./pong
 
 echo "Create migrations==========="
-python3 manage.py makemigrations
 python3 manage.py makemigrations players
+python3 manage.py makemigrations
 echo "============================"
 
 echo "Create staticfiles==========="
