@@ -16,7 +16,6 @@ from .serializers import PlayerSerializer
 
 @api_view(['GET', 'POST'])
 def getPlayers(request):
-
     if request.method == 'GET':
         players = Player.objects.all()
         serializer = PlayerSerializer(players, many=True)
@@ -50,21 +49,16 @@ def getPlayer(request, id):
         player.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['POST'])
 def login_view(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            send_otp(request)
-            request.session['username'] = username
-            return redirect('otp')
-        else:
-            messages.success(request, ("OUAICH T'ES QUI TOI !?"))
-            return redirect('login')
-
-    else:
-        return render(request, 'auth/login.html', {})
+    username = request.data['username']
+    password = request.data['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        send_otp(request)
+        request.session['username'] = username
+        return Response(status=status.HTTP_202_ACCEPTED)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 def otp_view(request):
     if request.method == "POST":
