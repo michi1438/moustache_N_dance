@@ -528,8 +528,9 @@ function selectOption(option) {
     if (currentQuestionIndex < questions.length) {
         listenerPongLocal();
     } else {
+		// if (document.getElementById('board_two'))
+		// 	document.getElementById('board_two').removeChild(renderer.domElemen);
 		currentQuestionIndex = 0;
-		// 	document.parentNode.getElementById('board_two').removeChild(renderer.domElement);
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);

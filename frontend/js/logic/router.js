@@ -14,7 +14,7 @@ import renderUserInfo from "../views/viewUserInfo.js"
 import handlePongLocal from "../game/oldmain.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
-import handlePongOnline from "../game/main.js"
+// import handlePongOnline from "../game/main.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
 
@@ -62,7 +62,7 @@ const routes = {
 		path: "/pongonline/",
 		view: renderPongOnline,
 		// load: handlePongOnline.loadPongOnline,
-		listener: handlePongOnline.listenerPongOnline
+		// listener: handlePongOnline.listenerPongOnline
 	},
 	"gamehistory": {
 		title: "Game History",
@@ -183,6 +183,40 @@ window.onload = async function()
 };
 
 /**
+ * Logout handler function
+ * Send a PATCH request to the server to logout the user
+ * If the response status is 200, the user is successfully logged out and redirected to the login page
+*/
+async function handleLogout() {
+
+	if (document.getElementById("login").value == "logout"){
+		document.getElementById("login").textContent = "Login";
+		document.getElementById("login").value = "login";
+
+		const csrftoken = document.cookie.split("; ").find((row) => row.startsWith("csrftoken"))?.split("=")[1];
+
+		const init = {
+			method: "POST",
+			headers: { 'X-CSRFToken': csrftoken, },
+		}
+
+		try {
+
+			let hostnameport = "https://" + window.location.host
+
+			const response = await fetch(hostnameport + '/api/players/logout', init);
+
+			if (response.status === 200) {
+				sessionStorage.clear();
+				router("login");
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+};
+
+/**
  * Event listener for DOMContentLoaded event
  * If the user is on the index page, index specific logic is executed
  * Attach event listener to the 'logout' button
@@ -199,10 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	// 	loadIndex();
 	// }
 
-	// document.getElementById("topbar__logout").addEventListener("click", (e) => {
-	// 	e.preventDefault();
-	// 	handleLogout();
-	// });
+	document.getElementById("login").addEventListener("click", (e) => {
+		e.preventDefault();
+		handleLogout();
+	});
 
 	document.querySelectorAll(".nav__item").forEach(element => {
 		element.addEventListener("click", (e) => {
