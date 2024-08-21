@@ -167,10 +167,26 @@ def otp_view(request):
 
     return render(request, 'auth/otp.html', {}) 
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, ("DECONNEXION REUSSIE ! GG !"))
-    return redirect('login')
+class logout_view(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, *args, **kwargs):
+		try:
+			logout(request)
+			return Response(
+				{'message': 'User logged out successfully'},
+				status=status.HTTP_200_OK
+			)
+		except Exception as e:
+			return Response(
+				{'message': f"{type(e).__name__}: {str(e)}"},
+				status=status.HTTP_400_BAD_REQUEST
+			)
+
+# def logout_view(request):
+#     logout(request)
+#     messages.success(request, ("DECONNEXION REUSSIE ! GG !"))
+#     return redirect('login')
 
 # def register_view(request):
 #     if request.method == "POST":

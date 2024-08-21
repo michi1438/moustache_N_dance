@@ -44,7 +44,7 @@ async function connectUser(loginForm) {
 			let errorMsg = await response.text();
 			errorMsg = JSON.parse(errorMsg);
 			console.log(errorMsg);
-			if (Object.keys(errorMsg) == "non_field_errors" && Object.values(errorMsg) == "Incorrect Credentials")
+			if (Object.keys(errorMsg) == "non_field_errors" && Object.values(errorMsg) == "Invalid credentials")
 				document.getElementById("form__login--errorMsg").textContent = "Incorrect Credentials";
 			else if (response.status == 422)
 				document.getElementById("form__login--errorMsg").textContent = errorMsg;
