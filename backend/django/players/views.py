@@ -55,12 +55,13 @@ def login_view(request):
     password = request.data['password']
     user = authenticate(request, username=username, password=password)
     if user is not None:
+        #token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         send_otp(request)
-        request.session['username'] = username
+        #return Response({'token': token}, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_202_ACCEPTED)
     return Response(status=status.HTTP_404_NOT_FOUND)
 
-def otp_view(request):
+def verify_otp(request):
     if request.method == "POST":
         otp = request.POST['otp']
         username = request.session['username']
