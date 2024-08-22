@@ -436,10 +436,10 @@ function animate(vitesse) {
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            //scoreP2++;
+            scoreP2++;
             sendScore(2);
-            scoreP2object[scoreP2 - 1].visible = false;
-            scoreP2object[scoreP2].visible = true;
+            // scoreP2object[scoreP2 - 1].visible = false;
+            // scoreP2object[scoreP2].visible = true;
             sendBallPosition();
         } else if (ball.position.x >= paddle2.position.x) {
             sound2.play();
@@ -447,10 +447,10 @@ function animate(vitesse) {
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            //scoreP1++;
+            scoreP1++;
             sendScore(1);
-            scoreP1object[scoreP1 - 1].visible = false;
-            scoreP1object[scoreP1].visible = true;
+            // scoreP1object[scoreP1 - 1].visible = false;
+            // scoreP1object[scoreP1].visible = true;
             sendBallPosition();
         //fin de la partie
         } else if (scoreP1 == 5 || scoreP2 == 5) {
@@ -465,10 +465,14 @@ function animate(vitesse) {
             sendBallPosition();
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
-                handleGameOver(1, animationId);
+                setTimeout(() => {
+                    handleGameOver(1, animationId);
+                }, 1000);
             } else {
                 p2WIN.visible = true;
-                handleGameOver(2, animationId);
+                setTimeout(() => {
+                    handleGameOver(2, animationId);
+                }, 1000);
             }
         }
         //gestion des paddles
@@ -510,10 +514,6 @@ document.addEventListener('keyup', (event) => {
 });
 
 const questions = [
-    {
-        question: "Nombre de joueurs",
-        options: ["2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
-    },
     {
         question: "Vitesse du jeu",
         options: ["Classique", "Progressive"]
@@ -652,7 +652,19 @@ function handleWebSocketMessage(message) {
         case 'score':
             scoreP1 = message.scoreP1;
             scoreP2 = message.scoreP2;
-            //updateScoreDisplay();
+            if(message.player == 1) {
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP1object[i].visible = false;
+                }
+                scoreP1object[scoreP1].visible = true;
+            }
+            else if(message.player == 2) {
+                for (let i = 0; i < scoreP2object.length; i++) {
+                    scoreP2object[i].visible = false;
+                }
+                scoreP2object[scoreP2].visible = true;
+            }
+            //updateScoreDisplay(message.player);
             break;
         case 'join':
             if (message.gameID !== gameID) {
@@ -664,7 +676,27 @@ function handleWebSocketMessage(message) {
     }
 }
 
-// function updateScoreDisplay() {
+// function updateScoreDisplay(player) {
+//     if(player == 1) {
+//         // Mettre tous les scores à false
+//         for (let i = 0; i < scoreP1object.length; i++) {
+//             scoreP1object[i].visible = false;
+//         }
+//         // Mettre à true uniquement le score reçu
+//         if (scoreP1 > 0 && scoreP1 <= scoreP1object.length) {
+//             scoreP1object[scoreP1 -].visible = true;
+//         }
+//     }
+//     else if(player == 2) {
+//         // Mettre tous les scores à false
+//         for (let i = 0; i < scoreP2object.length; i++) {
+//             scoreP2object[i].visible = false;
+//         }
+//         // Mettre à true uniquement le score reçu
+//         if (scoreP2 > 0 && scoreP2 <= scoreP2object.length) {
+//             scoreP2object[scoreP2 - 1].visible = true;
+//         }
+//     }
 //     // Mettre à jour l'affichage du score ici
 //     console.log('Score:', scoreP1, '-', scoreP2);
 // }
@@ -727,17 +759,13 @@ function sendBallPosition() {
 
 function sendScore(playerNumber) {
     if (ws && ws.readyState === WebSocket.OPEN) {
-        if(playerNumber === 1) {
-            scoreP1++;
-        }
-        else {
-            scoreP2++;
-        }
         const message = {
             type: 'score',
+            player: playerNumber,
             scoreP1: scoreP1,
             scoreP2: scoreP2
         };
+        console.log('Sending score:', message);
         ws.send(JSON.stringify(message));
         //console.log('Sending score:', message);
     } else {
