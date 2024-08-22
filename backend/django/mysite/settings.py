@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('DJ_SECRETKEY')
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
 DEBUG = True
 
-AUTH_USER_MODEL = 'players.User'
+AUTH_USER_MODEL = 'players.Player'
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -181,7 +181,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)                                                                                                                                                                          
 # https://docs.djangoproject.com/en/4.2/howto/static-files/                                                                                                                                                       
                                                                                                                                                                                                                   
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'  
 
 MEDIA_URL = ""

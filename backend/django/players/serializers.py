@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, get_user_model
-# from .models import Player
+from .models import Player
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -11,7 +11,7 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = User
+		model = Player
 		fields = ['id', 'username', 'email', 'password', 'avatar']
 
 	def create(self, validated_data):
@@ -96,10 +96,10 @@ class UserSerializer(serializers.ModelSerializer):
 		instance.save()
 		return instance
 
-# class PlayerSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Player
-#         fields = '__all__'
+class PlayerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = '__all__'
 
 class LoginSerializer(serializers.Serializer):
 	username = serializers.CharField(label="username")

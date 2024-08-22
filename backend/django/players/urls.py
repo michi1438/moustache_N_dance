@@ -7,6 +7,6 @@ urlpatterns = [
         path('otp', views.otp_view, name="otp"),
         path('logout', logout_view.as_view(), name="logout"),
         path('register', register_view.as_view(), name="register"),
-        # path('', views.getPlayers),
-        # path('details/<int:id>', views.getPlayer),
+        path('', views.getPlayers),
+        path('details/<int:id>', views.getPlayer),
 ]

@@ -11,47 +11,48 @@ from django.middleware.csrf import get_token
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
-# from .models import Player
+from .models import Player
 from .serializers import *
 
 User = get_user_model()
 
-# @api_view(['GET', 'POST'])
-# def getPlayers(request):
+@api_view(['GET', 'POST'])
+def getPlayers(request):
 
-#     if request.method == 'GET':
-#         players = Player.objects.all()
-#         serializer = PlayerSerializer(players, many=True)
-#         return Response(serializer.data)
+    if request.method == 'GET':
+        players = Player.objects.all()
+        serializer = PlayerSerializer(players, many=True)
+        return Response(serializer.data)
 
-#     elif request.method == 'POST':
-#         serializer = PlayerSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+    elif request.method == 'POST':
+        serializer = PlayerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def getPlayer(request, id):
-#     try:
-#         player = Player.objects.get(pk=id)
-#     except Player.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+@api_view(['GET', 'PUT', 'DELETE'])
+def getPlayer(request, id):
+    try:
+        player = Player.objects.get(pk=id)
+    except Player.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-#     if request.method == 'GET':
-#         serializer = PlayerSerializer(player)
-#         return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = PlayerSerializer(player)
+        return Response(serializer.data)
 
-#     elif request.method == 'PUT':
-#         serializer = PlayerSerializer(player, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'PUT':
+        serializer = PlayerSerializer(player, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     elif request.method == 'DELETE':
-#         player.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+    elif request.method == 'DELETE':
+        player.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class login_view(APIView):
 	permission_classes = [AllowAny]

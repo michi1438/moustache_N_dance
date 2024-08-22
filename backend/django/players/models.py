@@ -1,5 +1,5 @@
 from django.db import models
-# from django.urls import reverse
+from django.urls import reverse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 
@@ -30,14 +30,15 @@ from django.contrib.auth.models import AbstractUser
 #         """String for representing the MyModelName object (in Admin site etc.)."""
 #         return self.username
 
-class User(AbstractUser):
+class Player(AbstractUser):
 	avatar = models.ImageField(upload_to='', blank=True, null=True, default='')
+	nickname = models.CharField(max_length=50)
     # …
 
     # Metadata
 	class Meta:
 		ordering = ['username']
-		db_table = 'users'
+		db_table = 'players'
 
 		# Methods
 
