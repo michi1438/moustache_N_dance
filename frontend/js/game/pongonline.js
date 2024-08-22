@@ -16,6 +16,7 @@ let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
+let gameOver = false;
 
 let gameID = uuidv4();
 let ws;
@@ -394,6 +395,9 @@ function initGameSimpson () {
 
 function animate(vitesse) {
     let animationId = requestAnimationFrame(() => animate(vitesse));
+    if (gameOver) {
+        cancelAnimationFrame(animationId);
+    }
     controls.update();
     if (ball && paddle1 && paddle2 ) {
         if(go) {
@@ -432,25 +436,21 @@ function animate(vitesse) {
         //point marqué
         if (ball.position.x <= paddle1.position.x) {
             sound2.play();
+            scoreP2++;
+            sendScore(2);
             ball.position.set(0, 0, 0);
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP2++;
-            sendScore(2);
-            // scoreP2object[scoreP2 - 1].visible = false;
-            // scoreP2object[scoreP2].visible = true;
             sendBallPosition();
         } else if (ball.position.x >= paddle2.position.x) {
             sound2.play();
+            scoreP1++;
+            sendScore(1);
             ball.position.set(0, 0, 0);
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP1++;
-            sendScore(1);
-            // scoreP1object[scoreP1 - 1].visible = false;
-            // scoreP1object[scoreP1].visible = true;
             sendBallPosition();
         //fin de la partie
         } else if (scoreP1 == 5 || scoreP2 == 5) {
@@ -466,12 +466,12 @@ function animate(vitesse) {
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
                 setTimeout(() => {
-                    handleGameOver(1, animationId);
+                    handleGameOver(1);
                 }, 1000);
             } else {
                 p2WIN.visible = true;
                 setTimeout(() => {
-                    handleGameOver(2, animationId);
+                    handleGameOver(2);
                 }, 1000);
             }
         }
@@ -701,13 +701,13 @@ function handleWebSocketMessage(message) {
 //     console.log('Score:', scoreP1, '-', scoreP2);
 // }
 
-function handleGameOver(winner, animationId) {
+function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
-
+    gameOver = true;
     // Réinitialiser le jeu
 
-    cancelAnimationFrame(animationId);
+    //cancelAnimationFrame(animationId);
     //afficher un bouton pour rejouer
 
     // Afficher le score final
