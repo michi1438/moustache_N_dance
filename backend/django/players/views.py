@@ -5,7 +5,7 @@ from django.contrib import messages
 from .utils import send_otp
 from datetime import datetime
 import pyotp
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 
 from rest_framework import status
@@ -15,8 +15,6 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Player
 from .serializers import *
-
-User = get_user_model()
 
 @api_view(['GET', 'POST'])
 def getPlayers(request):
@@ -80,14 +78,7 @@ class login_view(APIView):
 					login(request, user)
 					csrf_token = get_token(request)
 					print("csrf_token : ", csrf_token)
-					return Response(
-						{
-							'data': UserSerializer(user).data,
-							'crsfToken': csrf_token,
-							'message': 'User logged in successfully',
-						},
-						status=status.HTTP_200_OK
-					)
+					return Response(data=UserSerializer(user).data, status=status.HTTP_200_OK)
 			raise ValueError('Invalid credentials')
 		except Exception as e:
 			return Response(

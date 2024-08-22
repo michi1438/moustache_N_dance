@@ -62,8 +62,10 @@ async function connectUser(loginForm) {
 			const data = await response.json();
 
 			sessionStorage.setItem("username", data["username"]);
-			//sessionStorage.setItem("avatar", data["player"].avatar);
-			//sessionStorage.setItem("nickname", data["player"].nickname);
+			sessionStorage.setItem("email", data["email"]);
+			if (data["avatar"])
+				sessionStorage.setItem("avatar", data["avatar"]);
+			sessionStorage.setItem("nickname", data["nickname"]);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
