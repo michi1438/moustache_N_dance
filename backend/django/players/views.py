@@ -1,17 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User #a supprimer
+from django.shortcuts import render, redirect, get_object_or_404 #a supprimer
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib import messages
-from .utils import send_otp
+from django.contrib.auth.forms import UserCreationForm #a supprimer
+from django.contrib import messages #a supprimer
 from datetime import datetime
 import pyotp
-from django.contrib.auth.models import User
 
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+
 from .models import Player
 from .serializers import PlayerSerializer
+from .utils import send_otp
 
 
 @api_view(['GET', 'POST'])
@@ -53,17 +56,27 @@ def getPlayer(request, id):
 def login_view(request):
     username = request.data['username']
     password = request.data['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        #token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        send_otp(request)
-        #return Response({'token': token}, status=status.HTTP_202_ACCEPTED)
-        return Response(status=status.HTTP_202_ACCEPTED)
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    if not username or not password:
+        return Response({"error": "Username and password required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    player = authenticate(request, username=username, password=password)
+    if player is not None:
+        refresh = RefreshToken.for_user(player)
+
+        send_otp(request, player)
+
+        return Response({
+            "message": "OTP sent to user",
+            "refresh": str(refresh),
+            "token": str(refresh.access_token)
+            }, status=status.HTTP_202_ACCEPTED)
+
+    return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['POST'])
 def verify_otp(request):
     if request.method == "POST":
-        otp = request.POST['otp']
+        otp = request.data['otp']
         username = request.session['username']
 
         otp_secret_key = request.session['otp_secret_key']
