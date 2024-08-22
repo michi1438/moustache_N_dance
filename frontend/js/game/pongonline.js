@@ -438,6 +438,10 @@ function animate(vitesse) {
             sound2.play();
             scoreP2++;
             sendScore(2);
+            for (let i = 0; i < scoreP1object.length; i++) {
+                scoreP2object[i].visible = false;
+            }
+            scoreP2object[scoreP2].visible = true;
             ball.position.set(0, 0, 0);
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
@@ -447,6 +451,10 @@ function animate(vitesse) {
             sound2.play();
             scoreP1++;
             sendScore(1);
+            for (let i = 0; i < scoreP1object.length; i++) {
+                scoreP1object[i].visible = false;
+            }
+            scoreP1object[scoreP1].visible = true;
             ball.position.set(0, 0, 0);
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
