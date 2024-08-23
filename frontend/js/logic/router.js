@@ -168,15 +168,15 @@ window.onload = async function()
 				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
 
 				document.title = routes[route].title;
-				// routes[route].listener();  // Attach event listeners
+				routes[route].listener();  // Attach event listener
 			// }
-			
 		}
-		else
-			router("login");
-			return;
+		// else
+		// 	router("login");
+		// return;
+		
 	}
-	if (found == false)
+	if (found === false)
 	{
 		router("404_error")
 	}
@@ -268,6 +268,7 @@ window.addEventListener("popstate", async (e) => {
 	{
 		document.getElementById("main__content").innerHTML = page.view();
 		document.title = page.title;
+		page.listener();
 		return;
 	}
 
