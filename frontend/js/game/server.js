@@ -13,6 +13,7 @@ const wss = new WebSocket.Server({ server });
 
 let players = [];
 let gameID = uuidv4();
+let playerConfigs = [];
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
@@ -22,10 +23,27 @@ wss.on('connection', (ws) => {
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
-            broadcast(ws, data);
+            if (data.type === 'config') {
+                playerConfigs[players.indexOf(ws)] = data.config;
+                console.log('Received configuration:', playerConfigs);
+                console.log('nbr de configs:', playerConfigs.length);
+                if (playerConfigs.length === 2 && playerConfigs[0] && playerConfigs[1]) {
+                    //broadcast(ws, { type: 'start', playerConfigs });
+                    //comparer les objects pour voir si les configurations sont les mêmes
+                    console.log('Ya 2 configs:', playerConfigs);
+                    if (JSON.stringify(playerConfigs[0]) === JSON.stringify(playerConfigs[1])) {
+                        console.log('player0 and player1 configs:', playerConfigs[0], playerConfigs[1]);
+                        broadcast(null, { type: 'start', config: playerConfigs[0] });
+                        playerConfigs = [];
+                    }
+                }
+            } else {
+                broadcast(ws, data);
+            }
         });
 
         ws.on('close', () => {
+            broadcast(ws, { type: 'deco', player: players.indexOf(ws) });
             players = players.filter((player) => player !== ws);
         });
 

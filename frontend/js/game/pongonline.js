@@ -570,26 +570,27 @@ function selectOption(option) {
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
-        startGame(configuration);
+        //startGame(configuration);
+        connectWebSocket(configuration);
+        console.log('config dans startgame:', configuration);
     }
 }
 
-function startGame(config) {
-    // if (connectedPlayers < 2) {
-    //     console.log('Waiting for more players to connect...');
-    //     return;
-    // }
-    //console.log('Starting game with configuration:', config);
-    // This function will be implemented in main.js
-    // You can call any initialization functions here
-    connectWebSocket();
-    window.startGame(config);
-}
+// function startGame(config) {
+//     // if (connectedPlayers < 2) {
+//     //     console.log('Waiting for more players to connect...');
+//     //     return;
+//     // }
+//     //console.log('Starting game with configuration:', config);
+//     // This function will be implemented in main.js
+//     // You can call any initialization functions here
+//     //window.startGame(config);
+// }
 
 
 
 
-function connectWebSocket() {
+function connectWebSocket(config) {
     if (ws) {
         console.log('WebSocket already connected');
         return;
@@ -599,6 +600,8 @@ function connectWebSocket() {
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
+        ws.send(JSON.stringify({ type: 'config', config }));
+        console.log('Sending configuration:', config);
     };
 
     ws.onmessage = (event) => {
@@ -608,7 +611,7 @@ function connectWebSocket() {
                 gameID = message.gameID; // Store the received gameID
                 console.log('Received gameID from server:', gameID);
             }
-            handleWebSocketMessage(message);
+            handleWebSocketMessage(message, config);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
         }
@@ -628,7 +631,7 @@ function connectWebSocket() {
 }
 
 
-function handleWebSocketMessage(message) {
+function handleWebSocketMessage(message, config) {
     console.log('Message reçu:', message);
     if (!message.type) {
         console.warn('Received message without type:', message);
@@ -642,6 +645,9 @@ function handleWebSocketMessage(message) {
         case 'player': 
             playerNumber = message.player;
             break;
+        case 'start':
+            console.log('Starting game with configuration:', message.config);
+            window.startGame(message.config);
         case 'paddle':
             if (message.player === 1) {
                 paddle1.position.z = message.position;
@@ -679,6 +685,30 @@ function handleWebSocketMessage(message) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
                 ws.close();
             }
+        case 'deco':
+            console.log('Player', message.player, 'disconnected');
+            if(message.player == 0) {
+                scoreP2 = 5;
+                scoreP1 = 0;
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP1object[i].visible = false;
+                    scoreP2object[i].visible = false;
+                }
+                scoreP1object[scoreP1].visible = true;
+                scoreP2object[scoreP2].visible = true;
+            }
+            else if(message.player == 1) {
+                scoreP1 = 5;
+                scoreP2 = 0;
+                for (let i = 0; i < scoreP2object.length; i++) {
+                    scoreP2object[i].visible = false;
+                    scoreP1object[i].visible = false;
+                }
+                scoreP2object[scoreP2].visible = true;
+                scoreP1object[scoreP1].visible = true;
+            }
+            break;
+
         default:
             console.warn('Unhandled message type:', message.type);
     }
