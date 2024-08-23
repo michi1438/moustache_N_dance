@@ -1,41 +1,39 @@
-from django.contrib.auth.models import User #a supprimer
-from django.shortcuts import render, redirect, get_object_or_404 #a supprimer
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm #a supprimer
-from django.contrib import messages #a supprimer
+from django.contrib.auth import authenticate
 from datetime import datetime
+from django.utils import timezone
 import pyotp
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Player
 from .serializers import PlayerSerializer
-from .utils import send_otp
 
+@api_view(['GET'])
+def list_players(request):
+    players = Player.objects.all()
+    serializer = PlayerSerializer(players, many=True)
+    return Response(serializer.data)
 
-@api_view(['GET', 'POST'])
-def getPlayers(request):
-    if request.method == 'GET':
-        players = Player.objects.all()
-        serializer = PlayerSerializer(players, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = PlayerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+@api_view(['POST'])
+def create_player(request):
+    serializer = PlayerSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def getPlayer(request, id):
+@permission_classes([IsAuthenticated])
+def player_details(request, id):
     try:
         player = Player.objects.get(pk=id)
     except Player.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = PlayerSerializer(player)
@@ -50,10 +48,10 @@ def getPlayer(request, id):
 
     elif request.method == 'DELETE':
         player.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": f'Player with id {id} deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
-def login_view(request):
+def login(request):
     username = request.data['username']
     password = request.data['password']
     if not username or not password:
@@ -63,66 +61,53 @@ def login_view(request):
     if player is not None:
         refresh = RefreshToken.for_user(player)
 
-        send_otp(request, player)
+        player.send_otp()
 
         return Response({
-            "message": "OTP sent to user",
+            "message": f'OTP {player.otp.otp_code} sent to user',
             "refresh": str(refresh),
-            "token": str(refresh.access_token)
+            "access": str(refresh.access_token)
             }, status=status.HTTP_202_ACCEPTED)
 
     return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def verify_otp(request):
-    if request.method == "POST":
-        otp = request.data['otp']
-        username = request.session['username']
+    otp = request.data['otp']
 
-        otp_secret_key = request.session['otp_secret_key']
-        otp_valid_date = request.session['otp_valid_date']
+    if not otp:
+        return Response({"error": "OTP is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if otp_secret_key and otp_valid_date is not None:
-            valid_date = datetime.fromisoformat(otp_valid_date)
+    player = request.user
 
-            if valid_date > datetime.now():
-                totp = pyotp.TOTP(otp_secret_key, interval=60)
+    if player.otp is None:
+        return Response({"error": f'No OTP generated for user {player.username}'}, status=status.HTTP_400_BAD_REQUEST)
 
-                if totp.verify(otp):
-                    user = get_object_or_404(User, username=username)
-                    login(request, user)
+    if player.otp.verify_otp(otp):
+        player.online = True
+        player.save()
+        return Response({"message": "OTP is valid"}, status=status.HTTP_200_OK)
 
-                    del request.session['otp_secret_key']
-                    del request.session['otp_valid_date']
+    return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
 
-                    return redirect('home')
-                else:
-                    messages.success(request, ("invalid otp code!"))
-            else:
-                messages.success(request, ("otp code has expired!"))
-        else:
-            messages.success(request, ("something went wrong, retry later..."))
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        refresh_token = request.data['refresh']
 
-    return render(request, 'auth/otp.html', {}) 
+        if not refresh_token:
+            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, ("DECONNEXION REUSSIE ! GG !"))
-    return redirect('login')
+        token = RefreshToken(refresh_token)
+        token.blacklist()
 
-def register_view(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(request, ("Registration successful!"))
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'auth/register.html', {
-        'form':form,
-        })
+        player = request.user
+        player.online = False
+        player.save()
+
+        return Response({"message": "Logout successful"}, status=status.HTTP_205_RESET_CONTENT)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
