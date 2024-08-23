@@ -594,7 +594,7 @@ function connectWebSocket() {
         console.log('WebSocket already connected');
         return;
     }
-    console.log('OUI', location.host);
+    console.log('location.host', location.host);
     ws = new WebSocket('wss://'+ location.host + ':3000');
 
     ws.onopen = () => {
