@@ -14,13 +14,12 @@ const wss = new WebSocket.Server({ server });
 let players = [];
 let gameID = uuidv4();
 let playerConfigs = [];
-let processedConfigs = []; // Liste des configurations déjà traitées
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
     if (players.length < 20) {
         players.push(ws);
-        ws.send(JSON.stringify({ type: 'player', player: players.length, gameID }));
+       // ws.send(JSON.stringify({ type: 'player', player: players.length, gameID }));
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
@@ -32,11 +31,6 @@ wss.on('connection', (ws) => {
                 console.log('Received configuration:', playerConfigs);
                 console.log('Nbr de configs:', playerConfigs.filter(config => config).length);
 
-                // Vérifiez si cette configuration a déjà été traitée
-                if (processedConfigs.includes(JSON.stringify(data.config))) {
-                    return; // Ne rien faire si cette configuration a déjà été traitée
-                }
-
                 // Chercher des configurations correspondantes
                 const matchingPlayers = [];
                 playerConfigs.forEach((config, index) => {
@@ -46,7 +40,8 @@ wss.on('connection', (ws) => {
                 });
 
                 if (matchingPlayers.length > 1) {
-                    //players[playerIndex].send(JSON.stringify({ type: 'player', playerNumber: 2 }));
+                    players[0].send(JSON.stringify({ type: 'player', playerNumber: 1, gameID }));
+                    players[1].send(JSON.stringify({ type: 'player', playerNumber: 2, gameID }));
                     const startMessage = JSON.stringify({ type: 'start', config: data.config });
 
                     wss.clients.forEach(client => {
@@ -57,9 +52,7 @@ wss.on('connection', (ws) => {
                             client.send(startMessage);
                         }
                     });
-
-                    // Marquer cette configuration comme traitée
-                    processedConfigs.push(JSON.stringify(data.config));
+                    playerConfigs = [];
                 }
             } else {
                 broadcast(ws, data);
