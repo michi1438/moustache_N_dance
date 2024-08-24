@@ -5,3 +5,8 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = '__all__'
+
+class FriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['id', 'username', 'nickname']

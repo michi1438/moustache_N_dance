@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Player
-from .serializers import PlayerSerializer
+from .models import Player, FriendRequest
+from .serializers import PlayerSerializer, FriendSerializer
 
 @api_view(['GET'])
 def list_players(request):
@@ -111,3 +111,84 @@ def logout(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_friends(request):
+    user = request.user
+    friends = user.friends.all()
+    serializer = FriendSerializer(friends, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_request(request):
+    to_player_id = request.data['to_player_id']
+    from_player = request.user
+
+    try:
+        to_player = Player.objects.get(id=to_player_id)
+
+        # si la demande inverse existe deja, accepter la demande directement et ne pas en recreer une
+        if FriendRequest.objects.filter(from_player=to_player, to_player=from_player).exists():
+            existing_request = FriendRequest.objects.get(from_player=to_player, to_player=from_player) 
+            existing_request.delete()
+            from_player.friends.add(to_player)
+            return Response({"message": "Friend request accepted automatically because reciprocal"}, status=status.HTTP_200_OK)
+
+        # si la meme demande existe deja, renvoyer une erreur
+        if FriendRequest.objects.filter(from_player=from_player, to_player=to_player).exists():
+            return Response({"error": "Friend request already sent"}, status=status.HTTP_400_BAD_REQUEST)
+
+        friend_request = FriendRequest(from_player=from_player, to_player=to_player)
+        friend_request.save()
+        return Response({"message": "Friend request sent"}, status=status.HTTP_201_CREATED)
+
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_response(request):
+    requester_id = request.data['requester_id'] # id du demandeur
+    action = request.data['action'] # accept ou reject
+    player = request.user
+
+    try:
+        requester = Player.objects.get(id=requester_id)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        friend_request = FriendRequest.objects.get(from_player=requester, to_player=player)
+
+        if action == "accept":
+            friend_request.delete()
+            requester.friends.add(player)
+            return Response({"message": "Friend request accepted"}, status=status.HTTP_200_OK)
+
+        elif action == "reject":
+            friend_request.delete()
+            return Response({"message": "Friend request rejected"}, status=status.HTTP_200_OK)
+
+        return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+    except FriendRequest.DoesNotExist:
+        return Response({"error": f'No friend request found between player {requester_id} and player {player.id}'},status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_delete(request):
+    friend_id = request.data['friend_id']
+    player = request.user
+
+    try:
+        friend = Player.objects.get(id=friend_id)
+
+        if friend in player.friends.all():
+            player.friends.remove(friend)
+            return Response({"message": "Friend removed successfully"}, status=status.HTTP_200_OK)
+        return Response({"error": f'Player with id {friend_id} is not your friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {friend_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
