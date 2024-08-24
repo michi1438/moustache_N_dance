@@ -14,6 +14,7 @@ const wss = new WebSocket.Server({ server });
 let players = [];
 let gameID = uuidv4();
 let playerConfigs = [];
+let processedConfigs = []; // Liste des configurations déjà traitées
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
@@ -22,37 +23,43 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify({ type: 'player', player: players.length, gameID }));
 
         ws.on('message', (message) => {
-            let i = 0;
-            let j = 1;
             const data = JSON.parse(message);
             if (data.type === 'config') {
-                playerConfigs[players.indexOf(ws)] = data.config;
+                const playerIndex = players.indexOf(ws);
+                playerConfigs[playerIndex] = data.config;
                 ws.config = data.config;
+
                 console.log('Received configuration:', playerConfigs);
-                console.log('nbr de configs:', playerConfigs.length);
-                if (playerConfigs.length > 1) {
-                    //broadcast(ws, { type: 'start', playerConfigs });
-                    //comparer les objects pour voir si les configurations sont les mêmes
-                    console.log('Ya au moins 2 configs:', playerConfigs);
-                    for (let i = 0; i < playerConfigs.length - 1; i++) {
-                        for (let j = i + 1; j < playerConfigs.length; j++) {
-                            if (JSON.stringify(playerConfigs[i]) === JSON.stringify(playerConfigs[j])) {
-                                console.log('player0 and player1 configs:', i, j, playerConfigs[i], playerConfigs[j]);
-                                const message = JSON.stringify({ type: 'start', config: playerConfigs[i] });
-                                wss.clients.forEach(client => {
-                                    if (client.readyState === WebSocket.OPEN && JSON.stringify(client.config) === JSON.stringify(playerConfigs[i])){
-                                        client.send(message);
-                                    }
-                                });
-                                // Peut-être ne pas réinitialiser tout le tableau, mais plutôt marquer ces configurations comme traitées.
-                                playerConfigs.splice(j, 1);
-                                playerConfigs.splice(i, 1);
-                                i--; // Reculer `i` car nous venons de supprimer un élément
-                                break;
-                            }
-                        }
+                console.log('Nbr de configs:', playerConfigs.filter(config => config).length);
+
+                // Vérifiez si cette configuration a déjà été traitée
+                if (processedConfigs.includes(JSON.stringify(data.config))) {
+                    return; // Ne rien faire si cette configuration a déjà été traitée
+                }
+
+                // Chercher des configurations correspondantes
+                const matchingPlayers = [];
+                playerConfigs.forEach((config, index) => {
+                    if (config && JSON.stringify(config) === JSON.stringify(data.config)) {
+                        matchingPlayers.push(index);
                     }
-                    
+                });
+
+                if (matchingPlayers.length > 1) {
+                    //players[playerIndex].send(JSON.stringify({ type: 'player', playerNumber: 2 }));
+                    const startMessage = JSON.stringify({ type: 'start', config: data.config });
+
+                    wss.clients.forEach(client => {
+                        if (
+                            client.readyState === WebSocket.OPEN &&
+                            JSON.stringify(client.config) === JSON.stringify(data.config)
+                        ) {
+                            client.send(startMessage);
+                        }
+                    });
+
+                    // Marquer cette configuration comme traitée
+                    processedConfigs.push(JSON.stringify(data.config));
                 }
             } else {
                 broadcast(ws, data);
@@ -61,10 +68,12 @@ wss.on('connection', (ws) => {
 
         ws.on('close', () => {
             broadcast(ws, { type: 'deco', player: players.indexOf(ws) });
-            players = players.filter((player) => player !== ws);
+            const playerIndex = players.indexOf(ws);
+            players.splice(playerIndex, 1);
+            playerConfigs.splice(playerIndex, 1);
         });
 
-        //Vérifiez si le nombre de clients connectés est égal à 2
+        // Vérifiez si le nombre de clients connectés est égal à 2
         if (wss.clients.size === 2) {
             const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
             wss.clients.forEach(client => {

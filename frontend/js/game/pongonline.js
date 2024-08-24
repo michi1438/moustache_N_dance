@@ -261,6 +261,7 @@ function initGameSimpson () {
     }
 
     window.startGame = function(config) {
+        console.log('JE COMMENCE REELEMENT LE JEU');
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
@@ -644,7 +645,12 @@ function handleWebSocketMessage(message, config) {
             connectedPlayers = message.count;
             break;
         case 'player': 
+            // if (message.playerNumber === undefined) {
+            //     playerNumber = 1;
+            // } else {
             playerNumber = message.player;
+            
+            console.log('playernumber:', playerNumber); 
             break;
         case 'start':
             console.log('Starting game with configuration:', message.config);
