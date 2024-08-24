@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns = [
         path('create', views.create_player),
         path('list', views.list_players),
-        path('details/<int:id>', views.player_details),
+        path('details', views.player_details),
         path('login', views.login, name="login"),
         path('logout', views.logout, name="logout"),
         path('token_refresh', TokenRefreshView.as_view(), name="token_refresh"),

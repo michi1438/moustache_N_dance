@@ -39,7 +39,7 @@ class OTPManager(models.Model):
         return f'OTPManager for {self.id}'
 
 class Player(AbstractUser):
-    nickname = models.CharField(max_length=50)
+    nickname = models.CharField(unique=True, max_length=50)
     email = models.EmailField(unique=True, blank=False, null=False)
     #avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     wins = models.IntegerField(default=0)

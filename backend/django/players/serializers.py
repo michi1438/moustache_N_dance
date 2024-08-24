@@ -9,4 +9,4 @@ class PlayerSerializer(serializers.ModelSerializer):
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['id', 'username', 'nickname']
+        fields = ['id', 'username', 'nickname', 'online']

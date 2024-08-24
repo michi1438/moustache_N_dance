@@ -13,12 +13,14 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Player, FriendRequest
 from .serializers import PlayerSerializer, FriendSerializer
 
+# LISTER LES JOUEURS
 @api_view(['GET'])
 def list_players(request):
     players = Player.objects.all()
     serializer = PlayerSerializer(players, many=True)
     return Response(serializer.data)
 
+# CREER UN JOUEUR
 @api_view(['POST'])
 def create_player(request):
     serializer = PlayerSerializer(data=request.data)
@@ -27,20 +29,19 @@ def create_player(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN JOUEUR (accessible par le joueur lui-meme uniquement)
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def player_details(request, id):
-    try:
-        player = Player.objects.get(pk=id)
-    except Player.DoesNotExist:
-        return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+def player_details(request):
+
+    player = request.user
 
     if request.method == 'GET':
         serializer = PlayerSerializer(player)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = PlayerSerializer(player, data=request.data)
+        serializer = PlayerSerializer(player, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -48,8 +49,9 @@ def player_details(request, id):
 
     elif request.method == 'DELETE':
         player.delete()
-        return Response({"message": f'Player with id {id} deleted'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Player deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+# LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login(request):
     username = request.data['username']
@@ -59,27 +61,26 @@ def login(request):
 
     player = authenticate(request, username=username, password=password)
     if player is not None:
-        refresh = RefreshToken.for_user(player)
-
         player.send_otp()
-
-        return Response({
-            "message": f'OTP {player.otp.otp_code} sent to user',
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
+        return Response({"message": "OTP sent to user",
+            "player_id": str(player.id)
             }, status=status.HTTP_202_ACCEPTED)
 
     return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+# VERIFICATION DE L'OTP (authentification avec JWT Token si OTP valide)
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def verify_otp(request):
+    player_id = request.data['player_id']
     otp = request.data['otp']
 
-    if not otp:
-        return Response({"error": "OTP is required"}, status=status.HTTP_400_BAD_REQUEST)
+    if not otp or not player_id:
+        return Response({"error": "OTP and player ID are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    player = request.user
+    try:
+        player = Player.objects.get(id=player_id)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {player_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
     if player.otp is None:
         return Response({"error": f'No OTP generated for user {player.username}'}, status=status.HTTP_400_BAD_REQUEST)
@@ -87,10 +88,16 @@ def verify_otp(request):
     if player.otp.verify_otp(otp):
         player.online = True
         player.save()
-        return Response({"message": "OTP is valid"}, status=status.HTTP_200_OK)
+
+        refresh = RefreshToken.for_user(player)
+        return Response({"message": "OTP is valid",
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+            }, status=status.HTTP_200_OK)
 
     return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
 
+# LOGOUT (blacklist du token)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
@@ -112,14 +119,16 @@ def logout(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+# LISTER SES AMIS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_friends(request):
-    user = request.user
-    friends = user.friends.all()
+    player = request.user
+    friends = player.friends.all()
     serializer = FriendSerializer(friends, many=True)
     return Response(serializer.data)
 
+# DEMANDE D'AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_request(request):
@@ -128,25 +137,25 @@ def friend_request(request):
 
     try:
         to_player = Player.objects.get(id=to_player_id)
-
-        # si la demande inverse existe deja, accepter la demande directement et ne pas en recreer une
-        if FriendRequest.objects.filter(from_player=to_player, to_player=from_player).exists():
-            existing_request = FriendRequest.objects.get(from_player=to_player, to_player=from_player) 
-            existing_request.delete()
-            from_player.friends.add(to_player)
-            return Response({"message": "Friend request accepted automatically because reciprocal"}, status=status.HTTP_200_OK)
-
-        # si la meme demande existe deja, renvoyer une erreur
-        if FriendRequest.objects.filter(from_player=from_player, to_player=to_player).exists():
-            return Response({"error": "Friend request already sent"}, status=status.HTTP_400_BAD_REQUEST)
-
-        friend_request = FriendRequest(from_player=from_player, to_player=to_player)
-        friend_request.save()
-        return Response({"message": "Friend request sent"}, status=status.HTTP_201_CREATED)
-
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
+    # si la demande inverse existe deja, accepter la demande directement et ne pas en recreer une
+    if FriendRequest.objects.filter(from_player=to_player, to_player=from_player).exists():
+        existing_request = FriendRequest.objects.get(from_player=to_player, to_player=from_player) 
+        existing_request.delete()
+        from_player.friends.add(to_player)
+        return Response({"message": "Friend request accepted automatically because reciprocal"}, status=status.HTTP_200_OK)
+
+    # si la meme demande existe deja, renvoyer une erreur
+    if FriendRequest.objects.filter(from_player=from_player, to_player=to_player).exists():
+        return Response({"error": "Friend request already sent"}, status=status.HTTP_400_BAD_REQUEST)
+
+    friend_request = FriendRequest(from_player=from_player, to_player=to_player)
+    friend_request.save()
+    return Response({"message": "Friend request sent"}, status=status.HTTP_201_CREATED)
+
+# REPONSE A UNE DEMANDE D'AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_response(request):
@@ -176,6 +185,7 @@ def friend_response(request):
     except FriendRequest.DoesNotExist:
         return Response({"error": f'No friend request found between player {requester_id} and player {player.id}'},status=status.HTTP_404_NOT_FOUND)
 
+# SUPPRESSION D'UN AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_delete(request):
