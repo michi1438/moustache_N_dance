@@ -9,14 +9,14 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
-let gameOver = false;
+
 
 let gameID = uuidv4();
 let ws;
@@ -395,6 +395,7 @@ function initGameSimpson () {
 
 function animate(vitesse) {
     let animationId = requestAnimationFrame(() => animate(vitesse));
+    gameOver = false;
     if (gameOver) {
         cancelAnimationFrame(animationId);
     }

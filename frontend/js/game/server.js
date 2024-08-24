@@ -17,24 +17,32 @@ let playerConfigs = [];
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
-    if (players.length < 2) {
+    if (players.length < 20) {
         players.push(ws);
         ws.send(JSON.stringify({ type: 'player', player: players.length, gameID }));
 
         ws.on('message', (message) => {
+            let i = 0;
+            let j = 1;
             const data = JSON.parse(message);
             if (data.type === 'config') {
                 playerConfigs[players.indexOf(ws)] = data.config;
                 console.log('Received configuration:', playerConfigs);
                 console.log('nbr de configs:', playerConfigs.length);
-                if (playerConfigs.length === 2 && playerConfigs[0] && playerConfigs[1]) {
+                if (playerConfigs.length > 1) {
                     //broadcast(ws, { type: 'start', playerConfigs });
                     //comparer les objects pour voir si les configurations sont les mêmes
-                    console.log('Ya 2 configs:', playerConfigs);
-                    if (JSON.stringify(playerConfigs[0]) === JSON.stringify(playerConfigs[1])) {
-                        console.log('player0 and player1 configs:', playerConfigs[0], playerConfigs[1]);
-                        broadcast(null, { type: 'start', config: playerConfigs[0] });
-                        playerConfigs = [];
+                    console.log('Ya au moins 2 configs:', playerConfigs);
+                    while (i < playerConfigs.length) {
+                        while (j < playerConfigs.length) {
+                            if (JSON.stringify(playerConfigs[i]) === JSON.stringify(playerConfigs[j])) {
+                                console.log('player0 and player1 configs:', i, j, playerConfigs[i], playerConfigs[j]);
+                                broadcast(null, { type: 'start', config: playerConfigs[i] });
+                                playerConfigs = [];
+                            }
+                            j++;
+                        }
+                        i++;
                     }
                 }
             } else {
