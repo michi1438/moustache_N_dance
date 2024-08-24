@@ -27,23 +27,32 @@ wss.on('connection', (ws) => {
             const data = JSON.parse(message);
             if (data.type === 'config') {
                 playerConfigs[players.indexOf(ws)] = data.config;
+                ws.config = data.config;
                 console.log('Received configuration:', playerConfigs);
                 console.log('nbr de configs:', playerConfigs.length);
                 if (playerConfigs.length > 1) {
                     //broadcast(ws, { type: 'start', playerConfigs });
                     //comparer les objects pour voir si les configurations sont les mêmes
                     console.log('Ya au moins 2 configs:', playerConfigs);
-                    while (i < playerConfigs.length) {
-                        while (j < playerConfigs.length) {
+                    for (let i = 0; i < playerConfigs.length - 1; i++) {
+                        for (let j = i + 1; j < playerConfigs.length; j++) {
                             if (JSON.stringify(playerConfigs[i]) === JSON.stringify(playerConfigs[j])) {
                                 console.log('player0 and player1 configs:', i, j, playerConfigs[i], playerConfigs[j]);
-                                broadcast(null, { type: 'start', config: playerConfigs[i] });
-                                playerConfigs = [];
+                                const message = JSON.stringify({ type: 'start', config: playerConfigs[i] });
+                                wss.clients.forEach(client => {
+                                    if (client.readyState === WebSocket.OPEN && JSON.stringify(client.config) === JSON.stringify(playerConfigs[i])){
+                                        client.send(message);
+                                    }
+                                });
+                                // Peut-être ne pas réinitialiser tout le tableau, mais plutôt marquer ces configurations comme traitées.
+                                playerConfigs.splice(j, 1);
+                                playerConfigs.splice(i, 1);
+                                i--; // Reculer `i` car nous venons de supprimer un élément
+                                break;
                             }
-                            j++;
                         }
-                        i++;
                     }
+                    
                 }
             } else {
                 broadcast(ws, data);
