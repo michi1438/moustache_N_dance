@@ -648,6 +648,7 @@ function handleWebSocketMessage(message, config) {
             // if (message.playerNumber === undefined) {
             //     playerNumber = 1;
             // } else {
+            console.log('Player number from message.player:', message.player);
             playerNumber = message.player;
             
             console.log('playernumber:', playerNumber); 

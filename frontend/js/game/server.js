@@ -19,7 +19,7 @@ wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
     if (players.length < 20) {
         players.push(ws);
-       // ws.send(JSON.stringify({ type: 'player', player: players.length, gameID }));
+        //players[0].send(JSON.stringify({ type: 'player', player: players.length, gameID }));
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
@@ -38,10 +38,10 @@ wss.on('connection', (ws) => {
                         matchingPlayers.push(index);
                     }
                 });
-
+                console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
                 if (matchingPlayers.length > 1) {
-                    players[0].send(JSON.stringify({ type: 'player', playerNumber: 1, gameID }));
-                    players[1].send(JSON.stringify({ type: 'player', playerNumber: 2, gameID }));
+                    players[matchingPlayers[0]].send(JSON.stringify({ type: 'player', playerNumber: 1}));
+                    players[matchingPlayers[1]].send(JSON.stringify({ type: 'player', playerNumber: 2}));
                     const startMessage = JSON.stringify({ type: 'start', config: data.config });
 
                     wss.clients.forEach(client => {
