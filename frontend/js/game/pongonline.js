@@ -261,7 +261,7 @@ function initGameSimpson () {
     }
 
     window.startGame = function(config) {
-        console.log('JE COMMENCE REELEMENT LE JEU');
+        console.log('JE COMMENCE REELEMENT LE JEU avec la config : ', config);
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
@@ -353,12 +353,11 @@ function initGameSimpson () {
     );
 
     }
-    
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
     countdownDisplay.id = 'countdownDisplay';
- 
-
+    
+    
     //console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
@@ -368,8 +367,9 @@ function initGameSimpson () {
         vitesse = false;
     }
     //console.log("Connected players:", connectedPlayers);
+    console.log('JARRRRIVE ICI', connectedPlayers, isModelLoaded, isConfigReady);
     let checkReadyInterval = setInterval(() => {
-        if (connectedPlayers > 1 && isModelLoaded && isConfigReady) {
+        if (isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocket();
             let countdownInterval = setInterval(() => {
@@ -385,7 +385,6 @@ function initGameSimpson () {
                     }, 1000);
                 }
             }, 1000);
-            console.log("playerNumber:", playerNumber);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met

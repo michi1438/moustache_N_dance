@@ -64,14 +64,14 @@ wss.on('connection', (ws) => {
         });
 
         // Vérifiez si le nombre de clients connectés est égal à 2
-        if (wss.clients.size === 2) {
-            const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
-            wss.clients.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(message);
-                }
-            });
-        }
+        // if (wss.clients.size === 2) {
+        //     const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
+        //     wss.clients.forEach(client => {
+        //         if (client.readyState === WebSocket.OPEN) {
+        //             client.send(message);
+        //         }
+        //     });
+        // }
     } else {
         ws.send(JSON.stringify({ type: 'error', message: 'Game is full' }));
         ws.close();
