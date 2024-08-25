@@ -396,7 +396,6 @@ function initGameSimpson () {
 
 function animate(vitesse) {
     let animationId = requestAnimationFrame(() => animate(vitesse));
-    gameOver = false;
     if (gameOver) {
         cancelAnimationFrame(animationId);
     }

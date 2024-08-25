@@ -40,7 +40,7 @@ wss.on('connection', (ws) => {
                     }
                 });
                 console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
-                if (matchingPlayers.length > 1) {
+                if (matchingPlayers.length == 2) {
                     // players[matchingPlayers[0]].send(JSON.stringify({ type: 'player', playerNumber: 1}));
                     // players[matchingPlayers[1]].send(JSON.stringify({ type: 'player', playerNumber: 2}));
                     gameID = uuidv4();
