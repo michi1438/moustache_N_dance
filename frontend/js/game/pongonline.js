@@ -644,16 +644,18 @@ function handleWebSocketMessage(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'player': 
-            // if (message.playerNumber === undefined) {
-            //     playerNumber = 1;
-            // } else {
-            console.log('Player number from message.player:', message.player);
-            playerNumber = message.player;
+        // case 'player': 
+        //     // if (message.playerNumber === undefined) {
+        //     //     playerNumber = 1;
+        //     // } else {
+        //     console.log('Player number from message.player:', message.player);
+        //     playerNumber = message.player;
             
-            console.log('playernumber:', playerNumber); 
-            break;
+        //     console.log('playernumber:', playerNumber); 
+        //     break;
         case 'start':
+            playerNumber = message.playerNumber;
+            console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
             window.startGame(message.config);
         case 'paddle':

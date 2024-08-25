@@ -2,6 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
+const { config } = require('process');
 
 // Charger les certificats SSL
 const server = https.createServer({
@@ -12,14 +13,14 @@ const server = https.createServer({
 const wss = new WebSocket.Server({ server });
 
 let players = [];
-let gameID = uuidv4();
+let gameID = 0;
 let playerConfigs = [];
+// let playerNumber = 1;
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
     if (players.length < 20) {
         players.push(ws);
-        //players[0].send(JSON.stringify({ type: 'player', player: players.length, gameID }));
 
         ws.on('message', (message) => {
             const data = JSON.parse(message);
@@ -40,19 +41,15 @@ wss.on('connection', (ws) => {
                 });
                 console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
                 if (matchingPlayers.length > 1) {
-                    players[matchingPlayers[0]].send(JSON.stringify({ type: 'player', playerNumber: 1}));
-                    players[matchingPlayers[1]].send(JSON.stringify({ type: 'player', playerNumber: 2}));
-                    const startMessage = JSON.stringify({ type: 'start', config: data.config });
-
-                    wss.clients.forEach(client => {
-                        if (
-                            client.readyState === WebSocket.OPEN &&
-                            JSON.stringify(client.config) === JSON.stringify(data.config)
-                        ) {
-                            client.send(startMessage);
-                        }
-                    });
-                    playerConfigs = [];
+                    // players[matchingPlayers[0]].send(JSON.stringify({ type: 'player', playerNumber: 1}));
+                    // players[matchingPlayers[1]].send(JSON.stringify({ type: 'player', playerNumber: 2}));
+                    gameID = uuidv4();
+                    players[matchingPlayers[0]].gameID = gameID;
+                    players[matchingPlayers[1]].gameID = gameID;
+                    players[matchingPlayers[0]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: playerConfigs[matchingPlayers[0]]}));
+                    players[matchingPlayers[1]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: playerConfigs[matchingPlayers[1]]}));
+                    playerConfigs[matchingPlayers[0]] = null;
+                    playerConfigs[matchingPlayers[1]] = null;
                 }
             } else {
                 broadcast(ws, data);
@@ -84,7 +81,7 @@ wss.on('connection', (ws) => {
 function broadcast(sender, message) {
     const data = JSON.stringify(message);
     wss.clients.forEach(client => {
-        if (client !== sender && client.readyState === WebSocket.OPEN) {
+        if (client !== sender && client.readyState === WebSocket.OPEN && client.gameID === sender.gameID) {
             client.send(data);
         }
     });
