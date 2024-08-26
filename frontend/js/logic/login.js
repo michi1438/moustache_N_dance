@@ -172,26 +172,27 @@ async function createUser(createAccountForm) {
 	}
 };
 
-// async function connectUser42() {
+async function connectUser42() {
 
-// 	try {
+	try {
 
-// 		let hostnameport = "https://" + window.location.host
+		let hostnameport = "https://" + window.location.host
 
-// 		const response = await fetch(hostnameport + '/api/accounts/');
+		const response = fetch('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f609ffa42a7126dcf409e8d38e010776e12797af600bc657d3ec6ea4108e18a4&redirect_uri=https%3A%2F%2Flocalhost%2F&response_type=code');
+		//const response = await fetch(hostnameport + '/api/players/ologin/authorize/');
+//https://api.intra.42.fr/oauth/token/?grant_type=client_credentials&client_id=tGbwrGzTizDGglRzGn7uSVLFWPpk6HMh8Oyw596a&client_secret=pbkdf2_sha256$720000$MyHaaHaFzFAQ3wvepAR4EF$pzMbc
+//sup/Kcc5/WngxF9jzX5WdcBcmfP4VwULCa8CsQ 
+		if (!response.ok) {
+			throw new Error(`HTTP error, status = ${response.status}`);
+		}
 
-// 		if (!response.ok) {
-// 			throw new Error(`HTTP error, status = ${response.status}`);
-// 		}
+		const address = await response.json();
 
-// 		const address = await response.json();
-
-// 		window.location.href = address;
-// 		// waitFor42();
-// 	} catch (e) {
-// 		console.error("Error 42: ", e);
-// 	}
-// };
+//		window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f609ffa42a7126dcf409e8d38e010776e12797af600bc657d3ec6ea4108e18a4&redirect_uri=https%3A%2F%2Flocalhost%2F&response_type=code";
+	} catch (e) {
+		console.error("Error 42: ", e);
+	}
+};
 
 function listenerLogin() {
 
@@ -244,7 +245,7 @@ function listenerLogin() {
 	// Login with 42 handler
 	login42Btn.addEventListener("click", e => {
 		e.preventDefault();
-		// connectUser42();
+		connectUser42();
 	});
 };
 
