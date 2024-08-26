@@ -68,6 +68,13 @@ export default function renderLogin() {
 									<div id="form__input--usernameError" class="h6 text-danger"></div>
 								</div>
 								<div class="mb-2">
+									<div class="text-dark"">
+										Nickname
+									</div>
+									<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="nickname">
+									<div id="form__input--nicknameError" class="h6 text-danger"></div>
+								</div>
+								<div class="mb-2">
 									<div class="text-dark">
 										Email
 									</div>

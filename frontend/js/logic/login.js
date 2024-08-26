@@ -113,6 +113,7 @@ async function createUser(createAccountForm) {
 
 	const inputValues = {
 		username: input.username.value,
+		nickname: input.nickname.value,
 		password: input.password_one.value,
 		email: input.email.value,
 	};
@@ -149,6 +150,10 @@ async function createUser(createAccountForm) {
 			else if (Object.keys(errorMsg)[0] == "username") {
 				document.getElementById("form__createAccount--msg").textContent = "Invalid username"
 				document.getElementById("form__input--usernameError").textContent = Object.values(errorMsg);
+			}
+			else if (Object.keys(errorMsg)[0] == "nickname") {
+				document.getElementById("form__createAccount--msg").textContent = "Invalid nickname"
+				document.getElementById("form__input--nicknameError").textContent = Object.values(errorMsg);
 			}
 			else if (Object.keys(errorMsg)[0] == "email") {
 				document.getElementById("form__createAccount--msg").textContent = "Invalid email";
