@@ -166,7 +166,11 @@ window.onload = async function()
 				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
 				// document.getElementById("topbar__profile--avatar").alt =
 				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
+				if (sessionStorage.getItem("username")){
+					document.getElementById("login").textContent = "Logout";
+					document.getElementById("login").value = "logout";
+				}
+				
 				document.title = routes[route].title;
 				routes[route].listener();  // Attach event listener
 			// }

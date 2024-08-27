@@ -229,7 +229,7 @@ def login_view(request):
 
     player = authenticate(request, username=username, password=password)
     if player is not None:
-        login(request, player)
+        login(request, player) #to remove
         # csrf_token = get_token(request)
         # print("csrf_token : ", csrf_token)
         # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
@@ -260,13 +260,17 @@ def verify_otp(request):
     if player.otp.verify_otp(otp):
         player.online = True
         player.save()
-        return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
+        # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
-        # refresh = RefreshToken.for_user(player)
-        # return Response({"message": "OTP is valid",
-        #     "refresh": str(refresh),
-        #     "access": str(refresh.access_token)
-        #     }, data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
+        refresh = RefreshToken.for_user(player)
+        return Response({"message": "OTP is valid",
+            "username": str(player.username),
+            "nickname": str(player.nickname),
+            "email": str(player.email),
+            # "avatar": player.avatar,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+            }, status=status.HTTP_200_OK)
 
     return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
 

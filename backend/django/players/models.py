@@ -102,8 +102,9 @@ class OTPManager(models.Model):
         return f'OTPManager for {self.id}'
 
 class Player(AbstractUser):
-    avatar = models.ImageField(upload_to='', blank=True, null=True, default='')
-    nickname = models.CharField(max_length=50)
+    nickname = models.CharField(unique=True, max_length=50)
+    email = models.EmailField(unique=True, blank=False, null=False)
+    avatar = models.ImageField(upload_to='', null=True, blank=True)
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
 
@@ -118,13 +119,13 @@ class Player(AbstractUser):
 
         self.otp.generate_otp()
         print(self.otp.otp_code)
-        # send_mail(
-        #     subject = "Here is your OTP for Moustache N Dance !",
-        #     message = f'Salut {self.username} aka "{self.nickname}", ton code OTP est {self.otp.otp_code}',
-        #     from_email = None,
-        #     recipient_list = [self.email],
-        #     fail_silently = False
-        #     )
+        send_mail(
+            subject = "Here is your OTP for Moustache N Dance !",
+            message = f'Salut {self.username} aka "{self.nickname}", ton code OTP est {self.otp.otp_code}',
+            from_email = None,
+            recipient_list = [self.email],
+            fail_silently = False
+            )
 
     def __str__(self):
         return self.username
