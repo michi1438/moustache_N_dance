@@ -25,7 +25,9 @@ def list_players(request):
 def create_player(request):
     serializer = PlayerSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        player = Player(**serializer.validated_data)
+        player.set_password(serializer.validated_data['password'])
+        player.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -43,11 +45,16 @@ def player_details(request):
     elif request.method == 'PUT':
         serializer = PlayerSerializer(player, data=request.data, partial=True)
         if serializer.is_valid():
+            if 'password' in serializer.validated_data:
+                player.set_password(serializer.validated_data['password'])
+                serializer.validated_data['password'] = player.password
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        if player.otp:
+            player.otp.delete()
         player.delete()
         return Response({"message": "Player deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
