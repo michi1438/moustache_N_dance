@@ -17,7 +17,7 @@ urlpatterns = [
         path('login', views.login_view, name="login"),
         # path('logout', views.logout, name="logout"),
         # path('token_refresh', TokenRefreshView.as_view(), name="token_refresh"),
-        # path('verify_otp', views.verify_otp, name="otp"),
+        path('verify_otp', views.verify_otp, name="otp"),
         # path('friends/list', views.list_friends),
         # path('friends/request', views.friend_request),
         # path('friends/response', views.friend_response),

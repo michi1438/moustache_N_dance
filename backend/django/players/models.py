@@ -118,13 +118,13 @@ class Player(AbstractUser):
 
         self.otp.generate_otp()
         print(self.otp.otp_code)
-        send_mail(
-            subject = "Here is your OTP for Moustache N Dance !",
-            message = f'Salut {self.username} aka "{self.nickname}", ton code OTP est {self.otp.otp_code}',
-            from_email = None,
-            recipient_list = [self.email],
-            fail_silently = False
-            )
+        # send_mail(
+        #     subject = "Here is your OTP for Moustache N Dance !",
+        #     message = f'Salut {self.username} aka "{self.nickname}", ton code OTP est {self.otp.otp_code}',
+        #     from_email = None,
+        #     recipient_list = [self.email],
+        #     fail_silently = False
+        #     )
 
     def __str__(self):
         return self.username

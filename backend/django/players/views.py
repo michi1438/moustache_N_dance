@@ -230,44 +230,45 @@ def login_view(request):
     player = authenticate(request, username=username, password=password)
     if player is not None:
         login(request, player)
-        csrf_token = get_token(request)
-        print("csrf_token : ", csrf_token)
-        return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
-        # player.send_otp()
-        # return Response({"message": "OTP sent to user",
-        #     "player_id": str(player.id)
-        #     }, status=status.HTTP_202_ACCEPTED)
+        # csrf_token = get_token(request)
+        # print("csrf_token : ", csrf_token)
+        # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
+        player.send_otp()
+        return Response({"message": "OTP sent to user",
+            "id": str(player.id)
+            }, status=status.HTTP_202_ACCEPTED)
 
     return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-# # VERIFICATION DE L'OTP (authentification avec JWT Token si OTP valide)
-# @api_view(['POST'])
-# def verify_otp(request):
-#     player_id = request.data['player_id']
-#     otp = request.data['otp']
+# VERIFICATION DE L'OTP (authentification avec JWT Token si OTP valide)
+@api_view(['POST'])
+def verify_otp(request):
+    player_id = request.data['id']
+    otp = request.data['otp']
 
-#     if not otp or not player_id:
-#         return Response({"error": "OTP and player ID are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if not otp or not player_id:
+        return Response({"error": "OTP and player ID are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-#     try:
-#         player = Player.objects.get(id=player_id)
-#     except Player.DoesNotExist:
-#         return Response({"error": f'Player with id {player_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+    try:
+        player = Player.objects.get(id=player_id)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {player_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
-#     if player.otp is None:
-#         return Response({"error": f'No OTP generated for user {player.username}'}, status=status.HTTP_400_BAD_REQUEST)
+    if player.otp is None:
+        return Response({"error": f'No OTP generated for user {player.username}'}, status=status.HTTP_400_BAD_REQUEST)
 
-#     if player.otp.verify_otp(otp):
-#         player.online = True
-#         player.save()
+    if player.otp.verify_otp(otp):
+        player.online = True
+        player.save()
+        return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
-#         refresh = RefreshToken.for_user(player)
-#         return Response({"message": "OTP is valid",
-#             "refresh": str(refresh),
-#             "access": str(refresh.access_token)
-#             }, status=status.HTTP_200_OK)
+        # refresh = RefreshToken.for_user(player)
+        # return Response({"message": "OTP is valid",
+        #     "refresh": str(refresh),
+        #     "access": str(refresh.access_token)
+        #     }, data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
-#     return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
 
 # # LOGOUT (blacklist du token)
 # @api_view(['POST'])

@@ -39,7 +39,17 @@ export default function renderLogin() {
 									<input type="password" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="password">
 									<div class="form__input--errorMsg text-danger"></div>
 								</div>
+								<div class="mb-2 d-none" id="otp">
+									<div class="text-dark">
+										One Time Password
+									</div>
+									<input type="password" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="otp">
+									<div class="form__input--errorMsg text-danger"></div>
+								</div>
 								<button class="btn btn-dark mt-1" type="submit" id="form__login--btn">
+									Login
+								</button>
+								<button class="btn btn-dark mt-1 d-none" id="form__loginOTP--btn">
 									Login
 								</button>
 							</form>
