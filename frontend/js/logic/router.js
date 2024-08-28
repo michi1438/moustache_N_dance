@@ -197,11 +197,11 @@ async function handleLogout() {
 		document.getElementById("login").textContent = "Login";
 		document.getElementById("login").value = "login";
 
-		const csrftoken = document.cookie.split("; ").find((row) => row.startsWith("csrftoken"))?.split("=")[1];
+		const token = sessionStorage.getItem("token");
 
 		const init = {
 			method: "POST",
-			headers: { 'X-CSRFToken': csrftoken, },
+			headers: { 'Authorization': `Bearer ${token}`, },
 		}
 
 		try {

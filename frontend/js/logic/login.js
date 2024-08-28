@@ -17,11 +17,11 @@ async function verifyOTP(loginForm) {
 		return;
 	}
 
-	const csrftoken = document.cookie.split("; ").find((row) => row.startsWith("csrftoken"))?.split("=")[1];
+	const token = sessionStorage.getItem("token");
 
 	const init = {
 		method: "POST",
-		headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json'},
+		headers: { 'Content-Type': 'application/json'},
 		body: JSON.stringify(inputValues)
 	};
 
@@ -63,6 +63,7 @@ async function verifyOTP(loginForm) {
 			if (data["avatar"])
 				sessionStorage.setItem("avatar", data["avatar"]);
 			sessionStorage.setItem("nickname", data["nickname"]);
+			sessionStorage.setItem("token", data["access"]);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
