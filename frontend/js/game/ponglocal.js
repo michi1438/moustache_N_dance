@@ -489,10 +489,6 @@ document.addEventListener('keyup', (event) => {
 
 const questions = [
     {
-        question: "Nombre de joueurs",
-        options: ["2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
-    },
-    {
         question: "Vitesse du jeu",
         options: ["Classique", "Progressive"]
     },
@@ -546,6 +542,8 @@ function stopGame() {
     // - Cachez les éléments de l'interface utilisateur
     go = false;
     gameOver = true;
+
+    document.getElementById('board_two').removeChild(renderer.domElement);
 
 }
 
