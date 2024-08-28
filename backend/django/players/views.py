@@ -9,6 +9,8 @@ from django.utils import timezone
 import pyotp
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
+import requests
+import os 
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -156,15 +158,16 @@ def player_details(request):
 # 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def 42_token(request):
-    urls = 'https://api.intra.42.fr/oauth/token'
-    x = requests.post(urls, data={'grant_type': 'client_credentials', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API")})
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def authorize_fortytwo(request):
+    urls = 'https://api.intra.42.fr/oauth/token'
+    x = requests.post(urls, data={'grant_type': 'client_credentials', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.GET.get('code'), 'redirect_uri': 'https://localhost:10443/'})
     print("####################################################################")
-    print(x.json()['access_token'])
-    return x.json()['access_token']
+    print (x.json()['access_token'])
+    return Response()
 
 # def otp_view(request):
 #     if request.method == "POST":
