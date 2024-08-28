@@ -9,7 +9,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -286,7 +286,6 @@ function initGameSimpson () {
                     scoreP2object.push(gltf.scene.getObjectByName('4_R'));
                     scoreP2object.push(gltf.scene.getObjectByName('5_R'));
                     isModelLoaded = true;
-                    console.log("isModelLoaded set to true");
                     resolve();
                 }, undefined, function(error) {
                     console.error(error);
@@ -384,7 +383,10 @@ function initGameSimpson () {
 
 
 function animate(vitesse) {
-    requestAnimationFrame(() => animate(vitesse));
+    let animationId = requestAnimationFrame(() => animate(vitesse));
+    if (gameOver) {
+        cancelAnimationFrame(animationId);
+    }
     controls.update();
     if (ball && paddle1 && paddle2 ) {
         if(go) {
@@ -445,8 +447,14 @@ function animate(vitesse) {
             ball.position.set(0, 0, 0);
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
+                setTimeout(() => {
+                    stopGame();
+                }, 3000);
             } else {
                 p2WIN.visible = true;
+                setTimeout(() => {
+                    stopGame();
+                }, 3000);
             }
         }
         //gestion des paddles
@@ -529,6 +537,16 @@ function selectOption(option) {
 		document.getElementById('board_two').appendChild(renderer.domElement);
         window.Game(configuration);
     }
+}
+
+function stopGame() {
+    // Nettoyez les ressources ici, par exemple :
+    // - Arrêtez les sons
+    // - Réinitialisez les variables de jeu
+    // - Cachez les éléments de l'interface utilisateur
+    go = false;
+    gameOver = true;
+
 }
 
 

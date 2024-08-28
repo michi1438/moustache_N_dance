@@ -84,7 +84,7 @@ function initGame () {
     audioLoader.load( '/frontend/js/game/sounds/obi-wan-hello-there.mp3', function ( buffer ) {
         sound = new THREE.Audio( listener );
         sound.setBuffer( buffer );
-        sound.setVolume( 0.1 );
+        sound.setVolume( 0.9 );
     });
     audioLoader.load( '/frontend/js/game/sounds/bouncing-effect.mp3', function ( buffer ) {
             sound1 = new THREE.Audio( listener );
@@ -576,20 +576,6 @@ function selectOption(option) {
     }
 }
 
-// function startGame(config) {
-//     // if (connectedPlayers < 2) {
-//     //     console.log('Waiting for more players to connect...');
-//     //     return;
-//     // }
-//     //console.log('Starting game with configuration:', config);
-//     // This function will be implemented in main.js
-//     // You can call any initialization functions here
-//     //window.startGame(config);
-// }
-
-
-
-
 function connectWebSocket(config) {
     if (ws) {
         console.log('WebSocket already connected');
@@ -642,15 +628,6 @@ function handleWebSocketMessage(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        // case 'player': 
-        //     // if (message.playerNumber === undefined) {
-        //     //     playerNumber = 1;
-        //     // } else {
-        //     console.log('Player number from message.player:', message.player);
-        //     playerNumber = message.player;
-            
-        //     console.log('playernumber:', playerNumber); 
-        //     break;
         case 'start':
             playerNumber = message.playerNumber;
             console.log('Player number:', playerNumber);
@@ -722,45 +699,10 @@ function handleWebSocketMessage(message, config) {
     }
 }
 
-// function updateScoreDisplay(player) {
-//     if(player == 1) {
-//         // Mettre tous les scores à false
-//         for (let i = 0; i < scoreP1object.length; i++) {
-//             scoreP1object[i].visible = false;
-//         }
-//         // Mettre à true uniquement le score reçu
-//         if (scoreP1 > 0 && scoreP1 <= scoreP1object.length) {
-//             scoreP1object[scoreP1 -].visible = true;
-//         }
-//     }
-//     else if(player == 2) {
-//         // Mettre tous les scores à false
-//         for (let i = 0; i < scoreP2object.length; i++) {
-//             scoreP2object[i].visible = false;
-//         }
-//         // Mettre à true uniquement le score reçu
-//         if (scoreP2 > 0 && scoreP2 <= scoreP2object.length) {
-//             scoreP2object[scoreP2 - 1].visible = true;
-//         }
-//     }
-//     // Mettre à jour l'affichage du score ici
-//     console.log('Score:', scoreP1, '-', scoreP2);
-// }
-
 function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
     gameOver = true;
-    // Réinitialiser le jeu
-
-    //cancelAnimationFrame(animationId);
-    //afficher un bouton pour rejouer
-
-    // Afficher le score final
-    // Afficher un message de félicitations
-    // Afficher un message de défaite
-    
-
 }
 
 
