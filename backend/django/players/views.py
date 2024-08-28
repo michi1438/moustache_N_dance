@@ -128,6 +128,14 @@ class register_view(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def (APIView):
+    urls = 'https://api.intra.42.fr/oauth/token'
+    x = requests.post(urls, data={'grant_type': 'client_credentials', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API")})
+
+    print("####################################################################")
+    print(x.json()['access_token'])
+    return x.json()['access_token']
+
 def otp_view(request):
     if request.method == "POST":
         otp = request.POST['otp']
