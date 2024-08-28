@@ -1,5 +1,83 @@
 import router from "./router.js"
 // import { connect_socket_friend } from "./friends.js";
+async function verifyOTP(loginForm) {
+
+	// remove a potential error message from the field
+	document.getElementById("form__login--errorMsg").textContent = "";
+
+	const input = loginForm.elements;
+
+	const inputValues = {
+		id: sessionStorage.getItem("id"),
+		otp: input.otp.value,
+	};
+
+	if (!inputValues.otp) {
+		document.getElementById("form__login--errorMsg").textContent = "OTM not provided";
+		return;
+	}
+
+	const token = sessionStorage.getItem("token");
+
+	const init = {
+		method: "POST",
+		headers: { 'Content-Type': 'application/json'},
+		body: JSON.stringify(inputValues)
+	};
+
+	try {
+
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/verify_otp', init); // will use another URL
+
+		if (!response.ok || response.status == 500) {
+			document.getElementById("form__login--errorMsg").textContent = "Erreur " + response.status;
+			document.getElementById("form__login--errorMsg").classList.add("text-danger");
+			document.getElementById("form__login--errorMsg").classList.remove("text-success");
+		}
+
+		if (!response.ok || response.status === 203) {
+			let errorMsg = await response.text();
+			errorMsg = JSON.parse(errorMsg);
+			console.log(errorMsg);
+			if (Object.keys(errorMsg) == "non_field_errors" && Object.values(errorMsg) == "Invalid credentials")
+				document.getElementById("form__login--errorMsg").textContent = "Incorrect Credentials";
+			else if (response.status == 422)
+				document.getElementById("form__login--errorMsg").textContent = errorMsg;
+			else {
+				if (Object.keys(errorMsg) == "Erreur")
+					document.getElementById("form__login--errorMsg").textContent = errorMsg["Error"];
+				else
+					document.getElementById("form__login--errorMsg").textContent = "Error";
+			}
+			return;
+		}
+		if (response.status === 200) {
+			// login is successful -> redirect to profile
+
+			const data = await response.json();
+
+			sessionStorage.setItem("username", data["username"]);
+			sessionStorage.setItem("email", data["email"]);
+			if (data["avatar"])
+				sessionStorage.setItem("avatar", data["avatar"]);
+			sessionStorage.setItem("nickname", data["nickname"]);
+			sessionStorage.setItem("token", data["access"]);
+
+			// Manually call the hide function of the boostrap Modal element
+			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
+			await modal.hide();
+
+			document.getElementById("login").textContent = "Logout";
+			document.getElementById("login").value = "logout";
+			router("index");
+			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
+		}
+	} catch (e) {
+		console.error("Error connect user: ", e);
+	}
+};
 
 async function connectUser(loginForm) {
 
@@ -56,25 +134,38 @@ async function connectUser(loginForm) {
 			}
 			return;
 		}
-		if (response.status === 200) {
-			// login is successful -> redirect to profile
+		if (response.status === 202) {
+			document.getElementById("otp").classList.remove("d-none");
+			document.getElementById("otp").classList.add("d-block");
+			document.getElementById("form__login--btn").classList.add("d-none");
+			document.getElementById("form__loginOTP--btn").classList.remove("d-none");
 
 			const data = await response.json();
 
-			sessionStorage.setItem("username", data["username"]);
-			sessionStorage.setItem("email", data["email"]);
-			if (data["avatar"])
-				sessionStorage.setItem("avatar", data["avatar"]);
-			sessionStorage.setItem("nickname", data["nickname"]);
+			sessionStorage.setItem("id", data["id"]);
 
-			// Manually call the hide function of the boostrap Modal element
-			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
-			await modal.hide();
+			document.getElementById("form__loginOTP--btn").addEventListener("click", (e) => {
+				e.preventDefault();
+				verifyOTP(loginForm);
+			});
+			// login is successful -> redirect to profile
 
-			document.getElementById("login").textContent = "Logout";
-			document.getElementById("login").value = "logout";
-			router("index");
-			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
+			// const data = await response.json();
+
+			// sessionStorage.setItem("username", data["username"]);
+			// sessionStorage.setItem("email", data["email"]);
+			// if (data["avatar"])
+			// 	sessionStorage.setItem("avatar", data["avatar"]);
+			// sessionStorage.setItem("nickname", data["nickname"]);
+
+			// // Manually call the hide function of the boostrap Modal element
+			// var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
+			// await modal.hide();
+
+			// document.getElementById("login").textContent = "Logout";
+			// document.getElementById("login").value = "logout";
+			// router("index");
+			// document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 		}
 	} catch (e) {
 		console.error("Error connect user: ", e);
@@ -113,6 +204,7 @@ async function createUser(createAccountForm) {
 
 	const inputValues = {
 		username: input.username.value,
+		nickname: input.nickname.value,
 		password: input.password_one.value,
 		email: input.email.value,
 	};
@@ -149,6 +241,10 @@ async function createUser(createAccountForm) {
 			else if (Object.keys(errorMsg)[0] == "username") {
 				document.getElementById("form__createAccount--msg").textContent = "Invalid username"
 				document.getElementById("form__input--usernameError").textContent = Object.values(errorMsg);
+			}
+			else if (Object.keys(errorMsg)[0] == "nickname") {
+				document.getElementById("form__createAccount--msg").textContent = "Invalid nickname"
+				document.getElementById("form__input--nicknameError").textContent = Object.values(errorMsg);
 			}
 			else if (Object.keys(errorMsg)[0] == "email") {
 				document.getElementById("form__createAccount--msg").textContent = "Invalid email";

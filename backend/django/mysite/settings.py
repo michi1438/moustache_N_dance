@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os                                                                                                                                                                                                                  
 from pathlib import Path                                                                                                                                                                                          
+from datetime import timedelta
                                                                                                                                                                                                                   
 # Build paths inside the project like this: BASE_DIR / 'subdir'.                                                                                                                                                  
 BASE_DIR = Path(__file__).resolve().parent.parent                                                                                                                                                                 
@@ -24,8 +25,6 @@ SECRET_KEY = os.environ.get('DJ_SECRETKEY')
                                                                                                                                                                                                                   
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
 DEBUG = True
-
-AUTH_USER_MODEL = 'players.Player'
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -65,6 +64,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'oauth2_provider',
     'corsheaders',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]                                                                                                                                                                                                                 
 
 PASSWORD_HASHERS = [
@@ -74,6 +75,18 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
+REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+            ),
+        }
+
+SIMPLE_JWT = {
+        'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=5),
+        'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
+        'ROTATE_REFRESH_TOKENS' : True,
+        'BLACKLIST_AFTER_ROTATION' : True,
+        }
 
 LOGGING = {
     'version': 1,
@@ -182,7 +195,7 @@ TIME_ZONE = 'UTC'
                                                                                                                                                                                                                   
 USE_I18N = True                                                                                                                                                                                                   
                                                                                                                                                                                                                   
-USE_TZ = True                                                                                                                                                                                                     
+USE_TZ = False                                                                                                                                                                                                     
                                                                                                                                                                                                                   
                                                                                                                                                                                                                   
 # Static files (CSS, JavaScript, Images)                                                                                                                                                                          
@@ -190,9 +203,19 @@ USE_TZ = True
                                                                                                                                                                                                                   
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'  
-
-MEDIA_URL = ""
-MEDIA_ROOT = os.path.join(BASE_DIR, "")
                                                                                                                                                                                                                   
 # Default primary key field type                                                                                                                                                                                  
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field                                                                                                                                          
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "MOUSTACHE N DANCE"
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+AUTH_USER_MODEL = 'players.Player'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
