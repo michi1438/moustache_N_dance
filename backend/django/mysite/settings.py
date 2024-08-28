@@ -25,8 +25,6 @@ SECRET_KEY = os.environ.get('DJ_SECRETKEY')
                                                                                                                                                                                                                   
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
 DEBUG = True
-
-AUTH_USER_MODEL = 'players.Player'
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -197,9 +195,6 @@ USE_TZ = False
                                                                                                                                                                                                                   
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'  
-
-MEDIA_URL = ""
-MEDIA_ROOT = os.path.join(BASE_DIR, "")
                                                                                                                                                                                                                   
 # Default primary key field type                                                                                                                                                                                  
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field                                                                                                                                          
@@ -211,3 +206,8 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = "MOUSTACHE N DANCE"
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+AUTH_USER_MODEL = 'players.Player'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

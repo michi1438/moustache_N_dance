@@ -100,47 +100,47 @@ class PlayerSerializer(serializers.ModelSerializer):
 		model = Player
 		fields = '__all__'
 
-	def create(self, validated_data):
-		username = validated_data.get('username')
-		email = validated_data.get('email')
-		password = validated_data.get('password')
-		nickname = validated_data.get('nickname')
-		# avatar = validated_data.get('avatar')
+	# def create(self, validated_data):
+	# 	username = validated_data.get('username')
+	# 	email = validated_data.get('email')
+	# 	password = validated_data.get('password')
+	# 	nickname = validated_data.get('nickname')
+	# 	# avatar = validated_data.get('avatar')
 
-		prohibited_usernames = ["guest", "system", "admin"]
+	# 	prohibited_usernames = ["guest", "system", "admin"]
 
-		if not username:
-			raise serializers.ValidationError({'username': 'Username is required.'})
-		else:
-			if username.lower() in prohibited_usernames:
-				raise serializers.ValidationError({'username': 'Username not allowed'})
-			elif len(username) > 8:
-				raise serializers.ValidationError({'username': 'Max length is 8'})
+	# 	if not username:
+	# 		raise serializers.ValidationError({'username': 'Username is required.'})
+	# 	else:
+	# 		if username.lower() in prohibited_usernames:
+	# 			raise serializers.ValidationError({'username': 'Username not allowed'})
+	# 		elif len(username) > 8:
+	# 			raise serializers.ValidationError({'username': 'Max length is 8'})
 
-		if not email:
-			raise serializers.ValidationError({'email': 'Email is required.'})
+	# 	if not email:
+	# 		raise serializers.ValidationError({'email': 'Email is required.'})
 			
-		try:
-			validate_email(email)
-		except DjangoValidationError:
-			raise serializers.ValidationError({'email': 'Enter a valid email address.'})
+	# 	try:
+	# 		validate_email(email)
+	# 	except DjangoValidationError:
+	# 		raise serializers.ValidationError({'email': 'Enter a valid email address.'})
 
-		if not password:
-			raise serializers.ValidationError({'password': 'Password is required.'})
-		try:
-			validate_password(password)
-		except DjangoValidationError as e:
-			raise serializers.ValidationError({'password': list(e.messages)})
+	# 	if not password:
+	# 		raise serializers.ValidationError({'password': 'Password is required.'})
+	# 	try:
+	# 		validate_password(password)
+	# 	except DjangoValidationError as e:
+	# 		raise serializers.ValidationError({'password': list(e.messages)})
 
-		user = User.objects.create_user(
-			username=username,
-			email=email,
-			nickname=nickname,
-			# avatar=avatar
-		)
-		user.set_password(password)
-		user.save()
-		return user
+	# 	user = User.objects.create_user(
+	# 		username=username,
+	# 		email=email,
+	# 		nickname=nickname,
+	# 		# avatar=avatar
+	# 	)
+	# 	user.set_password(password)
+	# 	user.save()
+	# 	return user
 
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:
