@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+import router from "../logic/router.js"
+import listenerPongLocal from '../logic/ponglocal.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -382,6 +383,24 @@ function initGameSimpson () {
     }, 300); 
 }
 
+function unloadScript() {
+    // Désactiver les scripts chargés dynamiquement
+    document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
+        script.setAttribute('data-disabled', 'true');
+        script.removeAttribute('type');
+        if (window.gameSocket) {
+            window.gameSocket.close();
+            // console.log(window.gameSocket.readyState);
+        }
+        if (window.tournamentSocket) {
+            window.tournamentSocket.close();
+            // console.log(window.tournamentSocket.readyState);
+        }
+        // console.log(script);
+        script.remove(); // Supprimer le script du DOM
+    });
+}
+
 
 function animate(vitesse) {
     requestAnimationFrame(() => animate(vitesse));
@@ -448,6 +467,10 @@ function animate(vitesse) {
             } else {
                 p2WIN.visible = true;
             }
+			setTimeout(() => {
+				unloadScript();
+				window.onload();
+			}, 3000);
         }
         //gestion des paddles
         if (paddle1 && paddle2) {
@@ -497,7 +520,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
-function listenerPongLocal() {
+function showQuestion() {
 	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
@@ -526,11 +549,10 @@ function selectOption(option) {
     
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        listenerPongLocal();
+        showQuestion();
     } else {
 		// if (document.getElementById('board_two'))
 		// 	document.getElementById('board_two').removeChild(renderer.domElemen);
-		currentQuestionIndex = 0;
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
@@ -539,15 +561,11 @@ function selectOption(option) {
     }
 }
 
+showQuestion();
+
 function startGame(config) {
     //console.log('Starting game with configuration:', config);
     // This function will be implemented in main.js
     // You can call any initialization functions here
     window.startGame(config);
 }
-
-
-export default {
-	listenerPongLocal,
-	// loadPongLocal
-};
