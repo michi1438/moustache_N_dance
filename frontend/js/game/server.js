@@ -50,6 +50,9 @@ wss.on('connection', (ws) => {
                     playerConfigs[matchingPlayers[0]] = null;
                     playerConfigs[matchingPlayers[1]] = null;
                 }
+            else if (data.type === 'tournoi') {
+                tournamentLogic(data);
+            }
             } else {
                 broadcast(ws, data);
             }
@@ -84,6 +87,44 @@ function broadcast(sender, message) {
             client.send(data);
         }
     });
+}
+
+function tournamentLogic(data) {
+    //crée un tableau de playersID de la taille de data.config[0]
+    let playersID = new Array(data.config[0]);
+    //ajouter le playerID dans le tableau contenu dans data.playerID
+    playersID.push(data.playerID);
+    //si le tableau est égale à data.config[0] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
+    if (playersID.length == data.config[0]) {
+        for (let i = 0; i < playersID.length; i++) {
+            for (let j = 0; j < playersID.length; j++) {
+                if (i != j) {
+                    gameID = uuidv4();
+                    players[playersID[i]].gameID = gameID;
+                    players[playersID[j]].gameID = gameID;
+                    players[playersID[i]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: playerConfigs[playersID[i]]}));
+                    players[playersID[j]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: playerConfigs[playersID[j]]}));
+                    playerConfigs[playersID[i]] = null;
+                    playerConfigs[playersID[j]] = null;
+                }
+            }
+        }
+    }
+    //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
+    playersID = [];
+    playersID.length = data.config[0] / 2;
+    for (let i = 0; i < data.winners.length; i++) {
+        playersID.push(data.winners[i]);
+    }
+    //si le tableau est égale à 1, le playerID est le winner
+    if (playersID.length == 1) {
+        data.winner = playersID[0];
+    }
+    //si le tableau est supérieur à 1, relance la fonction tournamentLogic
+    else {
+        tournamentLogic(data);
+    }
+
 }
 
 server.listen(3000, () => {
