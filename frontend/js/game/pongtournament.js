@@ -575,7 +575,7 @@ function selectOption(option) {
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
         configMenu.style.display = 'none';
         // Proceed with the join logic
-        // connectWebSocket(configuration);
+        connectWebSocket(configuration);
         // console.log('config dans startgame:', configuration);
         return;
     }
@@ -604,6 +604,9 @@ function connectWebSocket(config) {
         console.log('WebSocket connection opened');
         if(config['Créer / Rejoindre'] == 'Créer') {
             ws.send(JSON.stringify({ type: 'tournoi', config, playerID }));
+        }
+        else if(config['Créer / Rejoindre'] == 'Rejoindre') {
+            ws.send(JSON.stringify({ type: 'Rejoindre', playerID }));
         }
         //console.log('Sending configuration and playerID:', config, playerID);
     };

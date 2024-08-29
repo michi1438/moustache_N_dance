@@ -16,6 +16,8 @@ let players = [];
 let gameID = 0;
 let playerConfigs = [];
 let winners = [];
+let playersID = [];
+let who;
 // let playerNumber = 1;
 
 wss.on('connection', (ws) => {
@@ -60,7 +62,14 @@ wss.on('connection', (ws) => {
                 winners.push(data.winner);
             }
             else if (data.type === 'tournoi') {
-                tournamentLogic(data, winners || []);
+                who = 0;
+                tournamentLogic(who ,data, winners || []);
+            }
+            else if (data.type === 'Rejoindre') {
+                console.log('data', data);
+                who = 1;
+                tournamentLogic(who ,data, winners || []);
+                
             }
             else {
                 broadcast(ws, data);
@@ -99,9 +108,11 @@ function broadcast(sender, message) {
 }
 
 function tournamentLogic(data, winners) {
-    console.log('premier element contenu dans config', data.config['Taille du tournoi']);
+    //console.log('premier element contenu dans config', data.config['Taille du tournoi']);
     //crée un tableau de playersID de la taille de data.config['Taille du tournoi']
-    let playersID = new Array(data.config['Taille du tournoi']);
+    if (who === 0) {
+        playersID = new Array(data.config['Taille du tournoi']);
+    }
     //ajouter le playerID dans le tableau contenu dans data.playerID
     playersID.push(data.playerID);
     //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
