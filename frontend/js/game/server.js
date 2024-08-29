@@ -19,7 +19,7 @@ let playerConfigs = [];
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
-    if (players.length < 20) {
+    if (players.length < 50) {
         players.push(ws);
 
         ws.on('message', (message) => {
@@ -41,8 +41,7 @@ wss.on('connection', (ws) => {
                 });
                 console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
                 if (matchingPlayers.length == 2) {
-                    // players[matchingPlayers[0]].send(JSON.stringify({ type: 'player', playerNumber: 1}));
-                    // players[matchingPlayers[1]].send(JSON.stringify({ type: 'player', playerNumber: 2}));
+
                     gameID = uuidv4();
                     players[matchingPlayers[0]].gameID = gameID;
                     players[matchingPlayers[1]].gameID = gameID;

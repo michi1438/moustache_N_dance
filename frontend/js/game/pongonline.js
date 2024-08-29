@@ -18,7 +18,7 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
 
-let gameID = uuidv4();
+let gameID;
 let ws;
 let playerNumber;
 let connectedPlayers = 0;
@@ -593,10 +593,10 @@ function connectWebSocket(config) {
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
-            if (message.type === 'player') {
-                gameID = message.gameID; // Store the received gameID
-                console.log('Received gameID from server:', gameID);
-            }
+            // if (message.type === 'player') {
+            //     gameID = message.gameID; // Store the received gameID
+            //     console.log('Received gameID from server:', gameID);
+            // }
             handleWebSocketMessage(message, config);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
