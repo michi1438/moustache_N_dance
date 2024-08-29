@@ -14,7 +14,7 @@ import renderUserInfo from "../views/viewUserInfo.js"
 import handlePongLocal from "./ponglocal.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
-// import handlePongOnline from "../game/main.js"
+import handlePongOnline from "../game/main.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
 
@@ -62,7 +62,7 @@ const routes = {
 		path: "/pongonline/",
 		view: renderPongOnline,
 		// load: handlePongOnline.loadPongOnline,
-		// listener: handlePongOnline.listenerPongOnline
+		listener: handlePongOnline.listenerPongOnline
 	},
 	"gamehistory": {
 		title: "Game History",

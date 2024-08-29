@@ -469,7 +469,12 @@ function animate(vitesse) {
             }
 			setTimeout(() => {
 				unloadScript();
-				window.onload();
+				const boardTwo = document.getElementById('board_two');
+				if (boardTwo && boardTwo.contains(renderer.domElement)) {
+					boardTwo.removeChild(renderer.domElement);
+					console.log("Game stopped.");
+    }
+				// window.onload();
 			}, 3000);
         }
         //gestion des paddles
