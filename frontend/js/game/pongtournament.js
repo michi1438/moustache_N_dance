@@ -15,7 +15,8 @@ let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
-let playerID = sessionStorage.getItem('id');
+let playerID = 1;
+//sessionStorage.getItem('id');
 
 
 let gameID;
@@ -587,7 +588,7 @@ function selectOption(option) {
         // Start the game with the selected configuration
         document.getElementById('board_two').appendChild(renderer.domElement);
         connectWebSocket(configuration);
-        console.log('config dans startgame:', configuration);
+        //console.log('config dans startgame:', configuration);
     }
 }
 
@@ -604,7 +605,7 @@ function connectWebSocket(config) {
         if(config['Créer / Rejoindre'] == 'Créer') {
             ws.send(JSON.stringify({ type: 'tournoi', config, playerID }));
         }
-        console.log('Sending configuration and playerID:', config, playerID);
+        //console.log('Sending configuration and playerID:', config, playerID);
     };
 
     ws.onmessage = (event) => {
@@ -720,6 +721,18 @@ function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
     gameOver = true;
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'winner',
+            winner : playerID
+        };
+        
+        ws.send(JSON.stringify(message));
+        //console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    }
 }
 
 
