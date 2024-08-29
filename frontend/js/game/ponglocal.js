@@ -543,7 +543,15 @@ function stopGame() {
     go = false;
     gameOver = true;
 
-    document.getElementById('board_two').removeChild(renderer.domElement);
+    const boardTwo = document.getElementById('board_two');
+    if (boardTwo) {
+        // Supprimez tous les enfants de boardTwo
+        while (boardTwo.firstChild) {
+            boardTwo.removeChild(boardTwo.firstChild);
+        }
+        console.log("Game stopped and board_two cleared.");
+    }
+    currentQuestionIndex = 0;
 
 }
 
