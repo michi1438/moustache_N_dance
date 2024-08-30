@@ -262,7 +262,7 @@ function initGameSimpson () {
         //console.log("isConfigReady set to true");
     }
 
-    window.startGame = function(config) {
+    window.startGameTournament = function(config) {
         console.log('JE COMMENCE REELEMENT LE JEU avec la config : ', config);
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
@@ -373,7 +373,7 @@ function initGameSimpson () {
     let checkReadyInterval = setInterval(() => {
         if (isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
-            //connectWebSocket();
+            //connectWebSocketTournament();
             let countdownInterval = setInterval(() => {
                 countdownDisplay.innerText = countdown;
                 countdown--;
@@ -577,8 +577,8 @@ function selectOption(option) {
         configMenu.style.display = 'none';
         // Proceed with the join logic
         document.getElementById('board_two').appendChild(renderer.domElement);
-        connectWebSocket(configuration);
-        // console.log('config dans startgame:', configuration);
+        connectWebSocketTournament(configuration);
+        // console.log('config dans startGameTournament:', configuration);
         return;
     }
 
@@ -589,12 +589,12 @@ function selectOption(option) {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         document.getElementById('board_two').appendChild(renderer.domElement);
-        connectWebSocket(configuration);
-        //console.log('config dans startgame:', configuration);
+        connectWebSocketTournament(configuration);
+        //console.log('config dans startGameTournament:', configuration);
     }
 }
 
-function connectWebSocket(config) {
+function connectWebSocketTournament(config) {
     if (ws) {
         console.log('WebSocket already connected');
         return;
@@ -622,7 +622,7 @@ function connectWebSocket(config) {
             //     gameID = message.gameID; // Store the received gameID
             //     console.log('Received gameID from server:', gameID);
             // }
-            handleWebSocketMessage(message, config);
+            handleWebSocketMessageTournament(message, config);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
         }
@@ -642,7 +642,7 @@ function connectWebSocket(config) {
 }
 
 
-function handleWebSocketMessage(message, config) {
+function handleWebSocketMessageTournament(message, config) {
     console.log('Message reçu:', message);
     if (!message.type) {
         console.warn('Received message without type:', message);
@@ -653,11 +653,11 @@ function handleWebSocketMessage(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'start':
+        case 'startT':
             playerNumber = message.playerNumber;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
-            window.startGame(message.config);
+            window.startGameTournament(message.config);
         case 'paddle':
             if (message.player === 1) {
                 paddle1.position.z = message.position;

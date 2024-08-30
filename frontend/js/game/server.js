@@ -144,8 +144,8 @@ function tournamentLogic(data, winners) {
             gameID = uuidv4();
             players[[i]].gameID = gameID;
             players[[i+1]].gameID = gameID;
-            players[[i]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: configTournoi}));
-            players[[i+1]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: configTournoi}));
+            players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi}));
+            players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi}));
             i++;
             i++;
         }
