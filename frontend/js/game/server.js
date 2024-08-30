@@ -30,7 +30,7 @@ wss.on('connection', (ws) => {
         
         ws.on('message', (message) => {
             const data = JSON.parse(message);
-            console.log('Received message:', data);
+            //console.log('Received message:', data);
             //console.log('data.type:', data.type);
             if (data.type === 'config') {
                 const playerIndex = players.indexOf(ws);
@@ -142,8 +142,6 @@ function tournamentLogic(data, winners) {
         while(i < tabSize) {
             console.log('Lancement des games')
             gameID = uuidv4();
-            console.log('playersID[i]', playersID[i]);
-            console.log('playersID[j]', playersID[j]);
             players[[i]].gameID = gameID;
             players[[i+1]].gameID = gameID;
             players[[i]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: configTournoi}));

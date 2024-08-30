@@ -576,6 +576,7 @@ function selectOption(option) {
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
         configMenu.style.display = 'none';
         // Proceed with the join logic
+        document.getElementById('board_two').appendChild(renderer.domElement);
         connectWebSocket(configuration);
         // console.log('config dans startgame:', configuration);
         return;
@@ -603,12 +604,12 @@ function connectWebSocket(config) {
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
-        console.log('Sending configuration and playerID:', config, playerID);
+        //console.log('Sending configuration and playerID:', config, playerID);
         if(config['Créer / Rejoindre'] == 'Créer') {
             ws.send(JSON.stringify({ type: 'tournoi', config: config, playerID: playerID }));
         }
         else if(config['Créer / Rejoindre'] == 'Rejoindre') {
-            console.log('Sending rejoindre and playerID:', playerID);
+            //console.log('Sending rejoindre and playerID:', playerID);
             ws.send(JSON.stringify({ type: 'Rejoindre', playerID: playerID }));
         }
         //console.log('Sending configuration and playerID:', config, playerID);

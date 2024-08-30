@@ -18,13 +18,13 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
 function initGame () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
 //Camera
     camera.position.set(0, 30, 20);
     controls.update();
     camera.lookAt(0, 0, 0);
 
-    console.log(scene);
+    //console.log(scene);
 
 //Lights & shadows
     renderer.shadowMap.enabled = true;
@@ -132,7 +132,7 @@ function initGame () {
     p1WIN.visible = false;
     p2WIN.visible = false;
     isConfigReady = true;
-    console.log("isConfigReady set to true");
+    //console.log("isConfigReady set to true");
 }
 
 function initGameSimpson () {
