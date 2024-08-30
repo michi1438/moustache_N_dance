@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -15,7 +16,7 @@ let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
-let playerID = 1;
+let playerID = uuidv4();
 //sessionStorage.getItem('id');
 
 
@@ -602,11 +603,13 @@ function connectWebSocket(config) {
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
+        console.log('Sending configuration and playerID:', config, playerID);
         if(config['Créer / Rejoindre'] == 'Créer') {
-            ws.send(JSON.stringify({ type: 'tournoi', config, playerID }));
+            ws.send(JSON.stringify({ type: 'tournoi', config: config, playerID: playerID }));
         }
         else if(config['Créer / Rejoindre'] == 'Rejoindre') {
-            ws.send(JSON.stringify({ type: 'Rejoindre', playerID }));
+            console.log('Sending rejoindre and playerID:', playerID);
+            ws.send(JSON.stringify({ type: 'Rejoindre', playerID: playerID }));
         }
         //console.log('Sending configuration and playerID:', config, playerID);
     };

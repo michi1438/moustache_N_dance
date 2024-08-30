@@ -17,7 +17,9 @@ let gameID = 0;
 let playerConfigs = [];
 let winners = [];
 let playersID = [];
-let who;
+let tabSize;
+let tournoiSize;
+let configTournoi = {};
 // let playerNumber = 1;
 
 wss.on('connection', (ws) => {
@@ -28,7 +30,7 @@ wss.on('connection', (ws) => {
         
         ws.on('message', (message) => {
             const data = JSON.parse(message);
-            console.log('Received message:', data.config);
+            console.log('Received message:', data);
             //console.log('data.type:', data.type);
             if (data.type === 'config') {
                 const playerIndex = players.indexOf(ws);
@@ -62,13 +64,12 @@ wss.on('connection', (ws) => {
                 winners.push(data.winner);
             }
             else if (data.type === 'tournoi') {
-                who = 0;
-                tournamentLogic(who ,data, winners || []);
+                tournamentLogic(data, winners || []);
             }
             else if (data.type === 'Rejoindre') {
-                console.log('data', data);
-                who = 1;
-                tournamentLogic(who ,data, winners || []);
+                tournamentLogic(data, winners || []);
+
+                
                 
             }
             else {
@@ -108,45 +109,68 @@ function broadcast(sender, message) {
 }
 
 function tournamentLogic(data, winners) {
-    //console.log('premier element contenu dans config', data.config['Taille du tournoi']);
-    //crée un tableau de playersID de la taille de data.config['Taille du tournoi']
-    if (who === 0) {
-        playersID = new Array(data.config['Taille du tournoi']);
+    if(data.type === 'Rejoindre'){
+
+        playersID.push(data.playerID);
+        tabSize = playersID.length;
+        console.log('TABLEAU playersID', playersID);
+        console.log('TABLEAU tabSize', tabSize);
     }
-    //ajouter le playerID dans le tableau contenu dans data.playerID
-    playersID.push(data.playerID);
-    //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
-    if (playersID.length == data.config['Taille du tournoi']) {
-        for (let i = 0; i < playersID.length; i++) {
-            for (let j = 0; j < playersID.length; j++) {
-                if (i != j) {
-                    gameID = uuidv4();
-                    players[playersID[i]].gameID = gameID;
-                    players[playersID[j]].gameID = gameID;
-                    players[playersID[i]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: playerConfigs[playersID[i]]}));
-                    players[playersID[j]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: playerConfigs[playersID[j]]}));
-                    playerConfigs[playersID[i]] = null;
-                    playerConfigs[playersID[j]] = null;
-                }
-            }
+    else if(data.type === 'tournoi'){
+        tournoiSize = data.config['Taille du tournoi'];
+        tabSize = playersID.length;
+        configTournoi = {
+            'Vitesse du jeu': data.config['Vitesse du jeu'],
+            'Map': data.config['Map']
+        };
+
+        console.log('premier element contenu dans config', data.config['Taille du tournoi']);
+        if(tournoiSize != tabSize){
+            //crée un tableau de playersID de la taille de data.config['Taille du tournoi']
+            //ajouter le playerID (dans le premier element du tableau) contenu dans data.playerID 
+            playersID.push(data.playerID);
         }
     }
+    tabSize = playersID.length;
+    //afficher le tableau playersID
+    console.log('TABLEAU playersID', playersID);
+    console.log('TABLEAU tabSize', tabSize);
+    //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
+    if (tabSize == tournoiSize){
+        let i = 0;
+        let j = 0;
+        while(i < tabSize) {
+            console.log('Lancement des games')
+            gameID = uuidv4();
+            console.log('playersID[i]', playersID[i]);
+            console.log('playersID[j]', playersID[j]);
+            players[[i]].gameID = gameID;
+            players[[i+1]].gameID = gameID;
+            players[[i]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 1, config: configTournoi}));
+            players[[i+1]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: configTournoi}));
+            i++;
+            i++;
+        }
+    }
+    
+    
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
-    playersID = [];
-    playersID.length = data.config['Taille du tournoi'] / 2;
-    if(winners){
+    if(winners.length == tabSize / 2){
+        playersID = [];
+        tabSize = tabSize / 2;
         for (let i = 0; i < winners.length; i++) {
             playersID.push(winners[i]);
         }
     }
     //si le tableau est égale à 1, le playerID est le winner
-    if (playersID.length == 1) {
-        winners[0] = playersID[0];
-    }
+    // if (playersID.length == 1) {
+    //     winners[0] = playersID[0];
+    // }
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
-    else if (playersID.length > 1 && winners) {
+    else if (playersID.length == 10/*playersID.length > 1 && winners*/) {
         tournamentLogic(data);
     }
+
 
 }
 
