@@ -136,7 +136,7 @@ function tournamentLogic(data, winners) {
     console.log('TABLEAU playersID', playersID);
     console.log('TABLEAU tabSize', tabSize);
     //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
-    if (tabSize == tournoiSize){
+    if (tabSize == playersID.length) {
         let i = 0;
         let j = 0;
         while(i < tabSize) {
