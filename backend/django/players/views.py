@@ -13,51 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Player, FriendRequest
 from .serializers import PlayerSerializer, FriendSerializer
 
-# LISTER LES TOURNOIS
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def list_tournaments(request):
-    tournaments = Tournament.objects.all()
-    serializer = TournamentSerializer(tournaments, many=True)
-    return Response(serializer.data)
-
-# CREER UN TOURNOI
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_tournament(request):
-    data = request.data.copy()
-    data['created_by'] = request.user.id
-
-    serializer = TournamentSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN TOURNOI
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def tournament_details(request, tournament_id):
-    try:
-        tournament = Tournament.objects.get(id=tournament_id)
-    except Tournament.DoesNotExist:
-        return Response({"error": f'Tournament with id {tournament_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = TournamentSerializer(tournament)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = TournamentSerializer(tournament, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        tournament.delete()
-        return Response({"message": "Tournament deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
 # LISTER LES JOUEURS
 @api_view(['GET'])
 def list_players(request):

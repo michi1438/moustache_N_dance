@@ -14,7 +14,4 @@ urlpatterns = [
         path('friends/request', views.friend_request),
         path('friends/response', views.friend_response),
         path('friends/delete', views.friend_delete),
-        path('tournament/create', views.create_tournament),
-        path('tournament/list', views.list_tournaments),
-        path('tournament/<int:tournament_id>', views.tournament_details),
 ]

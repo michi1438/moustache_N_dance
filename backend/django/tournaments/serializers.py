@@ -5,4 +5,4 @@ class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = '__all__'
-        read_only_fields = ['id', 'created_by', 'created_on']
+        read_only_fields = ['id', 'created_on', 'created_by']

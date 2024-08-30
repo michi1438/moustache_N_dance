@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/29 18:51:52 by lzito            ###   ########.fr        #
+#    Updated: 2024/08/30 15:17:32 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ clean:
 		-@docker network rm $$(docker network ls -q) 2>/dev/null
 
 fclean: clean
-		@rm -rf /home/$(USER)/data
+		@sudo rm -rf /home/$(USER)/data
 
 ps:
 		@docker ps -a 

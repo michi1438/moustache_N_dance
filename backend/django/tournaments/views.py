@@ -20,13 +20,14 @@ def list_tournaments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_tournament(request):
-    data = request.data.copy()
-    data['created_by'] = request.user.id
 
-    serializer = TournamentSerializer(data=data)
+    player = request.user
+
+    serializer = TournamentSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        tournament = serializer.save(created_by=player)
+        tournament.participants.add(player)
+        return Response(tournament.id, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN TOURNOI
@@ -52,3 +53,20 @@ def tournament_details(request, tournament_id):
     elif request.method == 'DELETE':
         tournament.delete()
         return Response({"message": "Tournament deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+# AJOUTER PARTICIPANT
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_participant(request, tournament_id):
+    try:
+        tournament = Tournament.objects.get(id=tournament_id)
+    except Tournament.DoesNotExist:
+        return Response({"error": f'Tournament with id {tournament_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+
+    player = request.user
+
+    if player in tournament.participants.all():
+        return Response({"error": f'Player {player.username} is already a participant'}, status=status.HTTP_400_BAD_REQUEST)
+
+    tournament.participants.add(player)
+    return Response({"message": f'Player {player.username} added successfully to tournament {tournament.id}'}, status=status.HTTP_200_OK)
