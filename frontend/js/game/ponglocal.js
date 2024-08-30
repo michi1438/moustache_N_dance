@@ -1,8 +1,10 @@
+console.log("Ponglocal script loaded");
+
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import router from "../logic/router.js"
-import listenerPongLocal from '../logic/ponglocal.js';
+import {listenerPongLocal} from '../logic/ponglocallogic.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -15,6 +17,7 @@ let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
 let go = false;
+sessionStorage.setItem("gameOver", "false");
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
@@ -255,51 +258,51 @@ function initGameSimpson () {
         console.log("isConfigReady set to true");
     }
 
-    window.startGame = function(config) {
-        if (config['Map'] == 'Simpson') {
-            modelPath = '/frontend/js/game/models/modelSimpson.glb';
-    
-            new Promise((resolve, reject) => {
-                loader.load(modelPath, function(gltf) {
-                    scene.add(gltf.scene);
-            
-                    plane = gltf.scene.getObjectByName('Plane');
-                    paddle1 = gltf.scene.getObjectByName('Paddle1');
-                    paddle2 = gltf.scene.getObjectByName('Paddle2');
-                    ball = gltf.scene.getObjectByName('Ball');
-                    topWall = gltf.scene.getObjectByName('WallT');
-                    bottomWall = gltf.scene.getObjectByName('WallB');
-                    p1WIN = gltf.scene.getObjectByName('P1WIN');
-                    p2WIN = gltf.scene.getObjectByName('P2WIN');
-                    title = gltf.scene.getObjectByName('title');
-                
-                    scoreP1object.push(gltf.scene.getObjectByName('0_L'));
-                    scoreP1object.push(gltf.scene.getObjectByName('1_L'));
-                    scoreP1object.push(gltf.scene.getObjectByName('2_L'));
-                    scoreP1object.push(gltf.scene.getObjectByName('3_L'));
-                    scoreP1object.push(gltf.scene.getObjectByName('4_L'));
-                    scoreP1object.push(gltf.scene.getObjectByName('5_L'));
-                
-                    scoreP2object.push(gltf.scene.getObjectByName('0_R'));
-                    scoreP2object.push(gltf.scene.getObjectByName('1_R'));
-                    scoreP2object.push(gltf.scene.getObjectByName('2_R'));
-                    scoreP2object.push(gltf.scene.getObjectByName('3_R'));
-                    scoreP2object.push(gltf.scene.getObjectByName('4_R'));
-                    scoreP2object.push(gltf.scene.getObjectByName('5_R'));
-                    isModelLoaded = true;
-                    console.log("isModelLoaded set to true");
-                    resolve();
-                }, undefined, function(error) {
-                    console.error(error);
-                    reject(error);
-                });
-            }).then(() => {
-                if(isModelLoaded)
-                    initGameSimpson();
-            }).catch((error) => {
-                console.error('Failed to load model:', error);
-            });
-        }
+window.startGame = function(config) {
+	if (config['Map'] == 'Simpson') {
+		modelPath = '/frontend/js/game/models/modelSimpson.glb';
+
+		new Promise((resolve, reject) => {
+			loader.load(modelPath, function(gltf) {
+				scene.add(gltf.scene);
+		
+				plane = gltf.scene.getObjectByName('Plane');
+				paddle1 = gltf.scene.getObjectByName('Paddle1');
+				paddle2 = gltf.scene.getObjectByName('Paddle2');
+				ball = gltf.scene.getObjectByName('Ball');
+				topWall = gltf.scene.getObjectByName('WallT');
+				bottomWall = gltf.scene.getObjectByName('WallB');
+				p1WIN = gltf.scene.getObjectByName('P1WIN');
+				p2WIN = gltf.scene.getObjectByName('P2WIN');
+				title = gltf.scene.getObjectByName('title');
+			
+				scoreP1object.push(gltf.scene.getObjectByName('0_L'));
+				scoreP1object.push(gltf.scene.getObjectByName('1_L'));
+				scoreP1object.push(gltf.scene.getObjectByName('2_L'));
+				scoreP1object.push(gltf.scene.getObjectByName('3_L'));
+				scoreP1object.push(gltf.scene.getObjectByName('4_L'));
+				scoreP1object.push(gltf.scene.getObjectByName('5_L'));
+			
+				scoreP2object.push(gltf.scene.getObjectByName('0_R'));
+				scoreP2object.push(gltf.scene.getObjectByName('1_R'));
+				scoreP2object.push(gltf.scene.getObjectByName('2_R'));
+				scoreP2object.push(gltf.scene.getObjectByName('3_R'));
+				scoreP2object.push(gltf.scene.getObjectByName('4_R'));
+				scoreP2object.push(gltf.scene.getObjectByName('5_R'));
+				isModelLoaded = true;
+				console.log("isModelLoaded set to true");
+				resolve();
+			}, undefined, function(error) {
+				console.error(error);
+				reject(error);
+			});
+		}).then(() => {
+			if(isModelLoaded)
+				initGameSimpson();
+		}).catch((error) => {
+			console.error('Failed to load model:', error);
+		});
+	}
     else if (config['Map'] == 'Classique') {
         modelPath = '/frontend/js/game/models/modelMoustache.glb';
         new Promise((resolve, reject) => {
@@ -383,118 +386,103 @@ function initGameSimpson () {
     }, 300); 
 }
 
-function unloadScript() {
-    // Désactiver les scripts chargés dynamiquement
-    document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
-        script.setAttribute('data-disabled', 'true');
-        script.removeAttribute('type');
-        if (window.gameSocket) {
-            window.gameSocket.close();
-            // console.log(window.gameSocket.readyState);
-        }
-        if (window.tournamentSocket) {
-            window.tournamentSocket.close();
-            // console.log(window.tournamentSocket.readyState);
-        }
-        // console.log(script);
-        script.remove(); // Supprimer le script du DOM
-    });
-}
-
-
 function animate(vitesse) {
-    requestAnimationFrame(() => animate(vitesse));
-    controls.update();
-    if (ball && paddle1 && paddle2 ) {
-        if(go) {
-            ball.position.x += ballSpeed.x;
-            ball.position.z += ballSpeed.z;
-        }
-        //collision murs
-        if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
-            ballSpeed.z *= -1;
-            
-        }
-        //collision paddle1 et paddle2
-        if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.4 / 2 && ball.position.z >= paddle1.position.z - 6.4 / 2) {
-            sound1.play();
-            if (vitesse == true) {
-                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
-            }
-            else {
-                ballSpeed.x *= -1;
-            }
-        }
-        if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
-            sound1.play();
-            if (vitesse == true) {
-                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
-            }
-            else {
-                ballSpeed.x *= -1;
-            }
-        }
-        //point marqué
-        if (ball.position.x <= paddle1.position.x) {
-            sound2.play();
-            ball.position.set(0, 0, 0);
-            ballSpeed = { x: -0.2, z: -0.2 };
-            ball.position.x -= ballSpeed.x;
-            ball.position.z -= ballSpeed.z;
-            scoreP2++;
-            scoreP2object[scoreP2 - 1].visible = false;
-            scoreP2object[scoreP2].visible = true;
-        } else if (ball.position.x >= paddle2.position.x) {
-            sound2.play();
-            ball.position.set(0, 0, 0);
-            ballSpeed = { x: 0.2, z: 0.2 };
-            ball.position.x -= ballSpeed.x;
-            ball.position.z -= ballSpeed.z;
-            scoreP1++;
-            scoreP1object[scoreP1 - 1].visible = false;
-            scoreP1object[scoreP1].visible = true;
-        //fin de la partie
-        } else if (scoreP1 == 5 || scoreP2 == 5) {
-            if (!soundPlayed) {
-                setTimeout(() => {
-                    sound3.play();
-                }, 1000);
-                soundPlayed = true;
-            }
-            ball.position.set(0, 0, 0);
-            if (scoreP1 == 5) {
-                p1WIN.visible = true;
-            } else {
-                p2WIN.visible = true;
-            }
-			setTimeout(() => {
-				unloadScript();
-				const boardTwo = document.getElementById('board_two');
+	if (sessionStorage.getItem("gameOver") == "false") {
+		requestAnimationFrame(() => animate(vitesse));
+		controls.update();
+		if (ball && paddle1 && paddle2 ) {
+			if(go) {
+				ball.position.x += ballSpeed.x;
+				ball.position.z += ballSpeed.z;
+			}
+			//collision murs
+			if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
+				ballSpeed.z *= -1;
+				
+			}
+			//collision paddle1 et paddle2
+			if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.4 / 2 && ball.position.z >= paddle1.position.z - 6.4 / 2) {
+				sound1.play();
+				if (vitesse == true) {
+					ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+				}
+				else {
+					ballSpeed.x *= -1;
+				}
+			}
+			if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
+				sound1.play();
+				if (vitesse == true) {
+					ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+				}
+				else {
+					ballSpeed.x *= -1;
+				}
+			}
+			//point marqué
+			if (ball.position.x <= paddle1.position.x) {
+				sound2.play();
+				ball.position.set(0, 0, 0);
+				ballSpeed = { x: -0.2, z: -0.2 };
+				ball.position.x -= ballSpeed.x;
+				ball.position.z -= ballSpeed.z;
+				scoreP2++;
+				scoreP2object[scoreP2 - 1].visible = false;
+				scoreP2object[scoreP2].visible = true;
+			} else if (ball.position.x >= paddle2.position.x) {
+				sound2.play();
+				ball.position.set(0, 0, 0);
+				ballSpeed = { x: 0.2, z: 0.2 };
+				ball.position.x -= ballSpeed.x;
+				ball.position.z -= ballSpeed.z;
+				scoreP1++;
+				scoreP1object[scoreP1 - 1].visible = false;
+				scoreP1object[scoreP1].visible = true;
+			//fin de la partie
+			} else if (scoreP1 == 5 || scoreP2 == 5) {
+				if (!soundPlayed) {
+					setTimeout(() => {
+						sound3.play();
+					}, 1000);
+					soundPlayed = true;
+				}
+				ball.position.set(0, 0, 0);
+				if (scoreP1 == 5) {
+					p1WIN.visible = true;
+				} else {
+					p2WIN.visible = true;
+				}
+				setTimeout(() => {
+					const boardTwo = document.getElementById('board_two');
 				if (boardTwo && boardTwo.contains(renderer.domElement)) {
 					boardTwo.removeChild(renderer.domElement);
-					console.log("Game stopped.");
-    }
-				// window.onload();
+					console.log("Game stopped and board_two cleared.");
+					sessionStorage.setItem("gameOver", "true");
+					setTimeout(() => {
+						listenerPongLocal();
+					}, 3000);
+    			}
 			}, 3000);
-        }
-        //gestion des paddles
-        if (paddle1 && paddle2) {
-            if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle2.position.z -= paddleSpeed;
-            } 
-            if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle2.position.z += paddleSpeed;
-            } 
-            if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                paddle1.position.z -= paddleSpeed;
-            } 
-            if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                paddle1.position.z += paddleSpeed;
-            }
-        }
-    }
+			}
+			//gestion des paddles
+			if (paddle1 && paddle2) {
+				if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+					paddle2.position.z -= paddleSpeed;
+				} 
+				if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+					paddle2.position.z += paddleSpeed;
+				} 
+				if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+					paddle1.position.z -= paddleSpeed;
+				} 
+				if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+					paddle1.position.z += paddleSpeed;
+				}
+			}
+		}
 
-    renderer.render(scene, camera);
+		renderer.render(scene, camera);
+	}
 }
 
 let keys = {};
@@ -524,11 +512,12 @@ const questions = [
 
 let currentQuestionIndex = 0;
 let configuration = {};
+const configMenu = document.getElementById('config-menu');
+const questionContainer = document.getElementById('question-container');
+const optionsContainer = document.getElementById('options-container');
 
 function showQuestion() {
-	const configMenu = document.getElementById('config-menu');
-	const questionContainer = document.getElementById('question-container');
-	const optionsContainer = document.getElementById('options-container');
+	if (sessionStorage.getItem("gameOver") == "false"){
 	configMenu.style.display = 'block';
 
     const currentQuestion = questions[currentQuestionIndex];
@@ -545,6 +534,9 @@ function showQuestion() {
         li.addEventListener('click', () => selectOption(option));
         optionsContainer.appendChild(li);
     });
+	}
+	// if (sessionStorage.getItem("gameOver") == "true")
+	// 	stopGame();
 }
 
 function selectOption(option) {
@@ -573,4 +565,25 @@ function startGame(config) {
     // This function will be implemented in main.js
     // You can call any initialization functions here
     window.startGame(config);
+}
+
+function stopGame() {
+    // Nettoyez les ressources ici, par exemple :
+    // - Arrêtez les sons
+    // - Réinitialisez les variables de jeu
+    // - Cachez les éléments de l'interface utilisateur
+    go = false;
+
+    const boardTwo = document.getElementById('board_two');
+    if (boardTwo) {
+        // Supprimez tous les enfants de boardTwo
+        while (boardTwo.firstChild) {
+            boardTwo.removeChild(boardTwo.firstChild);
+        }
+        console.log("Game stopped and board_two cleared.");
+    }
+    currentQuestionIndex = 0;
+	// unloadScript();
+	// window.onload();
+
 }

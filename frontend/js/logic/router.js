@@ -11,10 +11,10 @@ import renderUserInfo from "../views/viewUserInfo.js"
 
 // Importe le script de chaque page qui gere le load et listener
 //import handleXX from "./XX.js"
-import handlePongLocal from "./ponglocal.js"
+import handlePongLocal from "./ponglocallogic.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
-import handlePongOnline from "../game/main.js"
+import handlePongOnline from "../game/pongonline.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
 

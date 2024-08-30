@@ -1,6 +1,7 @@
 import router from "./router.js"
 
 export function unloadScript() {
+	console.log("Ponglocal script unloaded");
     // Désactiver les scripts chargés dynamiquement
     document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
         script.setAttribute('data-disabled', 'true');
@@ -18,22 +19,31 @@ export function unloadScript() {
     });
 }
 
-export function listenerPongLocal() {
-	unloadScript()
-    // Créer et ajouter le script localpong.js
-    document.querySelectorAll('script[data-disabled="true"]').forEach(script => {
+function loadPongLocal() {
+	// Créer et ajouter le script localpong.js
+	document.querySelectorAll('script[data-disabled="true"]').forEach(script => {
         script.setAttribute('type', 'module');
         script.removeAttribute('data-disabled');
     });
     const scriptLocalPong = document.createElement('script');
     scriptLocalPong.type = 'module';
-    scriptLocalPong.src = '/frontend/js/game/oldmain.js'
+    scriptLocalPong.src = '/frontend/js/game/ponglocal.js'
     scriptLocalPong.setAttribute('data-pong', 'dynamic');  // Marqueur pour identifier les scripts chargés dynamiquement
     document.body.appendChild(scriptLocalPong);
+	}
+
+export function listenerPongLocal() {
+	if (sessionStorage.getItem("gameOver") != "true") 
+		loadPongLocal();
+
+	if (sessionStorage.getItem("gameOver") == "true"){
+		unloadScript();
+		sessionStorage.setItem("gameOver", "");
+		loadPongLocal();
+	}
 }
 
 export default {
 	listenerPongLocal,
-	unloadScript,
 	// loadPongLocal
 };
