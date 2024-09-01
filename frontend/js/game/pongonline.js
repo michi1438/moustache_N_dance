@@ -9,7 +9,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -17,7 +17,8 @@ let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
-let gameID = uuidv4();
+
+let gameID;
 let ws;
 let playerNumber;
 let connectedPlayers = 0;
@@ -80,22 +81,22 @@ function initGame () {
     const listener = new THREE.AudioListener();
     camera.add( listener );
 
-    audioLoader.load( '/frontend/js/game/sounds/salut.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/obi-wan-hello-there.mp3', function ( buffer ) {
         sound = new THREE.Audio( listener );
         sound.setBuffer( buffer );
-        sound.setVolume( 0.1 );
+        sound.setVolume( 0.9 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer-woohoo.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bouncing-effect.mp3', function ( buffer ) {
             sound1 = new THREE.Audio( listener );
             sound1.setBuffer( buffer );
             sound1.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer_doh.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bruh.mp3', function ( buffer ) {
         sound2 = new THREE.Audio( listener );
         sound2.setBuffer( buffer );
         sound2.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/c_nul_homer.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/yeah-boiii-i-i-i.mp3', function ( buffer ) {
         sound3 = new THREE.Audio( listener );
         sound3.setBuffer( buffer );
         sound3.setLoop( false );
@@ -152,7 +153,7 @@ function initGameSimpson () {
     //Lights & shadows
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        let dirLight = new THREE.DirectionalLight( 0xfffff0, 2 );
+        let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
         dirLight.name = 'Dir. Light';
         dirLight.position.set( 0, 10, 0 );
         dirLight.castShadow = true;
@@ -165,7 +166,7 @@ function initGameSimpson () {
         dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         scene.add( dirLight );
-        scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
     
         let spotLight = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight.name = 'Spot Light';
@@ -178,7 +179,7 @@ function initGameSimpson () {
         spotLight.shadow.mapSize.width = 1024;
         spotLight.shadow.mapSize.height = 1024;
         scene.add( spotLight );
-        scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
     
         let spotLight2 = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight2.name = 'Spot Light';
@@ -191,7 +192,7 @@ function initGameSimpson () {
         spotLight2.shadow.mapSize.width = 1024;
         spotLight2.shadow.mapSize.height = 1024;
         scene.add( spotLight2 );
-        scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
     
     //audio
     
@@ -260,6 +261,7 @@ function initGameSimpson () {
     }
 
     window.startGame = function(config) {
+        console.log('JE COMMENCE REELEMENT LE JEU avec la config : ', config);
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
     
@@ -351,12 +353,11 @@ function initGameSimpson () {
     );
 
     }
-    
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
     countdownDisplay.id = 'countdownDisplay';
- 
-
+    
+    
     //console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     let vitesse;
     if(config['Vitesse du jeu'] == 'Progressive') {
@@ -366,8 +367,9 @@ function initGameSimpson () {
         vitesse = false;
     }
     //console.log("Connected players:", connectedPlayers);
+    console.log('JARRRRIVE ICI', connectedPlayers, isModelLoaded, isConfigReady);
     let checkReadyInterval = setInterval(() => {
-        if (connectedPlayers > 1 && isModelLoaded && isConfigReady) {
+        if (isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocket();
             let countdownInterval = setInterval(() => {
@@ -383,7 +385,6 @@ function initGameSimpson () {
                     }, 1000);
                 }
             }, 1000);
-            console.log("playerNumber:", playerNumber);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -393,22 +394,20 @@ function initGameSimpson () {
 
 
 function animate(vitesse) {
-    requestAnimationFrame(() => animate(vitesse));
+    let animationId = requestAnimationFrame(() => animate(vitesse));
+    if (gameOver) {
+        cancelAnimationFrame(animationId);
+    }
     controls.update();
     if (ball && paddle1 && paddle2 ) {
         if(go) {
             ball.position.x += ballSpeed.x;
             ball.position.z += ballSpeed.z;
-            if(playerNumber == 1){
-                setInterval(sendPaddlePosition(1), 100);
-                setInterval(sendBallPosition, 100);
-            } else {
-                setInterval(sendPaddlePosition(2), 100);
-            }
         }
         //collision murs
         if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
             ballSpeed.z *= -1;
+            sendBallPosition();
             
         }
         //collision paddle1 et paddle2
@@ -416,39 +415,51 @@ function animate(vitesse) {
             sound1.play();
             if (vitesse == true) {
                 ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                sendBallPosition();
             }
             else {
                 ballSpeed.x *= -1;
+                sendBallPosition();
             }
         }
         if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
             sound1.play();
             if (vitesse == true) {
                 ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                sendBallPosition();
             }
             else {
                 ballSpeed.x *= -1;
+                sendBallPosition();
             }
         }
         //point marqué
         if (ball.position.x <= paddle1.position.x) {
             sound2.play();
+            scoreP2++;
+            sendScore(2);
+            for (let i = 0; i < scoreP1object.length; i++) {
+                scoreP2object[i].visible = false;
+            }
+            scoreP2object[scoreP2].visible = true;
             ball.position.set(0, 0, 0);
             ballSpeed = { x: -0.2, z: -0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP2++;
-            scoreP2object[scoreP2 - 1].visible = false;
-            scoreP2object[scoreP2].visible = true;
+            sendBallPosition();
         } else if (ball.position.x >= paddle2.position.x) {
             sound2.play();
+            scoreP1++;
+            sendScore(1);
+            for (let i = 0; i < scoreP1object.length; i++) {
+                scoreP1object[i].visible = false;
+            }
+            scoreP1object[scoreP1].visible = true;
             ball.position.set(0, 0, 0);
             ballSpeed = { x: 0.2, z: 0.2 };
             ball.position.x -= ballSpeed.x;
             ball.position.z -= ballSpeed.z;
-            scoreP1++;
-            scoreP1object[scoreP1 - 1].visible = false;
-            scoreP1object[scoreP1].visible = true;
+            sendBallPosition();
         //fin de la partie
         } else if (scoreP1 == 5 || scoreP2 == 5) {
             if (!soundPlayed) {
@@ -458,10 +469,18 @@ function animate(vitesse) {
                 soundPlayed = true;
             }
             ball.position.set(0, 0, 0);
+            ballSpeed = { x: 0, z: 0 };
+            sendBallPosition();
             if (scoreP1 == 5) {
                 p1WIN.visible = true;
+                setTimeout(() => {
+                    handleGameOver(1);
+                }, 1000);
             } else {
                 p2WIN.visible = true;
+                setTimeout(() => {
+                    handleGameOver(2);
+                }, 1000);
             }
         }
         //gestion des paddles
@@ -469,17 +488,21 @@ function animate(vitesse) {
             if(playerNumber == 2) {
                 if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                     paddle2.position.z -= paddleSpeed;
+                    sendPaddlePosition(2);
                 } 
                 if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                     paddle2.position.z += paddleSpeed;
+                    sendPaddlePosition(2);
                 } 
             }
             if(playerNumber == 1) {
                 if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                     paddle1.position.z -= paddleSpeed;
+                    sendPaddlePosition(1);
                 } 
                 if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                     paddle1.position.z += paddleSpeed;
+                    sendPaddlePosition(1);
                 }
             }
         }
@@ -488,12 +511,17 @@ function animate(vitesse) {
     renderer.render(scene, camera);
 }
 
+let keys = {};
+
+document.addEventListener('keydown', (event) => {
+    keys[event.key] = true;
+});
+
+document.addEventListener('keyup', (event) => {
+    keys[event.key] = false;
+});
 
 const questions = [
-    {
-        question: "Nombre de joueurs",
-        options: ["2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
-    },
     {
         question: "Vitesse du jeu",
         options: ["Classique", "Progressive"]
@@ -542,45 +570,34 @@ function selectOption(option) {
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
-        startGame(configuration);
+        //startGame(configuration);
+        connectWebSocket(configuration);
+        console.log('config dans startgame:', configuration);
     }
 }
 
-function startGame(config) {
-    // if (connectedPlayers < 2) {
-    //     console.log('Waiting for more players to connect...');
-    //     return;
-    // }
-    //console.log('Starting game with configuration:', config);
-    // This function will be implemented in main.js
-    // You can call any initialization functions here
-    connectWebSocket();
-    window.startGame(config);
-}
-
-
-
-
-function connectWebSocket() {
+function connectWebSocket(config) {
     if (ws) {
         console.log('WebSocket already connected');
         return;
     }
-
-    ws = new WebSocket('wss://localhost:3000');
+    console.log('location.host', location.host);
+    ws = new WebSocket('wss://'+ location.host + ':3000');
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
+        ws.send(JSON.stringify({ type: 'config', config }));
+        console.log('Sending configuration:', config);
     };
 
     ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
-            if (message.type === 'player') {
-                gameID = message.gameID; // Store the received gameID
-                console.log('Received gameID from server:', gameID);
-            }
-            handleWebSocketMessage(message);
+            // if (message.type === 'player') {
+            //     gameID = message.gameID; // Store the received gameID
+            //     console.log('Received gameID from server:', gameID);
+            // }
+            handleWebSocketMessage(message, config);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
         }
@@ -600,21 +617,22 @@ function connectWebSocket() {
 }
 
 
-function handleWebSocketMessage(message) {
-    //console.log('Message reçu:', message);
-    const now = Date.now();
-    const delay = now - message.timestamp;
-    if (delay > 100) { // Seuil de délai en millisecondes
-        ws.send(JSON.stringify({ type: 'sync', delay }));
+function handleWebSocketMessage(message, config) {
+    console.log('Message reçu:', message);
+    if (!message.type) {
+        console.warn('Received message without type:', message);
+        return;
     }
     switch (message.type) {
         case 'clientCount':
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'player': 
-            playerNumber = message.player;
-            break;
+        case 'start':
+            playerNumber = message.playerNumber;
+            console.log('Player number:', playerNumber);
+            console.log('Starting game with configuration:', message.config);
+            window.startGame(message.config);
         case 'paddle':
             if (message.player === 1) {
                 paddle1.position.z = message.position;
@@ -630,49 +648,63 @@ function handleWebSocketMessage(message) {
             ballSpeed.x = message.speed.x;
             ballSpeed.z = message.speed.z;
             break;
-        case 'adjustDelay':
-            const adjustDelay = message.delay;
-            setTimeout(() => {
-                // Appliquer le délai
-            }, adjustDelay);
-            break;
-        // case 'score':
-        //     scoreP1 = message.scoreP1;
-        //     scoreP2 = message.scoreP2;
-        //     updateScoreDisplay();
-        //     break;
-        case 'gameOver':
-            handleGameOver(message.winner);
+        case 'score':
+            scoreP1 = message.scoreP1;
+            scoreP2 = message.scoreP2;
+            if(message.player == 1) {
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP1object[i].visible = false;
+                }
+                scoreP1object[scoreP1].visible = true;
+            }
+            else if(message.player == 2) {
+                for (let i = 0; i < scoreP2object.length; i++) {
+                    scoreP2object[i].visible = false;
+                }
+                scoreP2object[scoreP2].visible = true;
+            }
+            //updateScoreDisplay(message.player);
             break;
         case 'join':
             if (message.gameID !== gameID) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
                 ws.close();
             }
+        case 'deco':
+            console.log('Player', message.player, 'disconnected');
+            if(message.player == 0) {
+                scoreP2 = 5;
+                scoreP1 = 0;
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP1object[i].visible = false;
+                    scoreP2object[i].visible = false;
+                }
+                scoreP1object[scoreP1].visible = true;
+                scoreP2object[scoreP2].visible = true;
+            }
+            else if(message.player == 1) {
+                scoreP1 = 5;
+                scoreP2 = 0;
+                for (let i = 0; i < scoreP2object.length; i++) {
+                    scoreP2object[i].visible = false;
+                    scoreP1object[i].visible = false;
+                }
+                scoreP2object[scoreP2].visible = true;
+                scoreP1object[scoreP1].visible = true;
+            }
+            break;
+
         default:
             console.warn('Unhandled message type:', message.type);
     }
 }
 
-function updateScoreDisplay() {
-    // Mettre à jour l'affichage du score ici
-    console.log('Score:', scoreP1, '-', scoreP2);
-}
-
 function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
+    gameOver = true;
 }
 
-let keys = {};
-
-document.addEventListener('keydown', (event) => {
-    keys[event.key] = true;
-});
-
-document.addEventListener('keyup', (event) => {
-    keys[event.key] = false;
-});
 
 function sendPaddlePosition(playerNumber) {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -692,10 +724,10 @@ function sendPaddlePosition(playerNumber) {
         ws.send(JSON.stringify(message));
         //console.log('Sending paddle position:', message);
     } 
-    // else {
-    //     console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     
-    // }
+    }
 }
 
 function sendBallPosition() {
@@ -708,6 +740,22 @@ function sendBallPosition() {
         
         ws.send(JSON.stringify(message));
         //console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    }
+}
+
+function sendScore(playerNumber) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'score',
+            player: playerNumber,
+            scoreP1: scoreP1,
+            scoreP2: scoreP2
+        };
+        console.log('Sending score:', message);
+        ws.send(JSON.stringify(message));
+        //console.log('Sending score:', message);
     } else {
         console.warn('WebSocket is not open. ReadyState:', ws.readyState);
     }
