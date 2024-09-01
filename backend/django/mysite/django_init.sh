@@ -10,12 +10,6 @@ cd mysite/
 
 mv /mysite2/* mysite/
 
-echo -n "pwd = "
-pwd
-echo -n "ls -la = "
-ls -la
-
-
 echo "Create APP=================="
 python3 manage.py startapp players
 python3 manage.py startapp pong

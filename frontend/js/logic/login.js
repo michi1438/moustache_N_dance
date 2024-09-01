@@ -264,26 +264,30 @@ async function createUser(createAccountForm) {
 	}
 };
 
-// async function connectUser42() {
+async function connectUser42() {
 
-// 	try {
+	try {
 
-// 		let hostnameport = "https://" + window.location.host
 
-// 		const response = await fetch(hostnameport + '/api/accounts/');
+		window.location = ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%3A10443%2Flogin%2F&response_type=code');
+		if (!response.ok) {
+			throw new Error(`HTTP error, status = ${response.status}`);
+		}
 
-// 		if (!response.ok) {
-// 			throw new Error(`HTTP error, status = ${response.status}`);
-// 		}
+		const address = await response.json();
 
-// 		const address = await response.json();
 
-// 		window.location.href = address;
-// 		// waitFor42();
-// 	} catch (e) {
-// 		console.error("Error 42: ", e);
-// 	}
-// };
+		const response = fetch(hostnameport + '/api/players/fortytwo_token', init);
+		const init = {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+		};
+
+		let hostnameport = "https://" + window.location.host
+	} catch (e) {
+		console.error("Error 42: ", e);
+	}
+};
 
 function listenerLogin() {
 
@@ -336,7 +340,7 @@ function listenerLogin() {
 	// Login with 42 handler
 	login42Btn.addEventListener("click", e => {
 		e.preventDefault();
-		// connectUser42();
+		connectUser42();
 	});
 };
 
