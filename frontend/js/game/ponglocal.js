@@ -351,7 +351,8 @@ function initGameSimpson () {
     
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
-    countdownDisplay.id = 'countdownDisplay';
+    countdownDisplay.style.dysplay = 'block';
+    //countdownDisplay.id = 'countdownDisplay';
     console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     
     let countdownInterval = setInterval(() => {
@@ -362,7 +363,7 @@ function initGameSimpson () {
             countdownDisplay.innerText = 'GO';
             clearInterval(countdownInterval);
             setTimeout(() => {
-                countdownDisplay.remove();
+                countdownDisplay.style.display = 'none';
                 go = true;
             }, 1000);
         }
