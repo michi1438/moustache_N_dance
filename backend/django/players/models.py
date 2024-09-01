@@ -7,67 +7,28 @@ import pyotp
 from datetime import datetime, timedelta
 from django.core.mail import send_mail
 
+class Tournament(models.Model):
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tournaments_created', on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='tournaments_participated', blank=True) 
+    results = models.JSONField(blank=True, null=True)
 
-# class User(models.Model):
-#     """A typical class defining a model, derived from the Model class."""
+    SIZE_CHOICES = [
+            (4, '4 Players'),
+            (8, '8 Players'),
+            (16, '16 Players'),
+            ]
+    tournament_size = models.IntegerField(default=0, choices=SIZE_CHOICES)
 
-#     # Fields
-#     username = models.CharField(max_length=20, help_text='Enter Username', primary_key=True)
-#     password = models.CharField(max_length=20, help_text='Enter Password')
-#     email = models.CharField(max_length=40, help_text='Enter Email')
-#     # …
+    STATUS_CHOICES = [
+            ('upcoming', 'Upcoming'),
+            ('ongoing', 'Ongoing'),
+            ('completed', 'Completed'),
+            ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='upcoming') 
 
-#     # Metadata
-#     class Meta:
-#         ordering = ['username']
-
-#     # Methods
-
-#     def set_password(self, raw_password):
-#         self.password = make_password(raw_password)
-
-#     def get_absolute_url(self):
-#         """Returns the URL to access a particular instance of MyModelName."""
-#         return reverse('model-detail-view', args=[str(self.id)])
-
-#     def __str__(self):
-#         """String for representing the MyModelName object (in Admin site etc.)."""
-#         return self.username
-
-# class Player(AbstractUser):
-# 	avatar = models.ImageField(upload_to='', blank=True, null=True, default='')
-# 	nickname = models.CharField(max_length=50)
-#     # …
-
-#     # Metadata
-# 	class Meta:
-# 		ordering = ['username']
-# 		db_table = 'players'
-
-# 		# Methods
-
-# 	def set_password(self, raw_password):
-# 		self.password = make_password(raw_password)
-
-# 	def get_absolute_url(self):
-# 		"""Returns the URL to access a particular instance of MyModelName."""
-# 		return reverse('model-detail-view', args=[str(self.id)])
-
-# 	def __str__(self):
-# 		"""String for representing the MyModelName object (in Admin site etc.)."""
-# 		return self.username
-
-
-# class Player(models.Model):
-#     username = models.CharField(max_length=50)
-#     nickname = models.CharField(max_length=50)
-#     password1 = models.CharField(max_length=50)
-#     password2 = models.CharField(max_length=50)
-#     email = models.EmailField(max_length=50)
-#     #avatar = models.ImageField()
-
-#     def __str__(self):
-#         return self.username
+    def __str__(self):
+        return f'Tournament created by {self.created_by}'
 
 class FriendRequest(models.Model):
     from_player = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sent_requests', on_delete=models.CASCADE)

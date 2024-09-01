@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: bkukaqi <bkukaqi@student.42.fr>            +#+  +:+       +#+         #
+#    By: robin <robin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/19 10:28:10 by bkukaqi          ###   ########.fr        #
+#    Updated: 2024/09/01 15:54:33 by robin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,4 +30,15 @@ RUN apt-get update && \
 
 EXPOSE 8000
 
-CMD ["bash","/mysite2/django_init.sh"]
+RUN	django-admin startproject mysite
+
+WORKDIR /mysite
+
+RUN python3 manage.py startapp players
+RUN python3 manage.py startapp tournaments
+
+COPY ./mysite ./mysite
+COPY ./players ./players
+COPY ./tournaments ./tournaments
+
+CMD ["bash","./mysite/django_init.sh"]
