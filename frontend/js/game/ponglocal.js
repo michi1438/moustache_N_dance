@@ -351,11 +351,11 @@ function initGameSimpson () {
     
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
-    countdownDisplay.style.dysplay = 'block';
     //countdownDisplay.id = 'countdownDisplay';
     console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     
     let countdownInterval = setInterval(() => {
+        countdownDisplay.style.display = 'block';
         countdownDisplay.innerText = countdown;
         countdown--;
         
