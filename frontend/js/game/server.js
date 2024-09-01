@@ -118,7 +118,7 @@ function tournamentLogic(data, winners) {
     }
     else if(data.type === 'tournoi'){
         tournoiSize = data.config['Taille du tournoi'];
-        tabSize = playersID.length;
+        //tabSize = playersID.length;
         configTournoi = {
             'Vitesse du jeu': data.config['Vitesse du jeu'],
             'Map': data.config['Map']
@@ -136,7 +136,7 @@ function tournamentLogic(data, winners) {
     console.log('TABLEAU playersID', playersID);
     console.log('TABLEAU tabSize', tabSize);
     //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
-    if (tabSize == playersID.length) {
+    if (tabSize == tournoiSize) {
         let i = 0;
         let j = 0;
         while(i < tabSize) {
