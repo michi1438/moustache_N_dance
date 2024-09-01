@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'mysite',
     'players',
-    'pong',
     'tournaments',
     'rest_framework',
     'rest_framework_simplejwt',

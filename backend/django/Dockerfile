@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/12 19:25:50 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/29 18:28:04 by lzito            ###   ########.fr        #
+#    Updated: 2024/09/01 15:49:08 by lzito            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,11 +25,9 @@ WORKDIR /mysite
 
 RUN python3 manage.py startapp players
 RUN python3 manage.py startapp tournaments
-RUN python3 manage.py startapp pong
 
 COPY ./mysite ./mysite
 COPY ./players ./players
-COPY ./pong ./pong
 COPY ./tournaments ./tournaments
 
 CMD ["bash","./mysite/django_init.sh"]
