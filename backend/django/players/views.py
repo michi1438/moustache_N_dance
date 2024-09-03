@@ -158,38 +158,32 @@ def player_details(request):
 # 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
 
     urls = 'https://api.intra.42.fr/oauth/token'
     x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.GET.get('code'), 'redirect_uri': 'https://localhost/api/players/authorize_fortytwo/'})
-    print(x)
-    print(x.text)
     token = x.json()['access_token']
-    print(token)
 
     urls = 'https://api.intra.42.fr/v2/me'
     x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
-    print(x)
-    print(x.text)
-    serializer = PlayerSerializer(data=x.text)
+    serializer = Player42Serializer(data=x.json())
     if serializer.is_valid():
         player = Player(**serializer.validated_data)
-        player.set_password(serializer.validated_data['password'])
         player.save()
+        print ("serializer succeeded")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print ("serializer failed")
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 #    serializer = PlayerSerializer(data=request.data)
-#    if serializer.is_valid():
 #        player = Player(**serializer.validated_data)
 #        player.set_password(serializer.validated_data['password'])
 #        player.save()
 #        return Response(serializer.data, status=status.HTTP_201_CREATED)
-#    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

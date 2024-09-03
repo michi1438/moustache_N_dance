@@ -94,6 +94,10 @@ User = get_user_model()
 
 	# 	instance.save()
 	# 	return instance
+class Player42Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        exclude = ["password"]
 
 class PlayerSerializer(serializers.ModelSerializer):
 	class Meta:
