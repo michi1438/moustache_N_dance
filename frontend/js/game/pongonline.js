@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { v4 as uuidv4 } from 'uuid';
+import {listenerPongOnline} from '../logic/unloadpongonline.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -9,7 +9,8 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
+sessionStorage.setItem("gameOverO", "false");
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -373,6 +374,7 @@ function initGameSimpson () {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocket();
             let countdownInterval = setInterval(() => {
+                countdownDisplay.style.display = 'block';
                 countdownDisplay.innerText = countdown;
                 countdown--;
                 
@@ -380,7 +382,7 @@ function initGameSimpson () {
                     countdownDisplay.innerText = 'GO';
                     clearInterval(countdownInterval);
                     setTimeout(() => {
-                        countdownDisplay.remove();
+                        countdownDisplay.style.display = 'none';
                         go = true;
                     }, 1000);
                 }
@@ -394,121 +396,117 @@ function initGameSimpson () {
 
 
 function animate(vitesse) {
-    let animationId = requestAnimationFrame(() => animate(vitesse));
-    if (gameOver) {
-        cancelAnimationFrame(animationId);
-    }
-    controls.update();
-    if (ball && paddle1 && paddle2 ) {
-        if(go) {
-            ball.position.x += ballSpeed.x;
-            ball.position.z += ballSpeed.z;
-        }
-        //collision murs
-        if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
-            ballSpeed.z *= -1;
-            sendBallPosition();
-            
-        }
-        //collision paddle1 et paddle2
-        if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.4 / 2 && ball.position.z >= paddle1.position.z - 6.4 / 2) {
-            sound1.play();
-            if (vitesse == true) {
-                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+    if (sessionStorage.getItem("gameOverO") == "false") {
+        animationID = requestAnimationFrame(() => animate(vitesse));
+        controls.update();
+        if (ball && paddle1 && paddle2 ) {
+            if(go) {
+                ball.position.x += ballSpeed.x;
+                ball.position.z += ballSpeed.z;
+            }
+            //collision murs
+            if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
+                ballSpeed.z *= -1;
                 sendBallPosition();
+                
             }
-            else {
-                ballSpeed.x *= -1;
+            //collision paddle1 et paddle2
+            if (ball.position.x <= paddle1.position.x + 0.6 && ball.position.z <= paddle1.position.z + 6.4 / 2 && ball.position.z >= paddle1.position.z - 6.4 / 2) {
+                sound1.play();
+                if (vitesse == true) {
+                    ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                    sendBallPosition();
+                }
+                else {
+                    ballSpeed.x *= -1;
+                    sendBallPosition();
+                }
+            }
+            if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
+                sound1.play();
+                if (vitesse == true) {
+                    ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+                    sendBallPosition();
+                }
+                else {
+                    ballSpeed.x *= -1;
+                    sendBallPosition();
+                }
+            }
+            //point marqué
+            if (ball.position.x <= paddle1.position.x) {
+                sound2.play();
+                scoreP2++;
+                sendScore(2);
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP2object[i].visible = false;
+                }
+                scoreP2object[scoreP2].visible = true;
+                ball.position.set(0, 0, 0);
+                ballSpeed = { x: -0.2, z: -0.2 };
+                ball.position.x -= ballSpeed.x;
+                ball.position.z -= ballSpeed.z;
                 sendBallPosition();
-            }
-        }
-        if (ball.position.x >= paddle2.position.x - 0.6 && ball.position.z <= paddle2.position.z + 6.4 / 2 && ball.position.z >= paddle2.position.z - 6.4 / 2) {
-            sound1.play();
-            if (vitesse == true) {
-                ballSpeed.x = Math.min(Math.max(ballSpeed.x * -1.1, -0.7), 0.7);
+            } else if (ball.position.x >= paddle2.position.x) {
+                sound2.play();
+                scoreP1++;
+                sendScore(1);
+                for (let i = 0; i < scoreP1object.length; i++) {
+                    scoreP1object[i].visible = false;
+                }
+                scoreP1object[scoreP1].visible = true;
+                ball.position.set(0, 0, 0);
+                ballSpeed = { x: 0.2, z: 0.2 };
+                ball.position.x -= ballSpeed.x;
+                ball.position.z -= ballSpeed.z;
                 sendBallPosition();
-            }
-            else {
-                ballSpeed.x *= -1;
+            //fin de la partie
+            } else if (scoreP1 == 5 || scoreP2 == 5) {
+                if (!soundPlayed) {
+                    setTimeout(() => {
+                        sound3.play();
+                    }, 1000);
+                    soundPlayed = true;
+                }
+                ball.position.set(0, 0, 0);
+                ballSpeed = { x: 0, z: 0 };
                 sendBallPosition();
+                if (scoreP1 == 5) {
+                    p1WIN.visible = true;
+                    handleGameOver();
+                } else {
+                    p2WIN.visible = true;
+                    handleGameOver();
+                }
+                
             }
-        }
-        //point marqué
-        if (ball.position.x <= paddle1.position.x) {
-            sound2.play();
-            scoreP2++;
-            sendScore(2);
-            for (let i = 0; i < scoreP1object.length; i++) {
-                scoreP2object[i].visible = false;
-            }
-            scoreP2object[scoreP2].visible = true;
-            ball.position.set(0, 0, 0);
-            ballSpeed = { x: -0.2, z: -0.2 };
-            ball.position.x -= ballSpeed.x;
-            ball.position.z -= ballSpeed.z;
-            sendBallPosition();
-        } else if (ball.position.x >= paddle2.position.x) {
-            sound2.play();
-            scoreP1++;
-            sendScore(1);
-            for (let i = 0; i < scoreP1object.length; i++) {
-                scoreP1object[i].visible = false;
-            }
-            scoreP1object[scoreP1].visible = true;
-            ball.position.set(0, 0, 0);
-            ballSpeed = { x: 0.2, z: 0.2 };
-            ball.position.x -= ballSpeed.x;
-            ball.position.z -= ballSpeed.z;
-            sendBallPosition();
-        //fin de la partie
-        } else if (scoreP1 == 5 || scoreP2 == 5) {
-            if (!soundPlayed) {
-                setTimeout(() => {
-                    sound3.play();
-                }, 1000);
-                soundPlayed = true;
-            }
-            ball.position.set(0, 0, 0);
-            ballSpeed = { x: 0, z: 0 };
-            sendBallPosition();
-            if (scoreP1 == 5) {
-                p1WIN.visible = true;
-                setTimeout(() => {
-                    handleGameOver(1);
-                }, 1000);
-            } else {
-                p2WIN.visible = true;
-                setTimeout(() => {
-                    handleGameOver(2);
-                }, 1000);
-            }
-        }
-        //gestion des paddles
-        if (paddle1 && paddle2) {
-            if(playerNumber == 2) {
-                if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                    paddle2.position.z -= paddleSpeed;
-                    sendPaddlePosition(2);
-                } 
-                if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                    paddle2.position.z += paddleSpeed;
-                    sendPaddlePosition(2);
-                } 
-            }
-            if(playerNumber == 1) {
-                if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
-                    paddle1.position.z -= paddleSpeed;
-                    sendPaddlePosition(1);
-                } 
-                if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
-                    paddle1.position.z += paddleSpeed;
-                    sendPaddlePosition(1);
+            //gestion des paddles
+            if (paddle1 && paddle2) {
+                if(playerNumber == 2) {
+                    if (keys['o'] && paddle2.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                        paddle2.position.z -= paddleSpeed;
+                        sendPaddlePosition(2);
+                    } 
+                    if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                        paddle2.position.z += paddleSpeed;
+                        sendPaddlePosition(2);
+                    } 
+                }
+                if(playerNumber == 1) {
+                    if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                        paddle1.position.z -= paddleSpeed;
+                        sendPaddlePosition(1);
+                    } 
+                    if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                        paddle1.position.z += paddleSpeed;
+                        sendPaddlePosition(1);
+                    }
                 }
             }
         }
-    }
 
-    renderer.render(scene, camera);
+        renderer.render(scene, camera);
+    }
 }
 
 let keys = {};
@@ -535,7 +533,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
-function listenerPongOnline() {
+function showQuestion() {
 	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
@@ -564,12 +562,12 @@ function selectOption(option) {
     
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        listenerPongOnline();
+        showQuestion();
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
-		document.getElementById('board_two').appendChild(renderer.domElement);
+		document.getElementById('board_three').appendChild(renderer.domElement);
         //startGame(configuration);
         connectWebSocket(configuration);
         console.log('config dans startgame:', configuration);
@@ -699,10 +697,27 @@ function handleWebSocketMessage(message, config) {
     }
 }
 
-function handleGameOver(winner) {
+function handleGameOver() {
     // Gérer la fin de la partie ici
-    console.log('Game over! Winner:', winner);
-    gameOver = true;
+    setTimeout(() => {
+        const boardTwo = document.getElementById('board_three');
+        if (boardTwo && boardTwo.contains(renderer.domElement)) {
+            boardTwo.removeChild(renderer.domElement);
+            console.log("Game stopped and board_three cleared.");
+            sessionStorage.setItem("gameOverO", "true");
+            setTimeout(() => {
+                listenerPongOnline();
+                // Fermer la connexion WebSocket
+                cancelAnimationFrame(animationID);
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                    console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
+                }
+            }, 3000);
+        }
+    }, 3000);
+
+
 }
 
 
@@ -761,8 +776,4 @@ function sendScore(playerNumber) {
     }
 }
 
-
-export default {
-    listenerPongOnline,
-    // loadPongLocal
-};
+showQuestion();

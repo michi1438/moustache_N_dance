@@ -13,7 +13,7 @@ const server = https.createServer({
 const wss = new WebSocket.Server({ server });
 
 let players = [];
-let gameID = 0;
+let gameID;
 let playerConfigs = [];
 let winners = [];
 let playersID = [];
@@ -61,16 +61,13 @@ wss.on('connection', (ws) => {
             }
             else if (data.type === 'winner') {
                 
-                winners.push(data.winner);
+                playersID.push(data.winner);
             }
             else if (data.type === 'tournoi') {
                 tournamentLogic(data, winners || []);
             }
             else if (data.type === 'Rejoindre') {
                 tournamentLogic(data, winners || []);
-
-                
-                
             }
             else {
                 broadcast(ws, data);
@@ -110,7 +107,6 @@ function broadcast(sender, message) {
 
 function tournamentLogic(data, winners) {
     if(data.type === 'Rejoindre'){
-
         playersID.push(data.playerID);
         tabSize = playersID.length;
         console.log('TABLEAU playersID', playersID);
@@ -131,6 +127,7 @@ function tournamentLogic(data, winners) {
             playersID.push(data.playerID);
         }
     }
+
     tabSize = playersID.length;
     //afficher le tableau playersID
     console.log('TABLEAU playersID', playersID);
@@ -149,23 +146,26 @@ function tournamentLogic(data, winners) {
             i++;
         }
     }
-    
+    playersID = [];
+    while(playersID.length < tabSize / 2){
+        setTimeout(() => {
+            console.log('w8');
+        }, 1000);
+    }
     
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
-    if(winners.length == tabSize / 2){
-        playersID = [];
+    if(playersID.length == tabSize / 2){
+        console.log('salut');   
         tabSize = tabSize / 2;
-        for (let i = 0; i < winners.length; i++) {
-            playersID.push(winners[i]);
-        }
     }
     //si le tableau est égale à 1, le playerID est le winner
     // if (playersID.length == 1) {
     //     winners[0] = playersID[0];
     // }
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
-    else if (playersID.length == 10/*playersID.length > 1 && winners*/) {
-        tournamentLogic(data);
+    else if (tabSize > 1) {
+        console.log('relance de la fonction');
+        tournamentLogic(data, winners);
     }
 
 
