@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 import requests
 import os 
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -168,14 +169,16 @@ def authorize_fortytwo(request):
 
     urls = 'https://api.intra.42.fr/v2/me'
     x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
-    serializer = Player42Serializer(data=x.json())
-    if serializer.is_valid():
+    try:
+        u = Player.objects.get(username=x.json()['login'])
+        return Response("Player already exsists, need to login as the stored object of the same username...", status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        serializer = Player42Serializer(data=x.json())
+        serializer.is_valid()
         player = Player(**serializer.validated_data)
+        player.username = x.json()['login']
         player.save()
-        print ("serializer succeeded")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    print ("serializer failed")
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
