@@ -179,8 +179,14 @@ def authorize_fortytwo(request):
         player.first_name = x.json()['first_name']
         player.last_name = x.json()['last_name']
         player.email = x.json()['email']
+        #player.token42 = x.json()['token']
         player.save()
-        return Response(serializers.serialize('json', [ player, ]), status=status.HTTP_201_CREATED)
+        return Response({"username": str(player.username),
+            "email": str(player.email),
+            "first_name": str(player.first_name),
+            "last_name": str(player.last_name)
+                         #"token42": str(player.token)
+            }, status=status.HTTP_200_OK)
 
 
 
