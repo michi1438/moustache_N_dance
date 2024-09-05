@@ -266,19 +266,18 @@ async function createUser(createAccountForm) {
 
 async function connectUser42() {
 
-	try {
-		window.location = ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Fplayers%2Fauthorize_fortytwo%2F&response_type=code');
+	window.location = await ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Fplayers%2Fauthorize_fortytwo%2F&response_type=code');
 
-		const response = fetch(hostnameport + '/api/players/ortytwo_token', init);
-		if (!response.ok) {
-			throw new Error(`HTTP error, status = ${response.status}`);
-		}
-
-
-		let hostnameport = "https://" + window.location.host
-	} catch (e) {
-		console.error("Error 42: ", e);
+	const data = await window.location.json();
+	const status = await window.location.status;
+	if (status == 201)
+	{
+		
+		sessionStorage.setItem("first_name", data["first_name"]);
+		document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("first_name");
+		router("index");
 	}
+	console.error("Error create user 42: ");
 };
 
 function listenerLogin() {

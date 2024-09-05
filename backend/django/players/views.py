@@ -12,6 +12,7 @@ from django.middleware.csrf import get_token
 import requests
 import os 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers 
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -173,12 +174,12 @@ def authorize_fortytwo(request):
         u = Player.objects.get(username=x.json()['login'])
         return Response("Player already exsists, need to login as the stored object of the same username...", status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
-        serializer = Player42Serializer(data=x.json())
-        serializer.is_valid()
-        player = Player(**serializer.validated_data)
         player.username = x.json()['login']
+        player.first_name = x.json()['first_name']
+        player.last_name = x.json()['last_name']
+        player.email = x.json()['email']
         player.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializers.serialize('json', [ player, ]), status=status.HTTP_201_CREATED)
 
 
 
