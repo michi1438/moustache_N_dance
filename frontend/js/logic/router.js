@@ -7,6 +7,7 @@ import renderGameHistory from "../views/ViewGameHistory.js"
 import render404_error from "../views/view404_error.js"
 import renderStats from "../views/viewStats.js"
 import renderUserInfo from "../views/viewUserInfo.js"
+import { unloadScript } from "./ponglocallogic.js"
 
 
 // Importe le script de chaque page qui gere le load et listener
@@ -103,6 +104,7 @@ const routes = {
  * If the load function returns 1 (the user can access it), render the view of the page
 */
 export default async function router(value) {
+	unloadScript();
 
 	var page = routes[value];
 	

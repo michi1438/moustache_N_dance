@@ -357,6 +357,7 @@ window.startGame = function(config) {
     console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     
     let countdownInterval = setInterval(() => {
+        countdownDisplay.style.display = 'block';
         countdownDisplay.innerText = countdown;
         countdown--;
         
@@ -364,7 +365,7 @@ window.startGame = function(config) {
             countdownDisplay.innerText = 'GO';
             clearInterval(countdownInterval);
             setTimeout(() => {
-                countdownDisplay.remove();
+                countdownDisplay.style.display = 'none';
                 go = true;
             }, 1000);
         }

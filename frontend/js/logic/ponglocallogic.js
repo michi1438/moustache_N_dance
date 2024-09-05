@@ -27,7 +27,7 @@ function loadPongLocal() {
     });
     const scriptLocalPong = document.createElement('script');
     scriptLocalPong.type = 'module';
-    scriptLocalPong.src = '/frontend/js/game/ponglocal.js'
+    scriptLocalPong.src = '/frontend/js/game/ponglocal.js?' + new Date().getTime(); // Ajoute un horodatage à l'URL
     scriptLocalPong.setAttribute('data-pong', 'dynamic');  // Marqueur pour identifier les scripts chargés dynamiquement
     document.body.appendChild(scriptLocalPong);
 	}
