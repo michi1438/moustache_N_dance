@@ -7,6 +7,7 @@ import renderGameHistory from "../views/ViewGameHistory.js"
 import render404_error from "../views/view404_error.js"
 import renderStats from "../views/viewStats.js"
 import renderUserInfo from "../views/viewUserInfo.js"
+import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
 
 
@@ -16,6 +17,7 @@ import handlePongLocal from "./ponglocallogic.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
 import handlePongOnline from "../game/pongonline.js"
+import handlePongTournament from "../game/pongtournament.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
 
@@ -64,6 +66,13 @@ const routes = {
 		view: renderPongOnline,
 		// load: handlePongOnline.loadPongOnline,
 		listener: handlePongOnline.listenerPongOnline
+	},
+	"pongtournament": {
+		title: "Pong Tournament",
+		path: "/pongtournament/",
+		view: renderPongTournament,
+		// load: handlePongTournament.loadPongTournament,
+		listener: handlePongTournament.listenerPongTournament
 	},
 	"gamehistory": {
 		title: "Game History",

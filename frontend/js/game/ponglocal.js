@@ -3,7 +3,6 @@ console.log("Ponglocal script loaded");
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import router from "../logic/router.js"
 import {listenerPongLocal} from '../logic/ponglocallogic.js';
 
 const scene = new THREE.Scene();
@@ -12,7 +11,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -22,13 +21,13 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 
 function initGame () {
-    console.log("Initializing game...");
+    //console.log("Initializing game...");
 //Camera
     camera.position.set(0, 30, 20);
     controls.update();
     camera.lookAt(0, 0, 0);
 
-    console.log(scene);
+    //console.log(scene);
 
 //Lights & shadows
     renderer.shadowMap.enabled = true;
@@ -79,22 +78,22 @@ function initGame () {
     const listener = new THREE.AudioListener();
     camera.add( listener );
 
-    audioLoader.load( '/frontend/js/game/sounds/salut.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/obi-wan-hello-there.mp3', function ( buffer ) {
         sound = new THREE.Audio( listener );
         sound.setBuffer( buffer );
         sound.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer-woohoo.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bouncing-effect.mp3', function ( buffer ) {
             sound1 = new THREE.Audio( listener );
             sound1.setBuffer( buffer );
             sound1.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/homer_doh.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/bruh.mp3', function ( buffer ) {
         sound2 = new THREE.Audio( listener );
         sound2.setBuffer( buffer );
         sound2.setVolume( 0.1 );
     });
-    audioLoader.load( '/frontend/js/game/sounds/c_nul_homer.mp3', function ( buffer ) {
+    audioLoader.load( '/frontend/js/game/sounds/yeah-boiii-i-i-i.mp3', function ( buffer ) {
         sound3 = new THREE.Audio( listener );
         sound3.setBuffer( buffer );
         sound3.setLoop( false );
@@ -136,7 +135,7 @@ function initGame () {
     p1WIN.visible = false;
     p2WIN.visible = false;
     isConfigReady = true;
-    console.log("isConfigReady set to true");
+    //console.log("isConfigReady set to true");
 }
 
 function initGameSimpson () {
@@ -151,7 +150,7 @@ function initGameSimpson () {
     //Lights & shadows
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        let dirLight = new THREE.DirectionalLight( 0xfffff0, 2 );
+        let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
         dirLight.name = 'Dir. Light';
         dirLight.position.set( 0, 10, 0 );
         dirLight.castShadow = true;
@@ -164,7 +163,7 @@ function initGameSimpson () {
         dirLight.shadow.mapSize.width = 1024;
         dirLight.shadow.mapSize.height = 1024;
         scene.add( dirLight );
-        scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
     
         let spotLight = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight.name = 'Spot Light';
@@ -177,7 +176,7 @@ function initGameSimpson () {
         spotLight.shadow.mapSize.width = 1024;
         spotLight.shadow.mapSize.height = 1024;
         scene.add( spotLight );
-        scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
     
         let spotLight2 = new THREE.SpotLight( 0xfffff0, 10000 );
         spotLight2.name = 'Spot Light';
@@ -190,7 +189,7 @@ function initGameSimpson () {
         spotLight2.shadow.mapSize.width = 1024;
         spotLight2.shadow.mapSize.height = 1024;
         scene.add( spotLight2 );
-        scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
+        //scene.add( new THREE.CameraHelper( spotLight2.shadow.camera ) );
     
     //audio
     
@@ -258,51 +257,50 @@ function initGameSimpson () {
         console.log("isConfigReady set to true");
     }
 
-window.startGame = function(config) {
-	if (config['Map'] == 'Simpson') {
-		modelPath = '/frontend/js/game/models/modelSimpson.glb';
-
-		new Promise((resolve, reject) => {
-			loader.load(modelPath, function(gltf) {
-				scene.add(gltf.scene);
-		
-				plane = gltf.scene.getObjectByName('Plane');
-				paddle1 = gltf.scene.getObjectByName('Paddle1');
-				paddle2 = gltf.scene.getObjectByName('Paddle2');
-				ball = gltf.scene.getObjectByName('Ball');
-				topWall = gltf.scene.getObjectByName('WallT');
-				bottomWall = gltf.scene.getObjectByName('WallB');
-				p1WIN = gltf.scene.getObjectByName('P1WIN');
-				p2WIN = gltf.scene.getObjectByName('P2WIN');
-				title = gltf.scene.getObjectByName('title');
-			
-				scoreP1object.push(gltf.scene.getObjectByName('0_L'));
-				scoreP1object.push(gltf.scene.getObjectByName('1_L'));
-				scoreP1object.push(gltf.scene.getObjectByName('2_L'));
-				scoreP1object.push(gltf.scene.getObjectByName('3_L'));
-				scoreP1object.push(gltf.scene.getObjectByName('4_L'));
-				scoreP1object.push(gltf.scene.getObjectByName('5_L'));
-			
-				scoreP2object.push(gltf.scene.getObjectByName('0_R'));
-				scoreP2object.push(gltf.scene.getObjectByName('1_R'));
-				scoreP2object.push(gltf.scene.getObjectByName('2_R'));
-				scoreP2object.push(gltf.scene.getObjectByName('3_R'));
-				scoreP2object.push(gltf.scene.getObjectByName('4_R'));
-				scoreP2object.push(gltf.scene.getObjectByName('5_R'));
-				isModelLoaded = true;
-				console.log("isModelLoaded set to true");
-				resolve();
-			}, undefined, function(error) {
-				console.error(error);
-				reject(error);
-			});
-		}).then(() => {
-			if(isModelLoaded)
-				initGameSimpson();
-		}).catch((error) => {
-			console.error('Failed to load model:', error);
-		});
-	}
+    window.Game = function(config) {
+        if (config['Map'] == 'Simpson') {
+            modelPath = '/frontend/js/game/models/modelSimpson.glb';
+    
+            new Promise((resolve, reject) => {
+                loader.load(modelPath, function(gltf) {
+                    scene.add(gltf.scene);
+            
+                    plane = gltf.scene.getObjectByName('Plane');
+                    paddle1 = gltf.scene.getObjectByName('Paddle1');
+                    paddle2 = gltf.scene.getObjectByName('Paddle2');
+                    ball = gltf.scene.getObjectByName('Ball');
+                    topWall = gltf.scene.getObjectByName('WallT');
+                    bottomWall = gltf.scene.getObjectByName('WallB');
+                    p1WIN = gltf.scene.getObjectByName('P1WIN');
+                    p2WIN = gltf.scene.getObjectByName('P2WIN');
+                    title = gltf.scene.getObjectByName('title');
+                
+                    scoreP1object.push(gltf.scene.getObjectByName('0_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('1_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('2_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('3_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('4_L'));
+                    scoreP1object.push(gltf.scene.getObjectByName('5_L'));
+                
+                    scoreP2object.push(gltf.scene.getObjectByName('0_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('1_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('2_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('3_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('4_R'));
+                    scoreP2object.push(gltf.scene.getObjectByName('5_R'));
+                    isModelLoaded = true;
+                    resolve();
+                }, undefined, function(error) {
+                    console.error(error);
+                    reject(error);
+                });
+            }).then(() => {
+                if(isModelLoaded)
+                    initGameSimpson();
+            }).catch((error) => {
+                console.error('Failed to load model:', error);
+            });
+        }
     else if (config['Map'] == 'Classique') {
         modelPath = '/frontend/js/game/models/modelMoustache.glb';
         new Promise((resolve, reject) => {
@@ -498,10 +496,6 @@ document.addEventListener('keyup', (event) => {
 
 const questions = [
     {
-        question: "Nombre de joueurs",
-        options: ["2 joueurs", "3 joueurs", "4 joueurs", "5 joueurs", "6 joueurs"]
-    },
-    {
         question: "Vitesse du jeu",
         options: ["Classique", "Progressive"]
     },
@@ -555,36 +549,9 @@ function selectOption(option) {
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
 		document.getElementById('board_two').appendChild(renderer.domElement);
-        startGame(configuration);
+        window.Game(configuration);
     }
 }
 
 showQuestion();
 
-function startGame(config) {
-    //console.log('Starting game with configuration:', config);
-    // This function will be implemented in main.js
-    // You can call any initialization functions here
-    window.startGame(config);
-}
-
-function stopGame() {
-    // Nettoyez les ressources ici, par exemple :
-    // - Arrêtez les sons
-    // - Réinitialisez les variables de jeu
-    // - Cachez les éléments de l'interface utilisateur
-    go = false;
-
-    const boardTwo = document.getElementById('board_two');
-    if (boardTwo) {
-        // Supprimez tous les enfants de boardTwo
-        while (boardTwo.firstChild) {
-            boardTwo.removeChild(boardTwo.firstChild);
-        }
-        console.log("Game stopped and board_two cleared.");
-    }
-    currentQuestionIndex = 0;
-	// unloadScript();
-	// window.onload();
-
-}

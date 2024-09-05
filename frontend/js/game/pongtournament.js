@@ -16,6 +16,8 @@ let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
+let playerID = uuidv4();
+//sessionStorage.getItem('id');
 
 
 let gameID;
@@ -260,7 +262,7 @@ function initGameSimpson () {
         //console.log("isConfigReady set to true");
     }
 
-    window.startGame = function(config) {
+    window.startGameTournament = function(config) {
         console.log('JE COMMENCE REELEMENT LE JEU avec la config : ', config);
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
@@ -371,7 +373,7 @@ function initGameSimpson () {
     let checkReadyInterval = setInterval(() => {
         if (isModelLoaded && isConfigReady) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
-            //connectWebSocket();
+            //connectWebSocketTournament();
             let countdownInterval = setInterval(() => {
                 countdownDisplay.innerText = countdown;
                 countdown--;
@@ -523,6 +525,14 @@ document.addEventListener('keyup', (event) => {
 
 const questions = [
     {
+        question: "Créer / Rejoindre",
+        options: ["Créer", "Rejoindre"]
+    },
+    {
+        question: "Taille du tournoi",
+        options: ["4", "8", "16"]
+    },
+    {
         question: "Vitesse du jeu",
         options: ["Classique", "Progressive"]
     },
@@ -535,7 +545,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
-function listenerPongOnline() {
+function listenerPongTournament() {
 	const configMenu = document.getElementById('config-menu');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
@@ -558,25 +568,33 @@ function listenerPongOnline() {
 }
 
 function selectOption(option) {
-	const configMenu = document.getElementById('config-menu');
+    const configMenu = document.getElementById('config-menu');
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
-    
+
+    if (currentQuestionIndex === 0 && option === "Rejoindre") {
+        // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
+        configMenu.style.display = 'none';
+        // Proceed with the join logic
+        document.getElementById('board_two').appendChild(renderer.domElement);
+        connectWebSocketTournament(configuration);
+        // console.log('config dans startGameTournament:', configuration);
+        return;
+    }
+
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        listenerPongOnline();
+        listenerPongTournament();
     } else {
         configMenu.style.display = 'none';
         // Start the game with the selected configuration
-        //console.log('Configuration:', configuration);
-		document.getElementById('board_two').appendChild(renderer.domElement);
-        //startGame(configuration);
-        connectWebSocket(configuration);
-        console.log('config dans startgame:', configuration);
+        document.getElementById('board_two').appendChild(renderer.domElement);
+        connectWebSocketTournament(configuration);
+        //console.log('config dans startGameTournament:', configuration);
     }
 }
 
-function connectWebSocket(config) {
+function connectWebSocketTournament(config) {
     if (ws) {
         console.log('WebSocket already connected');
         return;
@@ -586,8 +604,15 @@ function connectWebSocket(config) {
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
-        ws.send(JSON.stringify({ type: 'config', config }));
-        console.log('Sending configuration:', config);
+        //console.log('Sending configuration and playerID:', config, playerID);
+        if(config['Créer / Rejoindre'] == 'Créer') {
+            ws.send(JSON.stringify({ type: 'tournoi', config: config, playerID: playerID }));
+        }
+        else if(config['Créer / Rejoindre'] == 'Rejoindre') {
+            //console.log('Sending rejoindre and playerID:', playerID);
+            ws.send(JSON.stringify({ type: 'Rejoindre', playerID: playerID }));
+        }
+        //console.log('Sending configuration and playerID:', config, playerID);
     };
 
     ws.onmessage = (event) => {
@@ -597,7 +622,7 @@ function connectWebSocket(config) {
             //     gameID = message.gameID; // Store the received gameID
             //     console.log('Received gameID from server:', gameID);
             // }
-            handleWebSocketMessage(message, config);
+            handleWebSocketMessageTournament(message, config);
         } catch (error) {
             console.error('Invalid JSON:', event.data);
         }
@@ -617,7 +642,7 @@ function connectWebSocket(config) {
 }
 
 
-function handleWebSocketMessage(message, config) {
+function handleWebSocketMessageTournament(message, config) {
     console.log('Message reçu:', message);
     if (!message.type) {
         console.warn('Received message without type:', message);
@@ -628,11 +653,11 @@ function handleWebSocketMessage(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'start':
+        case 'startT':
             playerNumber = message.playerNumber;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
-            window.startGame(message.config);
+            window.startGameTournament(message.config);
         case 'paddle':
             if (message.player === 1) {
                 paddle1.position.z = message.position;
@@ -703,6 +728,18 @@ function handleGameOver(winner) {
     // Gérer la fin de la partie ici
     console.log('Game over! Winner:', winner);
     gameOver = true;
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = {
+            type: 'winner',
+            winner : playerID
+        };
+        
+        ws.send(JSON.stringify(message));
+        //console.log('Sending ball position:', message);
+    } else {
+        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    }
 }
 
 
@@ -761,8 +798,7 @@ function sendScore(playerNumber) {
     }
 }
 
-
 export default {
-    listenerPongOnline,
+    listenerPongTournament,
     // loadPongLocal
 };
