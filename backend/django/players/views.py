@@ -174,6 +174,7 @@ def authorize_fortytwo(request):
         u = Player.objects.get(username=x.json()['login'])
         return Response("Player already exsists, need to login as the stored object of the same username...", status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
+        player = Player()
         player.username = x.json()['login']
         player.first_name = x.json()['first_name']
         player.last_name = x.json()['last_name']
