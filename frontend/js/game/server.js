@@ -105,14 +105,11 @@ function broadcast(sender, message) {
     });
 }
 
-function tournamentLogic(data, winners) {
-    if(data.type === 'Rejoindre'){
-        playersID.push(data.playerID);
-        tabSize = playersID.length;
-        console.log('TABLEAU playersID', playersID);
-        console.log('TABLEAU tabSize', tabSize);
-    }
-    else if(data.type === 'tournoi'){
+async function tournamentLogic(data, winners) {
+    const gamePromises = [];
+    if (data.type === 'Rejoindre') {
+        gameEvents.emit('playerJoined', data.playerID);
+    } else if(data.type === 'tournoi'){
         tournoiSize = data.config['Taille du tournoi'];
         //tabSize = playersID.length;
         configTournoi = {
@@ -124,14 +121,10 @@ function tournamentLogic(data, winners) {
         if(tournoiSize != tabSize){
             //crée un tableau de playersID de la taille de data.config['Taille du tournoi']
             //ajouter le playerID (dans le premier element du tableau) contenu dans data.playerID 
-            playersID.push(data.playerID);
+            gameEvents.emit('playerJoined', data.playerID);
         }
     }
-
     tabSize = playersID.length;
-    //afficher le tableau playersID
-    console.log('TABLEAU playersID', playersID);
-    console.log('TABLEAU tabSize', tabSize);
     //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
     if (tabSize == tournoiSize) {
         let i = 0;
@@ -142,16 +135,21 @@ function tournamentLogic(data, winners) {
             players[[i+1]].gameID = gameID;
             players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi}));
             players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi}));
-            i++;
-            i++;
+
+            // Créez une promesse pour chaque partie
+            const gamePromise = new Promise((resolve) => {
+                gameEvents.once(`gameOver-${gameID}`, () => {
+                    resolve();
+                });
+            });
+            gamePromises.push(gamePromise);
+
+            i += 2;
         }
+        await Promise.all(gamePromises);
     }
-    playersID = [];
-    while(playersID.length < tabSize / 2){
-        setTimeout(() => {
-            console.log('w8');
-        }, 1000);
-    }
+    //playersID = [];
+
     
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
     if(playersID.length == tabSize / 2){
@@ -163,7 +161,7 @@ function tournamentLogic(data, winners) {
     //     winners[0] = playersID[0];
     // }
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
-    else if (tabSize > 1) {
+    else if (tabSize > 1 && tabSize == tournoiSize) {
         console.log('relance de la fonction');
         tournamentLogic(data, winners);
     }
@@ -173,4 +171,23 @@ function tournamentLogic(data, winners) {
 
 server.listen(3000, () => {
     console.log('WebSocket server is running on wss://localhost:3000');
+});
+
+const EventEmitter = require('events');
+const gameEvents = new EventEmitter();
+
+
+// Exemple de gestionnaire d'événements pour la fin des parties
+gameEvents.on('gameOver', (gameID) => {
+    console.log(`Game ${gameID} is over`);
+    // Ajoutez votre logique pour gérer la fin des parties ici
+});
+
+gameEvents.on('playerJoined', (playerID) => {
+    if (!playersID.includes(playerID)) {
+        playersID.push(playerID);
+        tabSize = playersID.length;
+        console.log('TABLEAU playersID', playersID);
+        console.log('TABLEAU tabSize', tabSize);
+    }
 });

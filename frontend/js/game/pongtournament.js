@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { v4 as uuidv4 } from 'uuid';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
+import { gameEvents } from './server.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -665,6 +666,7 @@ function handleWebSocketMessageTournament(message, config) {
             break;
         case 'startT':
             player.playerNumber = message.playerNumber;
+            player.gameID = message.gameID;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
             window.startGameTournament(message.config);
@@ -744,6 +746,7 @@ function handleGameOver(player) {
                 winner : player.playerID
             };
             ws.send(JSON.stringify(message));
+            gameEvents.emit(`gameOver-${player.gameID}`);
         }
         setTimeout(() => {
             const boardTwo = document.getElementById('board_four');
