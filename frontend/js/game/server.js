@@ -1,3 +1,4 @@
+const EventEmitter = require('events');
 const https = require('https');
 const fs = require('fs');
 const WebSocket = require('ws');
@@ -10,6 +11,7 @@ const server = https.createServer({
     key: fs.readFileSync('/etc/nginx/ssl/inception.key')
 });
 
+const gameEvents = new EventEmitter();
 const wss = new WebSocket.Server({ server });
 
 let players = [];
@@ -20,6 +22,7 @@ let playersID = [];
 let tabSize;
 let tournoiSize;
 let configTournoi = {};
+let gamePromises = [];
 // let playerNumber = 1;
 
 wss.on('connection', (ws) => {
@@ -60,6 +63,13 @@ wss.on('connection', (ws) => {
                 }
             }
             else if (data.type === 'winner') {
+                const gameID = data.gameID;
+            // Résoudre la promesse correspondante
+            const gamePromise = gamePromises.find(p => p.gameID === gameID);
+            if (gamePromise) {
+                gamePromise.resolve();
+                gamePromises = gamePromises.filter(p => p.gameID !== gameID);
+            }
                 
                 playersID.push(data.winner);
             }
@@ -106,7 +116,6 @@ function broadcast(sender, message) {
 }
 
 async function tournamentLogic(data, winners) {
-    const gamePromises = [];
     if (data.type === 'Rejoindre') {
         gameEvents.emit('playerJoined', data.playerID);
     } else if(data.type === 'tournoi'){
@@ -138,9 +147,7 @@ async function tournamentLogic(data, winners) {
 
             // Créez une promesse pour chaque partie
             const gamePromise = new Promise((resolve) => {
-                gameEvents.once(`gameOver-${gameID}`, () => {
-                    resolve();
-                });
+                gamePromises.push({ gameID, resolve });
             });
             gamePromises.push(gamePromise);
 
@@ -149,7 +156,7 @@ async function tournamentLogic(data, winners) {
         await Promise.all(gamePromises);
     }
     //playersID = [];
-
+    console.log('playersID apres promise', playersID);    
     
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
     if(playersID.length == tabSize / 2){
@@ -173,8 +180,7 @@ server.listen(3000, () => {
     console.log('WebSocket server is running on wss://localhost:3000');
 });
 
-const EventEmitter = require('events');
-const gameEvents = new EventEmitter();
+
 
 
 // Exemple de gestionnaire d'événements pour la fin des parties

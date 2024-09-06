@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { v4 as uuidv4 } from 'uuid';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
-import { gameEvents } from './server.js';
+
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -19,6 +19,7 @@ let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 let player = {};
+let gameOverSent = false;
 player.playerID = uuidv4();
 sessionStorage.setItem("gameOverT", "false");
 //sessionStorage.getItem('id');
@@ -493,7 +494,10 @@ function animate(vitesse) {
                         player.result = 1;
                     }
                 }
-                handleGameOver(player);
+                if(!gameOverSent){
+                    handleGameOver(player);
+                    gameOverSent = true;
+                }
             }
             //gestion des paddles
             if (paddle1 && paddle2) {
@@ -743,10 +747,10 @@ function handleGameOver(player) {
         if (ws && ws.readyState === WebSocket.OPEN) {
             const message = {
                 type: 'winner',
-                winner : player.playerID
+                winner : player.playerID,
+                gameID : player.gameID
             };
             ws.send(JSON.stringify(message));
-            gameEvents.emit(`gameOver-${player.gameID}`);
         }
         setTimeout(() => {
             const boardTwo = document.getElementById('board_four');
@@ -812,17 +816,23 @@ function sendPaddlePosition(playerNumber) {
 }
 
 function sendBallPosition() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        const message = {
-            type: 'ball',
-            position: { x: ball.position.x, z: ball.position.z },
-            speed: { x: ballSpeed.x, z: ballSpeed.z }
-        };
-        
-        ws.send(JSON.stringify(message));
-        //console.log('Sending ball position:', message);
-    } else {
-        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+    if (sessionStorage.getItem("gameOverT") == "true") {
+        console.log('Game is over, not sending ball position.');
+        return;
+    }
+    else {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            const message = {
+                type: 'ball',
+                position: { x: ball.position.x, z: ball.position.z },
+                speed: { x: ballSpeed.x, z: ballSpeed.z }
+            };
+            
+            ws.send(JSON.stringify(message));
+            //console.log('Sending ball position:', message);
+        } else {
+            console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+        }
     }
 }
 
