@@ -2,8 +2,6 @@
 import renderPongLocal from "../views/viewPongLocal.js"
 import renderPongOnline from "../views/viewPongOnline.js"
 import renderLogin from "../views/viewLogin.js"
-import renderLogout from "../views/viewLogout.js"
-import renderGameHistory from "../views/ViewGameHistory.js"
 import render404_error from "../views/view404_error.js"
 import renderStats from "../views/viewStats.js"
 import renderUserInfo from "../views/viewUserInfo.js"
@@ -46,13 +44,6 @@ const routes = {
 		// load: handleLogin.loadLogin,
 		listener: handleLogin.listenerLogin
 	},
-	"logout": {
-		title: "Logout",
-		path: "/logout/",
-		view: renderLogout,
-		// load: handleLogout.loadLogout,
-		// listener: handleLogout.listenerLogout
-	},
 	"ponglocal": {
 		title: "Pong Local",
 		path: "/ponglocal/",
@@ -73,13 +64,6 @@ const routes = {
 		view: renderPongTournament,
 		// load: handlePongTournament.loadPongTournament,
 		listener: handlePongTournament.listenerPongTournament
-	},
-	"gamehistory": {
-		title: "Game History",
-		path: "/gamehistory/",
-		view: renderGameHistory,
-		// load: handleGameHistory.loadGameHistory,
-		// listener: handleGameHistory.listenerGameHistory
 	},
 	"404_error": {
 		title: "404 error",
@@ -208,11 +192,15 @@ async function handleLogout() {
 		document.getElementById("login").textContent = "Login";
 		document.getElementById("login").value = "login";
 
-		const token = sessionStorage.getItem("token");
+		const access = sessionStorage.getItem("access");
+		const inputValues = {
+			refresh: sessionStorage.getItem("refresh"),
+		};
 
 		const init = {
 			method: "POST",
-			headers: { 'Authorization': `Bearer ${token}`, },
+			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
+			body: JSON.stringify(inputValues,),
 		}
 
 		try {
@@ -221,7 +209,7 @@ async function handleLogout() {
 
 			const response = await fetch(hostnameport + '/api/players/logout', init);
 
-			if (response.status === 200) {
+			if (response.status === 205) {
 				sessionStorage.clear();
 				router("login");
 			}

@@ -200,21 +200,21 @@ def authorize_fortytwo(request):
 
 #     return render(request, 'auth/otp.html', {}) 
 
-class logout_view(APIView):
-	permission_classes = [IsAuthenticated]
+# class logout_view(APIView):
+# 	permission_classes = [IsAuthenticated]
 
-	def post(self, request, *args, **kwargs):
-		try:
-			logout(request)
-			return Response(
-				{'message': 'User logged out successfully'},
-				status=status.HTTP_200_OK
-			)
-		except Exception as e:
-			return Response(
-				{'message': f"{type(e).__name__}: {str(e)}"},
-				status=status.HTTP_400_BAD_REQUEST
-			)
+# 	def post(self, request, *args, **kwargs):
+# 		try:
+# 			logout(request)
+# 			return Response(
+# 				{'message': 'User logged out successfully'},
+# 				status=status.HTTP_200_OK
+# 			)
+# 		except Exception as e:
+# 			return Response(
+# 				{'message': f"{type(e).__name__}: {str(e)}"},
+# 				status=status.HTTP_400_BAD_REQUEST
+# 			)
 
 # def logout_view(request):
 #     logout(request)
@@ -294,27 +294,27 @@ def verify_otp(request):
 
     return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
 
-# # LOGOUT (blacklist du token)
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def logout(request):
-#     try:
-#         refresh_token = request.data['refresh']
+# LOGOUT (blacklist du token)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        refresh_token = request.data['refresh']
 
-#         if not refresh_token:
-#             return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not refresh_token:
+            return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         token = RefreshToken(refresh_token)
-#         token.blacklist()
+        token = RefreshToken(refresh_token)
+        token.blacklist()
 
-#         player = request.user
-#         player.online = False
-#         player.save()
+        player = request.user
+        player.online = False
+        player.save()
 
-#         return Response({"message": "Logout successful"}, status=status.HTTP_205_RESET_CONTENT)
+        return Response({"message": "Logout successful"}, status=status.HTTP_205_RESET_CONTENT)
 
-#     except Exception as e:
-#         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 # # LISTER SES AMIS
 # @api_view(['GET'])

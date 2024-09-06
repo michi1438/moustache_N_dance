@@ -24,46 +24,48 @@ async function updateNickname(nicknameForm) {
 	msgElement.textContent = "Nickname changed"; // TO DELETE AFTER BACKEND !
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
 	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
+	
+	const access = sessionStorage.getItem("access");
 
-	// const init = {
-	// 	method: 'PATCH',
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		'X-CSRFToken': csrftoken,
-	// 	},
-	// 	body: JSON.stringify({nickname: input.nickname.value}),
-	// };
+	const init = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({nickname: input.nickname.value}),
+	};
 
-	// try {
-	// 	let hostnameport = "https://" + window.location.host
+	try {
+		let hostnameport = "https://" + window.location.host
 
-	// 	const response = await fetch(hostnameport + '/api/profile/', init);
+		const response = await fetch(hostnameport + '/api/players/profile', init);
 
-	// 	if (response.status != 200) {
+		if (response.status != 200) {
 
-	// 		const error = await response.text();
+			const error = await response.text();
 			
 
 			
-	// 		msgElement.textContent = error.replace(/["{}[\]]/g, '');
-	// 		msgElement.classList.add("text-danger");
-	// 		return;
-	// 	}
-	// 	if (response.status === 200) {
-	// 		const data = await response.json();
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
 
-	// 		sessionStorage.setItem("nickname", data.nickname);
+			sessionStorage.setItem("nickname", data.nickname);
 
-	// 		msgElement.textContent = "Nickname changed";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-success");
+			msgElement.textContent = "Nickname changed";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
 
-	// 		window.location.reload();
-	// 	}
+			window.location.reload();
+		}
 
-	// } catch (e) {
-	// 	console.error(e);
-	// }
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 async function updateUsername(usernameForm) {
@@ -89,45 +91,47 @@ async function updateUsername(usernameForm) {
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
 	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
-	// const init = {
-	// 	method: 'PATCH',
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		'X-CSRFToken': csrftoken,
-	// 	},
-	// 	body: JSON.stringify({username: input.username.value}),
-	// };
+	const access = sessionStorage.getItem("access");
 
-	// try {
-	// 	let hostnameport = "https://" + window.location.host
+	const init = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({username: input.username.value}),
+	};
 
-	// 	const response = await fetch(hostnameport + '/api/profile/', init);
+	try {
+		let hostnameport = "https://" + window.location.host
 
-	// 	if (response.status != 200) {
+		const response = await fetch(hostnameport + '/api/players/profile', init);
 
-	// 		const error = await response.text();
+		if (response.status != 200) {
+
+			const error = await response.text();
 			
 
 			
-	// 		msgElement.textContent = error.replace(/["{}[\]]/g, '');
-	// 		msgElement.classList.add("text-danger");
-	// 		return;
-	// 	}
-	// 	if (response.status === 200) {
-	// 		const data = await response.json();
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
 
-	// 		sessionStorage.setItem("username", data.username);
+			sessionStorage.setItem("username", data.username);
 
-	// 		msgElement.textContent = "Username changed";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-success");
+			msgElement.textContent = "Username changed";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
 
-	// 		window.location.reload();
-	// 	}
+			window.location.reload();
+		}
 
-	// } catch (e) {
-	// 	console.error(e);
-	// }
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 async function updateEmail(emailForm) {
@@ -152,45 +156,47 @@ async function updateEmail(emailForm) {
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
 	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
-	// const init = {
-	// 	method: 'PATCH',
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		'X-CSRFToken': csrftoken,
-	// 	},
-	// 	body: JSON.stringify({email: input.email.value}),
-	// };
+	const access = sessionStorage.getItem("access");
 
-	// try {
-	// 	let hostnameport = "https://" + window.location.host
+	const init = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({email: input.email.value}),
+	};
 
-	// 	const response = await fetch(hostnameport + '/api/profile/', init);
+	try {
+		let hostnameport = "https://" + window.location.host
 
-	// 	if (response.status != 200) {
+		const response = await fetch(hostnameport + '/api/players/profile', init);
 
-	// 		const error = await response.text();
+		if (response.status != 200) {
+
+			const error = await response.text();
 			
 
 			
-	// 		msgElement.textContent = error.replace(/["{}[\]]/g, '');
-	// 		msgElement.classList.add("text-danger");
-	// 		return;
-	// 	}
-	// 	if (response.status === 200) {
-	// 		const data = await response.json();
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
 
-	// 		sessionStorage.setItem("email", data.email);
+			sessionStorage.setItem("email", data.email);
 
-	// 		msgElement.textContent = "Email changed";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-success");
+			msgElement.textContent = "Email changed";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
 
-	// 		window.location.reload();
-	// 	}
+			window.location.reload();
+		}
 
-	// } catch (e) {
-	// 	console.error(e);
-	// }
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 async function updatePassword(passwordForm) {
@@ -215,38 +221,40 @@ async function updatePassword(passwordForm) {
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
 	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
-	// const init = {
-	// 	method: 'PATCH',
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		'X-CSRFToken': csrftoken,
-	// 	},
-	// 	body: JSON.stringify({password: input.password_one.value})
-	// };
+	const access = sessionStorage.getItem("access");
 
-	// try {
+	const init = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({password: input.password_one.value})
+	};
 
-	// 	let hostnameport = "https://" + window.location.host
+	try {
 
-	// 	const response = await fetch(hostnameport + '/api/updatepassword/', init);
+		let hostnameport = "https://" + window.location.host
 
-	// 	if (response.status != 200) {
-	// 		const error = await response.text();
-	// 		console.log("undpate password", error)
-	// 		msgElement.textContent = error.replace(/["{}[\]]/g, '');
-	// 		msgElement.classList.add("text-danger");
-	// 		return;
-	// 	}
-	// 	if (response.status === 200) {
-	// 		const data = await response.json();
+		const response = await fetch(hostnameport + '/api/players/profile', init);
 
-	// 		msgElement.textContent = "Password changed";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-success");
-	// 	}
-	// } catch (e) {
-	// 	console.error(e);
-	// }
+		if (response.status != 200) {
+			const error = await response.text();
+			console.log("undpate password", error)
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+
+			msgElement.textContent = "Password changed";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
+		}
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 async function updateAvatar() {
@@ -262,42 +270,45 @@ async function updateAvatar() {
 	msgElement.textContent = "Avatar changed"; // TO DELETE AFTER BACKEND !
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
 	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
+	
+	const access = sessionStorage.getItem("access");
 
-	// const init = {
-	// 	method: 'PATCH',
-	// 	headers: {
-	// 		'X-CSRFToken': csrftoken,
-	// 	},
-	// 	body: data,
-	// };
+	const init = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: data,
+	};
 
-	// try {
+	try {
 
-	// 	let hostnameport = "https://" + window.location.host
+		let hostnameport = "https://" + window.location.host
 
-	// 	const response = await fetch(hostnameport + '/api/updateavatar/', init);
+		const response = await fetch(hostnameport + '/api/players/profile', init);
 
-	// 	if (response.status === 400) {
-	// 		const error = await response.text();
+		if (response.status === 400) {
+			const error = await response.text();
 
-	// 		msgElement.textContent = error.replace(/["{}[\]]/g, '');
-	// 		msgElement.classList.add("text-danger");
-	// 		return;
-	// 	}
-	// 	if (response.status === 200) {
-	// 		const data = await response.json();
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
 
-	// 		sessionStorage.setItem("avatar", data.avatar);
+			sessionStorage.setItem("avatar", data.avatar);
 
-	// 		msgElement.textContent = "Avatar changed";
-	// 		msgElement.classList.remove("text-danger");
-	// 		msgElement.classList.add("text-success");
+			msgElement.textContent = "Avatar changed";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
 
-	// 		window.location.reload();
-	// 	}
-	// } catch (e) {
-	// 	console.error(e);
-	// }
+			window.location.reload();
+		}
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 function listenerUserInfo() {

@@ -64,7 +64,8 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("avatar", data["avatar"]);
 			if (data["nickname"])
 				sessionStorage.setItem("nickname", data["nickname"]);
-			sessionStorage.setItem("token", data["access"]); //pour lolo
+			sessionStorage.setItem("access", data["access"]); //pour lolo
+			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
@@ -284,6 +285,31 @@ async function connectUser42() {
 		};
 
 		let hostnameport = "https://" + window.location.host
+
+		if (response.status === 200) {
+			// login is successful -> redirect to profile
+
+			const data = await response.json();
+
+			sessionStorage.setItem("username", data["username"]);
+			sessionStorage.setItem("email", data["email"]);
+			if (data["avatar"])
+				sessionStorage.setItem("avatar", data["avatar"]);
+			if (data["nickname"])
+				sessionStorage.setItem("nickname", data["nickname"]);
+			sessionStorage.setItem("access", data["access"]); //pour lolo
+			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
+
+			// Manually call the hide function of the boostrap Modal element
+			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
+			await modal.hide();
+
+			document.getElementById("login").textContent = "Logout";
+			document.getElementById("login").value = "logout";
+			router("index");
+			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
+		}
+		
 	} catch (e) {
 		console.error("Error 42: ", e);
 	}

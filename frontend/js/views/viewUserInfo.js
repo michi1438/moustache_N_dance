@@ -195,7 +195,7 @@ export default function renderUserInfo() {
 				<canvas id="StatChart" style="width:100%;max-width:700px"></canvas>
 			</div>
 			<div class="col-6 text-start">
-				<div class="row my-3">
+				<div class="row my-5">
 					<div class="col">
 						Games:
 						<div id="games" class="fw-bold"></div>
@@ -204,8 +204,72 @@ export default function renderUserInfo() {
 						Dates:
 						<div id="games_dates" class="fw-bold"></div>
 					</div>
+				</div>
+				<div class="row">
+				<div id="add_friend">
+					<div class="list-group d-flex">
+							<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__add_friend" id="btn__add_friend">Add Friend
 					</div>
 				</div>
+				<div class="modal fade" id="modal__add_friend" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered text-center">
+						<div class="modal-content">
+							<div class="modal-header text-dark fw-bold fs-2">
+								<p class="col-11 modal-title"></p>
+								<button type="button" class="col-1 btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">X</button>
+							</div>
+							<div class="modal-body">
+								<form id="form__add_friend" class="">
+								<div class="mb-1" id="form__add_friend--msg"></div>
+									<div class="mb-2">
+										<div class="text-dark">
+											Nickname
+										</div>
+										<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="add_friend_nickname">
+										<div id="form__tournament--msg" class="text-danger"></div>
+									</div>
+									<button class="btn btn-dark mt-1" type="submit">
+										Add
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row my-3 align-items-center">
+				<div class="col">
+					Friend 1:
+					<div id="friend1__nickname--big" class="fw-bold"></div>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__accept_friend__nickname">
+						Accept
+					</button>
+				</div>
+			</div>
+					<div class="row my-3 align-items-center">
+				<div class="col">
+					Friend 2:
+					<div id="friend2__nickname--big" class="fw-bold"></div>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__accept_friend__nickname">
+						Accept
+					</button>
+				</div>
+			</div>
+					<div class="row my-3 align-items-center">
+				<div class="col">
+					Friend 3:
+					<div id="friend3__nickname--big" class="fw-bold"></div>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__accept_friend__nickname">
+						Accept
+					</button>
+				</div>
+			</div>
 			</div>
 		</div>
 	`;
