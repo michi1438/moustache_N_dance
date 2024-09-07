@@ -392,6 +392,7 @@ function initGameSimpson () {
                     }, 1000);
                 }
             }, 1000);
+            ballSpeed = { x: 0.2, z: 0.2 };
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -407,6 +408,7 @@ function animate(vitesse) {
             if(go) {
                 ball.position.x += ballSpeed.x;
                 ball.position.z += ballSpeed.z;
+                console.log('ANIMATION ballSpeed and ballposition and vitesse', ballSpeed, ball.position, vitesse);
             }
             //collision murs
             if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
@@ -752,6 +754,7 @@ function handleGameOver(player) {
             };
             ws.send(JSON.stringify(message));
         }
+        cancelAnimationFrame(animationID);
         resetGameVariables();
         clearScene();
         // setTimeout(() => {
@@ -875,16 +878,12 @@ function clearScene() {
 
 function resetGameVariables() {
     // Réinitialiser les scores
-    scoreP1 = 0;
-    scoreP2 = 0;
-
-    // Réinitialiser la visibilité des objets de score
-    scoreP1object.forEach((obj, index) => {
-        obj.visible = index === 0;
-    });
-    scoreP2object.forEach((obj, index) => {
-        obj.visible = index === 0;
-    });
+    for (let i = 0; i < scoreP1object.length; i++) {
+        scoreP1object[i].visible = false;
+        scoreP2object[i].visible = false;
+    }
+    scoreP1object[0].visible = true;
+    scoreP2object[0].visible = true;
 
     // Réinitialiser la visibilité des messages de victoire
     p1WIN.visible = false;
