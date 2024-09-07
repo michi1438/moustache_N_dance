@@ -4,10 +4,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { v4 as uuidv4 } from 'uuid';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
 
-
-
-
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
@@ -756,19 +752,22 @@ function handleGameOver(player) {
             };
             ws.send(JSON.stringify(message));
         }
-        setTimeout(() => {
-            const boardTwo = document.getElementById('board_four');
-            if (boardTwo && boardTwo.contains(renderer.domElement)) {
-                boardTwo.removeChild(renderer.domElement);
-                console.log("Game stopped and board_three cleared.");
-                sessionStorage.setItem("gameOverT", "true");
-                setTimeout(() => {
-                    listenerPongTournament();
-                    cancelAnimationFrame(animationID);
-                }, 3000);
-            }
+        resetGameVariables();
+        clearScene();
+        // setTimeout(() => {
+        //     const boardTwo = document.getElementById('board_four');
+        //     if (boardTwo && boardTwo.contains(renderer.domElement)) {
+        //         boardTwo.removeChild(renderer.domElement);
+        //         console.log("Game stopped and board_three cleared.");
+        //         sessionStorage.setItem("gameOverT", "true");
+        //         setTimeout(() => {
+        //             listenerPongTournament();
+        //             cancelAnimationFrame(animationID);
+        //             clearScene();
+        //         }, 3000);
+        //     }
 
-        }, 3000);
+        // }, 3000);
         
     } else if (player.result == 0) {
         //console.log('Sending ball position:', message);
@@ -858,3 +857,60 @@ function sendScore(playerNumber) {
 }
 
 showQuestion();
+
+function clearScene() {
+    while(scene.children.length > 0){ 
+        let object = scene.children[0];
+        scene.remove(object);
+        if (object.geometry) {
+            object.geometry.dispose();
+        }
+        if (object.material) {
+            if (object.material.map) object.material.map.dispose();
+            object.material.dispose();
+        }
+    }
+    console.log("Scene cleared.");
+}
+
+function resetGameVariables() {
+    // Réinitialiser les scores
+    scoreP1 = 0;
+    scoreP2 = 0;
+
+    // Réinitialiser la visibilité des objets de score
+    scoreP1object.forEach((obj, index) => {
+        obj.visible = index === 0;
+    });
+    scoreP2object.forEach((obj, index) => {
+        obj.visible = index === 0;
+    });
+
+    // Réinitialiser la visibilité des messages de victoire
+    p1WIN.visible = false;
+    p2WIN.visible = false;
+
+    // Réinitialiser la balle et les autres objets
+    if (ball) {
+        ball.position.set(0, 0, 0);
+    }
+    ballSpeed = { x: 0.2, z: 0.2 };
+
+    // Réinitialiser les positions des paddles
+    if (paddle1) {
+        paddle1.position.set(/* position initiale de paddle1 */);
+    }
+    if (paddle2) {
+        paddle2.position.set(/* position initiale de paddle2 */);
+    }
+
+    // Réinitialiser d'autres variables de jeu
+    isConfigReady = false;
+    isModelLoaded = false;
+    go = false;
+    gameOverSent = false;
+    connectedPlayers = 0;
+    sessionStorage.setItem("gameOverT", "false");
+
+    console.log("Game variables reset.");
+}
