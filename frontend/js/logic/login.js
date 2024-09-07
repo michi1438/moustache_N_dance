@@ -66,6 +66,8 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]); //pour lolo
 			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
+			if (data["friends"])
+				sessionStorage.setItem("friends", data["friends"]);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
@@ -368,6 +370,7 @@ function listenerLogin() {
 		e.preventDefault();
 		connectUser42();
 	});
+	
 };
 
 async function loadLogin() {

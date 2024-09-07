@@ -283,13 +283,16 @@ def verify_otp(request):
         # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
         refresh = RefreshToken.for_user(player)
-        return Response({"message": "OTP is valid",
+        serializer = PlayerSerializer(player)
+        return Response({
+            "message": "OTP is valid",
             "username": str(player.username),
             "nickname": str(player.nickname),
             "email": str(player.email),
-            # "avatar": player.avatar,
+            "avatar": player.avatar.url if player.avatar else None,
             "refresh": str(refresh),
-            "access": str(refresh.access_token)
+            "access": str(refresh.access_token),
+            "friends": player.friends.all().values_list('id', flat=True)
             }, status=status.HTTP_200_OK)
 
     return Response({"error": "Invalid OTP or OTP expired"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -316,86 +319,86 @@ def logout(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# # LISTER SES AMIS
-# @api_view(['GET'])
+# LISTER SES AMIS
+@api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-# def list_friends(request):
-#     player = request.user
-#     friends = player.friends.all()
-#     serializer = FriendSerializer(friends, many=True)
-#     return Response(serializer.data)
+def list_friends(request):
+    player = request.user
+    friends = player.friends.all()
+    serializer = FriendSerializer(friends, many=True)
+    return Response(serializer.data)
 
-# # DEMANDE D'AMI
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def friend_request(request):
-#     to_player_id = request.data['to_player_id']
-#     from_player = request.user
+# DEMANDE D'AMI
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_request(request):
+    to_player_id = request.data['to_player_id']
+    from_player = request.user
 
-#     try:
-#         to_player = Player.objects.get(id=to_player_id)
-#     except Player.DoesNotExist:
-#         return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+    try:
+        to_player = Player.objects.get(id=to_player_id)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
-#     # si la demande inverse existe deja, accepter la demande directement et ne pas en recreer une
-#     if FriendRequest.objects.filter(from_player=to_player, to_player=from_player).exists():
-#         existing_request = FriendRequest.objects.get(from_player=to_player, to_player=from_player) 
-#         existing_request.delete()
-#         from_player.friends.add(to_player)
-#         return Response({"message": "Friend request accepted automatically because reciprocal"}, status=status.HTTP_200_OK)
+    # si la demande inverse existe deja, accepter la demande directement et ne pas en recreer une
+    if FriendRequest.objects.filter(from_player=to_player, to_player=from_player).exists():
+        existing_request = FriendRequest.objects.get(from_player=to_player, to_player=from_player) 
+        existing_request.delete()
+        from_player.friends.add(to_player)
+        return Response({"message": "Friend request accepted automatically because reciprocal"}, status=status.HTTP_200_OK)
 
-#     # si la meme demande existe deja, renvoyer une erreur
-#     if FriendRequest.objects.filter(from_player=from_player, to_player=to_player).exists():
-#         return Response({"error": "Friend request already sent"}, status=status.HTTP_400_BAD_REQUEST)
+    # si la meme demande existe deja, renvoyer une erreur
+    if FriendRequest.objects.filter(from_player=from_player, to_player=to_player).exists():
+        return Response({"error": "Friend request already sent"}, status=status.HTTP_400_BAD_REQUEST)
 
-#     friend_request = FriendRequest(from_player=from_player, to_player=to_player)
-#     friend_request.save()
-#     return Response({"message": "Friend request sent"}, status=status.HTTP_201_CREATED)
+    friend_request = FriendRequest(from_player=from_player, to_player=to_player)
+    friend_request.save()
+    return Response({"message": "Friend request sent"}, status=status.HTTP_201_CREATED)
 
-# # REPONSE A UNE DEMANDE D'AMI
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def friend_response(request):
-#     requester_id = request.data['requester_id'] # id du demandeur
-#     action = request.data['action'] # accept ou reject
-#     player = request.user
+# REPONSE A UNE DEMANDE D'AMI
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_response(request):
+    requester_id = request.data['requester_id'] # id du demandeur
+    action = request.data['action'] # accept ou reject
+    player = request.user
 
-#     try:
-#         requester = Player.objects.get(id=requester_id)
-#     except Player.DoesNotExist:
-#         return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+    try:
+        requester = Player.objects.get(id=requester_id)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
-#     try:
-#         friend_request = FriendRequest.objects.get(from_player=requester, to_player=player)
+    try:
+        friend_request = FriendRequest.objects.get(from_player=requester, to_player=player)
 
-#         if action == "accept":
-#             friend_request.delete()
-#             requester.friends.add(player)
-#             return Response({"message": "Friend request accepted"}, status=status.HTTP_200_OK)
+        if action == "accept":
+            friend_request.delete()
+            requester.friends.add(player)
+            return Response({"message": "Friend request accepted"}, status=status.HTTP_200_OK)
 
-#         elif action == "reject":
-#             friend_request.delete()
-#             return Response({"message": "Friend request rejected"}, status=status.HTTP_200_OK)
+        elif action == "reject":
+            friend_request.delete()
+            return Response({"message": "Friend request rejected"}, status=status.HTTP_200_OK)
 
-#         return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
 
-#     except FriendRequest.DoesNotExist:
-#         return Response({"error": f'No friend request found between player {requester_id} and player {player.id}'},status=status.HTTP_404_NOT_FOUND)
+    except FriendRequest.DoesNotExist:
+        return Response({"error": f'No friend request found between player {requester_id} and player {player.id}'},status=status.HTTP_404_NOT_FOUND)
 
-# # SUPPRESSION D'UN AMI
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def friend_delete(request):
-#     friend_id = request.data['friend_id']
-#     player = request.user
+# SUPPRESSION D'UN AMI
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def friend_delete(request):
+    friend_id = request.data['friend_id']
+    player = request.user
 
-#     try:
-#         friend = Player.objects.get(id=friend_id)
+    try:
+        friend = Player.objects.get(id=friend_id)
 
-#         if friend in player.friends.all():
-#             player.friends.remove(friend)
-#             return Response({"message": "Friend removed successfully"}, status=status.HTTP_200_OK)
-#         return Response({"error": f'Player with id {friend_id} is not your friend'}, status=status.HTTP_400_BAD_REQUEST)
+        if friend in player.friends.all():
+            player.friends.remove(friend)
+            return Response({"message": "Friend removed successfully"}, status=status.HTTP_200_OK)
+        return Response({"error": f'Player with id {friend_id} is not your friend'}, status=status.HTTP_400_BAD_REQUEST)
         
-#     except Player.DoesNotExist:
-#         return Response({"error": f'Player with id {friend_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+    except Player.DoesNotExist:
+        return Response({"error": f'Player with id {friend_id} does not exist'},status=status.HTTP_404_NOT_FOUND)

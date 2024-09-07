@@ -19,11 +19,6 @@ async function updateNickname(nicknameForm) {
 		msgElement.classList.add("text-danger");
 		return;
 	}
-
-	sessionStorage.setItem("nickname", input.nickname.value); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Nickname changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 	
 	const access = sessionStorage.getItem("access");
 
@@ -86,11 +81,6 @@ async function updateUsername(usernameForm) {
 		return;
 	}
 
-	sessionStorage.setItem("username", input.username.value); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Username changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
-
 	const access = sessionStorage.getItem("access");
 
 	const init = {
@@ -151,11 +141,6 @@ async function updateEmail(emailForm) {
 		return;
 	}
 
-	sessionStorage.setItem("email", input.email.value); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Email changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
-
 	const access = sessionStorage.getItem("access");
 
 	const init = {
@@ -215,11 +200,6 @@ async function updatePassword(passwordForm) {
 		msgElement.classList.remove("text-success");
 		return;
 	}
-
-	sessionStorage.setItem("password", input.password_one.value); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Password changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
 
 	const access = sessionStorage.getItem("access");
 
@@ -311,6 +291,66 @@ async function updateAvatar() {
 	}
 };
 
+async function addFriend(friendForm) {
+
+	const msgElement = document.getElementById("form__add_friend--msg");
+
+	// remove a potential error message from the placeholder
+	msgElement.textContent = "";
+	msgElement.classList.remove("text-danger");
+	msgElement.classList.remove("text-success");
+
+	const input = friendForm.elements;
+
+	if (!input.add_friend_nickname.value) {
+		msgElement.textContent = "User not found";
+		msgElement.classList.add("text-danger");
+		return;
+	}
+
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({to_player_id: input.add_friend_nickname.value}),
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/request', init);
+
+		if (response.status != 201) {
+
+			const error = await response.text();
+			
+
+			
+			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			msgElement.classList.add("text-danger");
+			return;
+		}
+		if (response.status === 201) {
+			const data = await response.json();
+
+			sessionStorage.setItem("friend", data.email);
+
+			msgElement.textContent = "Friend request sent";
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
+
+			// window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
 function listenerUserInfo() {
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
@@ -318,12 +358,14 @@ function listenerUserInfo() {
 	document.getElementById("update__username--big").textContent = sessionStorage.getItem("username");
 	document.getElementById("update__nickname--big").textContent = sessionStorage.getItem("nickname");
 	document.getElementById("update__email--big").textContent = sessionStorage.getItem("email");
+	document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friends");
 
 	const nicknameForm = document.getElementById("form__updateNickname");
 	const usernameForm = document.getElementById("form__updateUsername");
 	const passwordForm = document.getElementById("form__updatePassword");
 	const avatarForm = document.getElementById("form__updateAvatar");
 	const emailForm = document.getElementById("form__updateEmail");
+	const friendForm = document.getElementById("form__add_friend");
 
 	var xValues = ["Wins", "Losses"];
 	var yValues = [70, 30];
@@ -414,6 +456,12 @@ function listenerUserInfo() {
 		e.preventDefault();
 
 		updateAvatar();
+	});
+
+	friendForm.addEventListener("submit", e => {
+		e.preventDefault();
+
+		addFriend(friendForm);
 	});
 };
 

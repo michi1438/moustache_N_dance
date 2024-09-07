@@ -22,8 +22,8 @@ urlpatterns = [
         path('profile', views.player_details, name="profile"),
         # path('token_refresh', TokenRefreshView.as_view(), name="token_refresh"),
         path('verify_otp', views.verify_otp, name="otp"),
-        # path('friends/list', views.list_friends),
-        # path('friends/request', views.friend_request),
-        # path('friends/response', views.friend_response),
-        # path('friends/delete', views.friend_delete),
+        path('friends/list', views.list_friends),
+        path('friends/request', views.friend_request),
+        path('friends/response', views.friend_response),
+        path('friends/delete', views.friend_delete),
 ]

@@ -220,13 +220,13 @@ export default function renderUserInfo() {
 							</div>
 							<div class="modal-body">
 								<form id="form__add_friend" class="">
-								<div class="mb-1" id="form__add_friend--msg"></div>
+									<div class="mb-1" id="form__add_friend--msg"></div>
 									<div class="mb-2">
 										<div class="text-dark">
 											Nickname
 										</div>
 										<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="add_friend_nickname">
-										<div id="form__tournament--msg" class="text-danger"></div>
+										<div id="form__add_friend--msg" class="text-danger"></div>
 									</div>
 									<button class="btn btn-dark mt-1" type="submit">
 										Add
