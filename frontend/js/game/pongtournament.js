@@ -5,13 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
 
 
+
+
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, winnerG;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -586,6 +589,7 @@ function selectOption(option) {
     const configMenu = document.getElementById('config-menu');
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
+    
 
     if (currentQuestionIndex === 0 && option === "Rejoindre") {
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
@@ -763,6 +767,7 @@ function handleGameOver(player) {
                     cancelAnimationFrame(animationID);
                 }, 3000);
             }
+
         }, 3000);
         
     } else if (player.result == 0) {

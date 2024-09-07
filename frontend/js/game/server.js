@@ -17,14 +17,13 @@ const wss = new WebSocket.Server({ server });
 let players = [];
 let gameID;
 let playerConfigs = [];
-let winners = [];
 let playersID = [];
 let tabSize;
 let tournoiSize;
 let configTournoi = {};
 let gamePromises = [];
-let started = false;
-// let playerNumber = 1;
+let gamePromise;
+
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
@@ -64,21 +63,22 @@ wss.on('connection', (ws) => {
                 }
             }
             else if (data.type === 'winner') {
-                const gameID = data.gameID;
+            console.log('Winner:', data.winner);
+            gameID = data.gameID;
             // Résoudre la promesse correspondante
-            const gamePromise = gamePromises.find(p => p.gameID === gameID);
+            playersID.push(data.winner);
+            gamePromise = gamePromises.find(p => p.gameID === gameID);
             if (gamePromise) {
                 gamePromise.resolve();
                 gamePromises = gamePromises.filter(p => p.gameID !== gameID);
             }
                 
-                playersID.push(data.winner);
             }
             else if (data.type === 'tournoi') {
-                tournamentLogic(data, winners || []);
+                tournamentConnection(data);
             }
             else if (data.type === 'Rejoindre') {
-                tournamentLogic(data, winners || []);
+                tournamentConnection(data);
             }
             else {
                 broadcast(ws, data);
@@ -116,11 +116,11 @@ function broadcast(sender, message) {
     });
 }
 
-async function tournamentLogic(data, winners) {
+async function tournamentConnection(data) {
     if (data.type === 'Rejoindre') {
         gameEvents.emit('playerJoined', data.playerID);
         console.log('tabSize du début', tabSize);
-    } else if(data.type === 'tournoi' && !started) {
+    } else if(data.type === 'tournoi') {
         tournoiSize = data.config['Taille du tournoi'];
         tabSize = tournoiSize;
         //tabSize = playersID.length;
@@ -128,66 +128,72 @@ async function tournamentLogic(data, winners) {
             'Vitesse du jeu': data.config['Vitesse du jeu'],
             'Map': data.config['Map']
         };
-
-        console.log('premier element contenu dans config', data.config['Taille du tournoi']);
         //crée un tableau de playersID de la taille de data.config['Taille du tournoi']
         //ajouter le playerID (dans le premier element du tableau) contenu dans data.playerID 
         gameEvents.emit('playerJoined', data.playerID);
-        started = true;
+        await waitForPlayers();
+        await tournamentLogic(data);
     }
     console.log('tabsize et playersIDlength', tabSize, playersID.length);
+    
+}
+
+async function tournamentLogic(data) {
+    console.log('LOGIC TOURNAMENT');
     await waitForPlayers();
     //si le tableau est égale à data.config['Taille du tournoi'] lance les parties entre playersID[0] et playersID[1] jusqu'à la fin du tableau
     if (tabSize == playersID.length) {
-        let i = 0;
-        while(i < tabSize) {
-            console.log('Lancement des games')
-            gameID = uuidv4();
-            players[[i]].gameID = gameID;
-            players[[i+1]].gameID = gameID;
-            players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi}));
-            players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi}));
-
-            // Créez une promesse pour chaque partie
-            const gamePromise = new Promise((resolve) => {
-                gamePromises.push({ gameID, resolve });
-            });
-            gamePromises.push(gamePromise);
-
-            i += 2;
-        }
+        await new Promise(resolve => setTimeout(resolve, 8000));
+        await startGames();
         playersID = [];
-        await Promise.all(gamePromises);
+        try {
+            await Promise.all(gamePromises);
+        } catch (error) {
+            console.error('Erreur lors de l\'attente des jeux:', error);
+        }
+        if(playersID.length == tabSize / 2){
+            console.log('salut');   
+            tabSize = tabSize / 2;
+        }
     }
     //playersID = [];
     console.log('playersID apres promise', playersID);    
     
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
-    if(playersID.length == tabSize / 2){
-        console.log('salut');   
-        tabSize = tabSize / 2;
-    }
     //si le tableau est égale à 1, le playerID est le winner
     // if (playersID.length == 1) {
     //     winners[0] = playersID[0];
     // }
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
-    else if (tabSize > 1 && tabSize == playersID.length) {
+    if (tabSize > 1 && tabSize == playersID.length) {
         console.log('relance de la fonction');
-        tournamentLogic(data, winners);
+        tournamentLogic(data);
     }
-
-
 }
-
-server.listen(3000, () => {
-    console.log('WebSocket server is running on wss://localhost:3000');
-});
 
 async function waitForPlayers() {
     while (playersID.length < tabSize) {
         console.log(`En attente de joueurs... Actuellement ${playersID.length}/${tabSize}`);
         await new Promise(resolve => setTimeout(resolve, 1000)); // Attendre 1 seconde avant de vérifier à nouveau
+    }
+}
+
+async function startGames() {
+    let i = 0;
+    while(i < tabSize) {
+        console.log('Lancement des games')
+        gameID = uuidv4();
+        players[[i]].gameID = gameID;
+        players[[i+1]].gameID = gameID;
+        players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi}));
+        players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi}));
+        // Créez une promesse pour chaque partie
+        gamePromise = new Promise((resolve) => {
+            gamePromises.push({ gameID, resolve });
+        });
+        gamePromises.push(gamePromise);
+        
+        i += 2;
     }
 }
 
@@ -203,4 +209,9 @@ gameEvents.on('playerJoined', (playerID) => {
         console.log('TABLEAU playersID', playersID);
         console.log('TABLEAU tabSize', tabSize);
     }
+});
+
+
+server.listen(3000, () => {
+    console.log('WebSocket server is running on wss://localhost:3000');
 });
