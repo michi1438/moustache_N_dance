@@ -135,6 +135,28 @@ def list_friends(request):
     serializer = FriendSerializer(friends, many=True)
     return Response(serializer.data)
 
+# LISTER SES DEMANDES D'AMI RECUES
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def requests_received(request):
+    player = request.user
+
+    friend_requests_received = FriendRequest.objects.filter(to_player=player)
+    sender_ids = friend_requests_received.values_list('from_player_id', flat=True)
+
+    return Response({"sender_ids": list(sender_ids)}, status=status.HTTP_200_OK)
+
+# LISTER SES DEMANDES D'AMI ENVOYEES
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def requests_sent(request):
+    player = request.user
+
+    friend_requests_sent = FriendRequest.objects.filter(from_player=player)
+    receiver_ids = friend_requests_sent.values_list('to_player_id', flat=True)
+
+    return Response({"receiver_ids": list(receiver_ids)}, status=status.HTTP_200_OK)
+
 # DEMANDE D'AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -209,3 +231,4 @@ def friend_delete(request):
         
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {friend_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
+
