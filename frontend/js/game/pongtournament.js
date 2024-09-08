@@ -393,6 +393,10 @@ function initGameSimpson () {
                 }
             }, 1000);
             ballSpeed = { x: 0.2, z: 0.2 };
+            gameOverSent = false;
+            player.result = -1;
+            console.log(scene);
+            console.log('gameoversent avant dappelller animate', gameOverSent);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -403,12 +407,12 @@ function initGameSimpson () {
 function animate(vitesse) {
     if (sessionStorage.getItem("gameOverT") == "false") {
         animationID = requestAnimationFrame(() => animate(vitesse));
+        console.log('score : ', scoreP1, scoreP2);
         controls.update();
         if (ball && paddle1 && paddle2 ) {
             if(go) {
                 ball.position.x += ballSpeed.x;
                 ball.position.z += ballSpeed.z;
-                console.log('ANIMATION ballSpeed and ballposition and vitesse', ballSpeed, ball.position, vitesse);
             }
             //collision murs
             if (ball.position.z <= topWall.position.z + 0.5 || ball.position.z >= bottomWall.position.z - 0.5) {
@@ -473,7 +477,7 @@ function animate(vitesse) {
                         sound3.play();
                     }, 1000);
                     soundPlayed = true;
-
+                    
                 }
                 ball.position.set(0, 0, 0);
                 ballSpeed = { x: 0, z: 0 };
@@ -773,7 +777,15 @@ function handleGameOver(player) {
         // }, 3000);
         
     } else if (player.result == 0) {
-        //console.log('Sending ball position:', message);
+        console.log('Salut jai perdu ^^');
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            console.log('Salut jai envoyé le message que jai perdu ^^');
+            const message = {
+                type: 'positionTournament',
+                playerID : player.playerID,
+            };
+            ws.send(JSON.stringify(message));
+        }
         setTimeout(() => {
             const boardTwo = document.getElementById('board_four');
             if (boardTwo && boardTwo.contains(renderer.domElement)) {
@@ -873,21 +885,23 @@ function clearScene() {
             object.material.dispose();
         }
     }
+    scoreP1object = [];
+    scoreP2object = [];
     console.log("Scene cleared.");
 }
 
 function resetGameVariables() {
     // Réinitialiser les scores
-    for (let i = 0; i < scoreP1object.length; i++) {
-        scoreP1object[i].visible = false;
-        scoreP2object[i].visible = false;
-    }
-    scoreP1object[0].visible = true;
-    scoreP2object[0].visible = true;
+    // for (let i = 0; i < scoreP1object.length; i++) {
+    //     scoreP1object[i].visible = false;
+    //     scoreP2object[i].visible = false;
+    // }
+    // scoreP1object[0].visible = true;
+    // scoreP2object[0].visible = true;
 
-    // Réinitialiser la visibilité des messages de victoire
-    p1WIN.visible = false;
-    p2WIN.visible = false;
+    // // Réinitialiser la visibilité des messages de victoire
+    // p1WIN.visible = false;
+    // p2WIN.visible = false;
 
     // Réinitialiser la balle et les autres objets
     if (ball) {

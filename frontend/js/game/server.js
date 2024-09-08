@@ -22,6 +22,7 @@ let tabSize;
 let tournoiSize;
 let configTournoi = {};
 let gamePromises = [];
+let position = [];
 let gamePromise;
 
 
@@ -39,10 +40,10 @@ wss.on('connection', (ws) => {
                 const playerIndex = players.indexOf(ws);
                 playerConfigs[playerIndex] = data.config;
                 ws.config = data.config;
-
+        
                 console.log('Received configuration:', playerConfigs);
                 console.log('Nbr de configs:', playerConfigs.filter(config => config).length);
-
+        
                 // Chercher des configurations correspondantes
                 const matchingPlayers = [];
                 playerConfigs.forEach((config, index) => {
@@ -52,7 +53,6 @@ wss.on('connection', (ws) => {
                 });
                 console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
                 if (matchingPlayers.length == 2) {
-
                     gameID = uuidv4();
                     players[matchingPlayers[0]].gameID = gameID;
                     players[matchingPlayers[1]].gameID = gameID;
@@ -61,29 +61,27 @@ wss.on('connection', (ws) => {
                     playerConfigs[matchingPlayers[0]] = null;
                     playerConfigs[matchingPlayers[1]] = null;
                 }
-            }
-            else if (data.type === 'winner') {
-            console.log('Winner:', data.winner);
-            gameID = data.gameID;
-            // Résoudre la promesse correspondante
-            playersID.push(data.winner);
-            gamePromise = gamePromises.find(p => p.gameID === gameID);
-            if (gamePromise) {
-                gamePromise.resolve();
-                gamePromises = gamePromises.filter(p => p.gameID !== gameID);
-            }
-                
-            }
-            else if (data.type === 'tournoi') {
+            } else if (data.type === 'winner') {
+                console.log('Winner:', data.winner);
+                gameID = data.gameID;
+                // Résoudre la promesse correspondante
+                playersID.push(data.winner);
+                gamePromise = gamePromises.find(p => p.gameID === gameID);
+                if (gamePromise) {
+                    gamePromise.resolve();
+                    gamePromises = gamePromises.filter(p => p.gameID !== gameID);
+                }
+            } else if (data.type === 'positionTournament') {
+                position.push(data.playerID);
+            } else if (data.type === 'tournoi') {
                 tournamentConnection(data);
-            }
-            else if (data.type === 'Rejoindre') {
+            } else if (data.type === 'Rejoindre') {
                 tournamentConnection(data);
-            }
-            else {
+            } else {
                 broadcast(ws, data);
             }
         });
+    
 
         ws.on('close', () => {
             broadcast(ws, { type: 'deco', player: players.indexOf(ws) });
@@ -133,9 +131,7 @@ async function tournamentConnection(data) {
         gameEvents.emit('playerJoined', data.playerID);
         await waitForPlayers();
         await tournamentLogic(data);
-    }
-    console.log('tabsize et playersIDlength', tabSize, playersID.length);
-    
+    } 
 }
 
 async function tournamentLogic(data) {
@@ -151,6 +147,7 @@ async function tournamentLogic(data) {
         } catch (error) {
             console.error('Erreur lors de l\'attente des jeux:', error);
         }
+        console.log('tabsize et playersIDlength', tabSize, playersID.length);
         if(playersID.length == tabSize / 2){
             console.log('salut');   
             tabSize = tabSize / 2;
@@ -161,13 +158,22 @@ async function tournamentLogic(data) {
     
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
     //si le tableau est égale à 1, le playerID est le winner
-    // if (playersID.length == 1) {
-    //     winners[0] = playersID[0];
-    // }
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
     if (tabSize > 1 && tabSize == playersID.length) {
         console.log('relance de la fonction');
         tournamentLogic(data);
+    }
+    else {
+        setTimeout(() => {
+            console.log('playersID[0]', playersID[0]);
+            //position.push(playersID[0]);
+            console.log('fin du tournoi');
+            console.log('position', position[0]);
+            console.log('position', position[1]);
+            console.log('position', position[2]);
+            console.log('position', position[3]);
+        }, 1000);
+        
     }
 }
 
