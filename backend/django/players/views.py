@@ -326,7 +326,7 @@ def list_friends(request):
     player = request.user
     friends = player.friends.all()
     serializer = FriendSerializer(friends, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # LISTER SES DEMANDES D'AMI RECUES
 @api_view(['GET'])

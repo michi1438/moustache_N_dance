@@ -335,9 +335,6 @@ async function addFriend(friendForm) {
 			return;
 		}
 		if (response.status === 201) {
-			const data = await response.json();
-
-			sessionStorage.setItem("friend", data.email);
 
 			msgElement.textContent = "Friend request sent";
 			msgElement.classList.remove("text-danger");
@@ -351,14 +348,168 @@ async function addFriend(friendForm) {
 	}
 };
 
+async function loadFriend() {
+
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/requests_received', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+			sessionStorage.setItem("friends_received", data.sender_ids);
+
+			// window.location.reload();
+		}
+	} catch (e) {
+		console.error(e);
+	}
+	
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/list', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+			if (data[0]) {
+				sessionStorage.setItem("friend1_id", data[0].id);
+				if (data[0].online === true)
+					sessionStorage.setItem("friend1_status", "online");
+				else
+					sessionStorage.setItem("friend1_status", "offline");
+			}
+			else {
+				sessionStorage.setItem("friend1_id", "");
+				sessionStorage.setItem("friend1_status", "");
+			}
+			if (data[1]) {
+				sessionStorage.setItem("friend2_id", data[1].id);
+				if (data[1].online === true)
+					sessionStorage.setItem("friend2_status", "online");
+				else
+					sessionStorage.setItem("friend2_status", "offline");
+			}
+			else {
+				sessionStorage.setItem("friend2_id", "");
+				sessionStorage.setItem("friend2_status", "");
+			}
+
+			// window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+async function acceptFriend(friend_id) {
+
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({requester_id: friend_id, action: "accept"}),
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/response', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+
+			// window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+async function deleteFriend(friend_id) {
+
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({friend_id: friend_id}),
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/delete', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+
+			// window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
 function listenerUserInfo() {
+
+	if (sessionStorage.getItem("username"))
+		loadFriend();
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
 		sessionStorage.getItem("avatar") : "/frontend/img/avatar.png";
 	document.getElementById("update__username--big").textContent = sessionStorage.getItem("username");
 	document.getElementById("update__nickname--big").textContent = sessionStorage.getItem("nickname");
 	document.getElementById("update__email--big").textContent = sessionStorage.getItem("email");
-	document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friends");
+	document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
+	document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
+	document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
+	document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
+	document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friends_received");
 
 	const nicknameForm = document.getElementById("form__updateNickname");
 	const usernameForm = document.getElementById("form__updateUsername");
@@ -462,6 +613,28 @@ function listenerUserInfo() {
 		e.preventDefault();
 
 		addFriend(friendForm);
+	});
+	document.getElementById("btn__friend1_accept").addEventListener("click", (e) => {
+		e.preventDefault();
+		acceptFriend(document.getElementById("friend1__nickname--big").textContent);
+		document.getElementById("btn__friend1_accept").classList.add("d-none");
+		document.getElementById("btn__friend1_accept").disabled = true;
+		document.getElementById("btn__friend1_delete").classList.remove("d-none");
+	});
+	document.getElementById("btn__friend1_delete").addEventListener("click", (e) => {
+		e.preventDefault();
+		deleteFriend(document.getElementById("friend1__nickname--big").textContent);
+	});
+	document.getElementById("btn__friend3_accept").addEventListener("click", (e) => {
+		e.preventDefault();
+		acceptFriend(document.getElementById("friend3__nickname--big").textContent);
+		document.getElementById("btn__friend3_accept").classList.add("d-none");
+		document.getElementById("btn__friend3_accept").disabled = true;
+		document.getElementById("btn__friend3_delete").classList.remove("d-none");
+	});
+	document.getElementById("btn__friend3_delete").addEventListener("click", (e) => {
+		e.preventDefault();
+		deleteFriend(document.getElementById("friend3__nickname--big").textContent);
 	});
 };
 

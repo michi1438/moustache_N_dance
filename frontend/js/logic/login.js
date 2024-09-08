@@ -66,8 +66,8 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]); //pour lolo
 			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
-			if (data["friends"])
-				sessionStorage.setItem("friends", data["friends"]);
+			// if (data["friends"])
+			// 	sessionStorage.setItem("friends", data["friends"]);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
@@ -142,6 +142,7 @@ async function connectUser(loginForm) {
 			document.getElementById("otp").classList.remove("d-none");
 			document.getElementById("otp").classList.add("d-block");
 			document.getElementById("form__login--btn").classList.add("d-none");
+			document.getElementById("form__login--btn").disabled = true;
 			document.getElementById("form__loginOTP--btn").classList.remove("d-none");
 
 			const data = await response.json();
