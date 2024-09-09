@@ -264,16 +264,53 @@ async function createUser(createAccountForm) {
 	}
 };
 
+function listenerCallback42() {
+
+	console.log("passed in listenerCallback42");
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const myParam = urlParams.get('code');
+
+	const init = {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(myParam)
+	
+	};
+	call_local_api(init);
+};
+
+async function call_local_api(init) {
+	try {
+		let hostnameport = "https://" + window.location.host
+		const response = await fetch(hostnameport + '/api/players/authorize_fortytwo/', init);
+
+		if (response.status === 200) {
+
+			// document.querySelectorAll(".dropdown-item").forEach(btn => {
+			// 	btn.removeAttribute("disabled");
+			// });
+			// document.getElementById("topbar__logout").removeAttribute("disabled");
+
+			router("index");
+		}
+	}
+	catch (e) {
+		console.error("Error create user: ", e);
+	}
+};
+
 async function connectUser42() {
 
+	const clientId = 'u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf';
+    const redirectUri = encodeURIComponent('https://localhost/callback/');
+    const responseType = 'code';
+    const scope = 'public';
 
-	//TODO
-	window.location = await ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Fplayers%2Fauthorize_fortytwo%2F&response_type=code');
+    // Construct the authorization URL
+    const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
 
-	const status = await window.location.status;
-		
-	router("index");
-	console.error("Error create user 42: ");
+	window.location = (authUrl);
 };
 
 function listenerLogin() {
