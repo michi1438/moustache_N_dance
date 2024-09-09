@@ -65,7 +65,7 @@ class OTPManager(models.Model):
 class Player(AbstractUser):
     nickname = models.CharField(unique=True, max_length=50, null=True, blank=True)
     email = models.EmailField(unique=True, blank=False, null=False)
-    avatar = models.ImageField(upload_to='', null=True, blank=True)
+    avatar = models.ImageField(upload_to='staticfiles/avatars/', null=True, blank=True)
     wins = models.IntegerField(default=0)
     losses = models.IntegerField(default=0)
 

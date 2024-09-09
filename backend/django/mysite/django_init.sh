@@ -11,6 +11,7 @@ echo "============================"
 
 echo "Create staticfiles==========="
 python3 manage.py collectstatic --noinput
+mkdir -p staticfiles/avatars
 echo "============================"
 
 echo "Migrate====================="

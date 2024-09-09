@@ -246,6 +246,9 @@ async function updateAvatar() {
 	msgElement.classList.remove("text-danger");
 	msgElement.classList.remove("text-success");
 
+	let data = new FormData();
+	data.append('avatar', document.getElementById("form__updateAvatar--input").files[0]);
+
 	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); // TO DELETE AFTER BACKEND !
 	msgElement.textContent = "Avatar changed"; // TO DELETE AFTER BACKEND !
 	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
@@ -256,7 +259,6 @@ async function updateAvatar() {
 	const init = {
 		method: 'PUT',
 		headers: {
-			'Content-Type': 'application/json',
 			'Authorization': `Bearer ${access}`,
 		},
 		body: data,
@@ -365,27 +367,6 @@ async function loadFriend() {
 			'Authorization': `Bearer ${access}`,
 		},
 	};
-
-	try {
-		let hostnameport = "https://" + window.location.host
-
-		const response = await fetch(hostnameport + '/api/players/friends/requests_received', init);
-
-		if (response.status != 200) {
-
-			const error = await response.text();
-
-			return;
-		}
-		if (response.status === 200) {
-			const data = await response.json();
-			sessionStorage.setItem("friends_received", data.sender_ids);
-
-			// window.location.reload();
-		}
-	} catch (e) {
-		console.error(e);
-	}
 	
 	try {
 		let hostnameport = "https://" + window.location.host
@@ -439,7 +420,6 @@ async function loadFriend() {
 			document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
 			document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
 			document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
-			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
 
 			// window.location.reload();
 		}
@@ -447,10 +427,39 @@ async function loadFriend() {
 	} catch (e) {
 		console.error(e);
 	}
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/requests_received', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+			if (sessionStorage.getItem("friend3_id"))
+				sessionStorage.setItem("friends_received", "Maximum Friends reached");
+			else if (data.sender_ids[0])
+				sessionStorage.setItem("friends_received", data.sender_ids[0]);
+			else
+				sessionStorage.setItem("friends_received", "");
+			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
+
+			// window.location.reload();
+		}
+	} catch (e) {
+		console.error(e);
+	}
 };
 
 async function acceptFriend(friend_id) {
 
+	if (sessionStorage.getItem("friends_received") === "Maximum Friends reached")
+		return;
 	const access = sessionStorage.getItem("access");
 
 	const init = {
