@@ -295,6 +295,12 @@ async function addFriend(friendForm) {
 
 	const msgElement = document.getElementById("form__add_friend--msg");
 
+	if (sessionStorage.getItem("friend3_id")) {
+		msgElement.textContent = "Maximum Friends reached";
+		msgElement.classList.add("text-danger");
+		return;
+	}
+
 	// remove a potential error message from the placeholder
 	msgElement.textContent = "";
 	msgElement.classList.remove("text-danger");
@@ -416,6 +422,24 @@ async function loadFriend() {
 				sessionStorage.setItem("friend2_id", "");
 				sessionStorage.setItem("friend2_status", "");
 			}
+			if (data[2]) {
+				sessionStorage.setItem("friend3_id", data[2].id);
+				if (data[2].online === true)
+					sessionStorage.setItem("friend3_status", "online");
+				else
+					sessionStorage.setItem("friend3_status", "offline");
+			}
+			else {
+				sessionStorage.setItem("friend3_id", "");
+				sessionStorage.setItem("friend3_status", "");
+			}
+			document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
+			document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
+			document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
+			document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
+			document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
+			document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
+			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
 
 			// window.location.reload();
 		}
@@ -451,8 +475,8 @@ async function acceptFriend(friend_id) {
 		}
 		if (response.status === 200) {
 			const data = await response.json();
-
-			// window.location.reload();
+			loadFriend();
+			window.location.reload();
 		}
 
 	} catch (e) {
@@ -486,8 +510,8 @@ async function deleteFriend(friend_id) {
 		}
 		if (response.status === 200) {
 			const data = await response.json();
-
-			// window.location.reload();
+			loadFriend();
+			window.location.reload();
 		}
 
 	} catch (e) {
@@ -505,11 +529,6 @@ function listenerUserInfo() {
 	document.getElementById("update__username--big").textContent = sessionStorage.getItem("username");
 	document.getElementById("update__nickname--big").textContent = sessionStorage.getItem("nickname");
 	document.getElementById("update__email--big").textContent = sessionStorage.getItem("email");
-	document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
-	document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
-	document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
-	document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
-	document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friends_received");
 
 	const nicknameForm = document.getElementById("form__updateNickname");
 	const usernameForm = document.getElementById("form__updateUsername");
@@ -614,27 +633,25 @@ function listenerUserInfo() {
 
 		addFriend(friendForm);
 	});
-	document.getElementById("btn__friend1_accept").addEventListener("click", (e) => {
-		e.preventDefault();
-		acceptFriend(document.getElementById("friend1__nickname--big").textContent);
-		document.getElementById("btn__friend1_accept").classList.add("d-none");
-		document.getElementById("btn__friend1_accept").disabled = true;
-		document.getElementById("btn__friend1_delete").classList.remove("d-none");
-	});
 	document.getElementById("btn__friend1_delete").addEventListener("click", (e) => {
 		e.preventDefault();
-		deleteFriend(document.getElementById("friend1__nickname--big").textContent);
+		if (document.getElementById("friend1__nickname--big").textContent)
+			deleteFriend(document.getElementById("friend1__nickname--big").textContent);
 	});
-	document.getElementById("btn__friend3_accept").addEventListener("click", (e) => {
+	document.getElementById("btn__friend2_delete").addEventListener("click", (e) => {
 		e.preventDefault();
-		acceptFriend(document.getElementById("friend3__nickname--big").textContent);
-		document.getElementById("btn__friend3_accept").classList.add("d-none");
-		document.getElementById("btn__friend3_accept").disabled = true;
-		document.getElementById("btn__friend3_delete").classList.remove("d-none");
+		if (document.getElementById("friend2__nickname--big").textContent)
+			deleteFriend(document.getElementById("friend2__nickname--big").textContent);
 	});
 	document.getElementById("btn__friend3_delete").addEventListener("click", (e) => {
 		e.preventDefault();
-		deleteFriend(document.getElementById("friend3__nickname--big").textContent);
+		if (document.getElementById("friend3__nickname--big").textContent)
+			deleteFriend(document.getElementById("friend3__nickname--big").textContent);
+	});
+	document.getElementById("btn__friend4_accept").addEventListener("click", (e) => {
+		e.preventDefault();
+		if (document.getElementById("friend4__nickname--big").textContent)
+			acceptFriend(document.getElementById("friend4__nickname--big").textContent);
 	});
 };
 

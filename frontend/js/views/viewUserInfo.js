@@ -246,9 +246,6 @@ export default function renderUserInfo() {
 					<div id="friend1__status--big" class="fw-bold"></div>
 				</div>
 				<div class="col text-end">
-					<button class="btn btn-outline-secondary text-light" id="btn__friend1_accept">
-						Accept
-					</button>
 					<button class="btn btn-outline-secondary text-light" id="btn__friend1_delete">
 						Delete
 					</button>
@@ -263,9 +260,6 @@ export default function renderUserInfo() {
 					<div id="friend2__status--big" class="fw-bold"></div>
 				</div>
 				<div class="col text-end">
-					<button class="btn btn-outline-secondary text-light" id="btn__friend2_accept">
-						Accept
-					</button>
 					<button class="btn btn-outline-secondary text-light" id="btn__friend2_delete">
 						Delete
 					</button>
@@ -280,15 +274,24 @@ export default function renderUserInfo() {
 					<div id="friend3__status--big" class="fw-bold"></div>
 				</div>
 				<div class="col text-end">
-					<button class="btn btn-outline-secondary text-light" id="btn__friend3_accept">
-						Accept
-					</button>
 					<button class="btn btn-outline-secondary text-light" id="btn__friend3_delete">
 						Delete
 					</button>
 				</div>
 			</div>
-			</div>
+			<div class="row my-3 align-items-center">
+				<div class="col">
+					Friend to accept:
+					<div id="friend4__nickname--big" class="fw-bold"></div>
+				</div>
+				<div class="col">
+					<div id="friend4__status--big" class="fw-bold"></div>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__friend4_accept">
+						Accept
+					</button>
+				</div>
 			</div>
 		</div>
 	`;
