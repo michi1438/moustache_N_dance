@@ -39,10 +39,6 @@ async function call_local_api(init) {
 			document.getElementById("login").value = "logout";
 			router("index");
 			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
-			// document.querySelectorAll(".dropdown-item").forEach(btn => {
-			// 	btn.removeAttribute("disabled");
-			// });
-			//document.getElementById("topbar__logout").removeAttribute("disabled");
 
 		}
 	}

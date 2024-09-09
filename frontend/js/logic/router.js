@@ -42,7 +42,7 @@ const routes = {
 	"callback42": {
 		title: "Callback42",
 		path: "/callback/",
-		view: renderUserInfo,
+		view: handleIndex.renderIndex,
 		// load: handleLogin.loadLogin,
 		listener: handleLogin42.listenerCallback42
 	},
@@ -188,7 +188,6 @@ window.onload = async function()
 				}
 				
 				document.title = routes[route].title;
-				console.log("route: " + route);
 				routes[route].listener();  // Attach event listener
 			// }
 		}

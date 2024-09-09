@@ -174,10 +174,11 @@ def authorize_fortytwo(request):
         username = x.json()['login'] + "_42",
         first_name = x.json()['first_name'],
         last_name = x.json()['last_name'],
+        #avatar = x.json()['image'],
         email = x.json()['email']
         #player.token42 = x.json()['token'],
     )
-    print (created)
+    #print (x.json())
     player.save()
     return Response({"username": str(player.username),
         "email": str(player.email),

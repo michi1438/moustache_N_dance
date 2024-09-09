@@ -28,10 +28,6 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_DOMAIN = None
 
-CORS_ALLOWED_ORIGINS = [ 
-    "https://profile.intra.42.fr",
-    ]
-
 SITE_ID = 1                                                                                                                                                                                                                                                                                                                                                                                                                
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -50,8 +46,6 @@ INSTALLED_APPS = [
     'players',
     'tournaments',
     'rest_framework',
-    'oauth2_provider',
-    'corsheaders',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
 ]                                                                                                                                                                                                                 
@@ -100,7 +94,6 @@ LOGGING = {
 MIDDLEWARE = [                                                                                                                                                                                                    
     'django.middleware.security.SecurityMiddleware',                                                                                                                                                              
     'django.contrib.sessions.middleware.SessionMiddleware',                                                                                                                                                       
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',                                                                                                                                                                  
     'django.middleware.csrf.CsrfViewMiddleware',                                                                                                                                                                  
     'django.contrib.auth.middleware.AuthenticationMiddleware',                                                                                                                                                    
