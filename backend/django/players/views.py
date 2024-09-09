@@ -170,23 +170,21 @@ def authorize_fortytwo(request):
 
     urls = 'https://api.intra.42.fr/v2/me'
     x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
-    try:
-        u = Player.objects.get(username=x.json()['login'])
-        return Response("Player already exsists, need to login as the stored object of the same username...", status=status.HTTP_400_BAD_REQUEST)
-    except ObjectDoesNotExist:
-        player = Player()
-        player.username = x.json()['login']
-        player.first_name = x.json()['first_name']
-        player.last_name = x.json()['last_name']
-        player.email = x.json()['email']
-        #player.token42 = x.json()['token']
-        player.save()
-        return Response({"username": str(player.username),
-            "email": str(player.email),
-            "first_name": str(player.first_name),
-            "last_name": str(player.last_name)
-                         #"token42": str(player.token)
-            }, status=status.HTTP_200_OK)
+    player, created = Player.objects.get_or_create(
+        username = x.json()['login'] + "_42",
+        first_name = x.json()['first_name'],
+        last_name = x.json()['last_name'],
+        email = x.json()['email']
+        #player.token42 = x.json()['token'],
+    )
+    print (created)
+    player.save()
+    return Response({"username": str(player.username),
+        "email": str(player.email),
+        "first_name": str(player.first_name),
+        "last_name": str(player.last_name)
+                     #"token42": str(player.token)
+        }, status=status.HTTP_200_OK)
 
 
 

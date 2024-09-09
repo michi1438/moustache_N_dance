@@ -266,11 +266,12 @@ async function createUser(createAccountForm) {
 
 async function connectUser42() {
 
+
+	//TODO
 	window.location = await ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Fplayers%2Fauthorize_fortytwo%2F&response_type=code');
 
 	const status = await window.location.status;
 		
-	document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("first_name");
 	router("index");
 	console.error("Error create user 42: ");
 };
