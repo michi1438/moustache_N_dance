@@ -120,6 +120,7 @@ async function tournamentConnection(data) {
         console.log('tabSize du début', tabSize);
     } else if(data.type === 'tournoi') {
         tournoiSize = data.config['Taille du tournoi'];
+        console.log('tournoisize', tournoiSize);
         tabSize = tournoiSize;
         //tabSize = playersID.length;
         configTournoi = {
