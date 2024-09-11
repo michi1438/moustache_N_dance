@@ -689,6 +689,25 @@ function handleWebSocketMessageTournament(message, config) {
                 //console.log('Position paddle2:', paddle2.position.z);
             }
             break;
+        case 'fintournoi':
+            setTimeout(() => {
+                const boardTwo = document.getElementById('board_four');
+                if (boardTwo && boardTwo.contains(renderer.domElement)) {
+                    boardTwo.removeChild(renderer.domElement);
+                    console.log("Game stopped and board_three cleared.");
+                    sessionStorage.setItem("gameOverT", "true");
+                    setTimeout(() => {
+                        listenerPongTournament();
+                        // Fermer la connexion WebSocket
+                        cancelAnimationFrame(animationID);
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.close();
+                            console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
+                        }
+                    }, 3000);
+                }
+            }, 3000);
+            break;
         case 'ball':
             ball.position.x = message.position.x;
             ball.position.z = message.position.z;

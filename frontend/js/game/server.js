@@ -159,21 +159,22 @@ async function tournamentLogic(data) {
     //vide le tableau playersID, divise sa taille par 2 et ajoute le playerID des winners dans le tableau
     //si le tableau est égale à 1, le playerID est le winner
     //si le tableau est supérieur à 1, relance la fonction tournamentLogic
+    console.log('tabsize et playersIDlength et position', tabSize, playersID.length, position);
     if (tabSize > 1 && tabSize == playersID.length) {
         console.log('relance de la fonction');
         tournamentLogic(data);
     }
     else {
-        setTimeout(() => {
-            console.log('playersID[0]', playersID[0]);
-            //position.push(playersID[0]);
-            console.log('fin du tournoi');
-            console.log('position', position[0]);
-            console.log('position', position[1]);
-            console.log('position', position[2]);
-            console.log('position', position[3]);
-        }, 1000);
-        
+        console.log('playersID[0]', playersID[0]);
+        position.push(playersID[0]);
+        console.log('fin du tournoi');
+        console.log('position', position[0]);
+        console.log('position', position[1]);
+        console.log('position', position[2]);
+        console.log('position', position[3]);
+        //envoyer un message au vainqueur pour lui dire que le tournoi est fini
+        //players[0].send(JSON.stringify({ type: 'fintournoi'}));
+
     }
 }
 
