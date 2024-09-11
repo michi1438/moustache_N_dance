@@ -27,7 +27,7 @@ def create_tournament(request):
     if serializer.is_valid():
         tournament = serializer.save(created_by=player)
         tournament.participants.add(player)
-        return Response(tournament.id, status=status.HTTP_201_CREATED)
+        return Response({"tournament_id" : tournament.id}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN TOURNOI
