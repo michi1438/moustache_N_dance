@@ -83,6 +83,8 @@ async function verifyOTP(loginForm) {
 async function connectUser(loginForm) {
 
 	// remove a potential error message from the field
+	// TODO dans le login(normal) on a le login et le mdp qui apparaissent dans la request, je met ca la comme ca on oublie pas...
+	//
 	document.getElementById("form__login--errorMsg").textContent = "";
 
 	const input = loginForm.elements;
@@ -266,8 +268,10 @@ async function createUser(createAccountForm) {
 
 async function connectUser42() {
 
+	let hostnameport = "https://" + window.location.host;
+
 	const clientId = 'u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf'; //TODO get key from .env
-    const redirectUri = encodeURIComponent('https://localhost/callback/');
+    const redirectUri = encodeURIComponent(hostnameport + '/callback/');
     const responseType = 'code';
     const scope = 'public';
 

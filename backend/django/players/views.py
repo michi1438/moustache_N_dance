@@ -164,28 +164,38 @@ def player_details(request):
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
 
-    urls = 'https://api.intra.42.fr/oauth/token'
-    x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost/callback/'})
-    token = x.json()['access_token']
+    try:
+        urls = 'https://api.intra.42.fr/oauth/token'
+        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost:8443/callback/'})
+        token = x.json()['access_token']
 
-    urls = 'https://api.intra.42.fr/v2/me'
-    x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
-    player, created = Player.objects.get_or_create(
-        username = x.json()['login'] + "_42",
-        first_name = x.json()['first_name'],
-        last_name = x.json()['last_name'],
-        #avatar = x.json()['image'],
-        email = x.json()['email']
-        #player.token42 = x.json()['token'],
-    )
-    #print (x.json())
-    player.save()
-    return Response({"username": str(player.username),
-        "email": str(player.email),
-        "first_name": str(player.first_name),
-        "last_name": str(player.last_name)
-                     #"token42": str(player.token)
-        }, status=status.HTTP_200_OK)
+        urls = 'https://api.intra.42.fr/v2/me'
+        x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
+        player, created = Player.objects.get_or_create(
+            username = x.json()['login'] + "_42",
+            first_name = x.json()['first_name'],
+            last_name = x.json()['last_name'],
+            email = x.json()['email']
+            #avatar = x.json()['image'],
+            #player.token42 = x.json()['token'],
+        )
+        #print (x.json())
+        player.save()
+
+        refresh = RefreshToken.for_user(player)
+        return Response({"username": str(player.username),
+            "email": str(player.email),
+            "first_name": str(player.first_name),
+            "last_name": str(player.last_name),
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+                         #"token42": str(player.token)
+            }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {'42_login error': f"{type(e).__name__}: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 
