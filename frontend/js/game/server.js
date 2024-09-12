@@ -61,6 +61,9 @@ wss.on('connection', (ws) => {
                     playerConfigs[matchingPlayers[0]] = null;
                     playerConfigs[matchingPlayers[1]] = null;
                 }
+            } else if(data.type === 'playerID') {
+                //renvoie a l'autre joueur(sur le meme gameID) le playerID de l'autre joueur
+                broadcast(ws, { type: 'playerID', playerID: data.playerID });
             } else if (data.type === 'winner') {
                 console.log('Winner:', data.winner);
                 gameID = data.gameID;
@@ -176,7 +179,7 @@ async function tournamentLogic(data) {
         console.log('position', position[3]);
         //envoyer un message au vainqueur pour lui dire que le tournoi est fini
         setTimeout(() => {
-            players[0].send(JSON.stringify({ type: 'fintournoi'}));
+            players[0].send(JSON.stringify({ type: 'fintournoi', position: position }));
         }, 2000);
         playersID = [];
 

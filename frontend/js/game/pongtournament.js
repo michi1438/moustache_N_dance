@@ -10,7 +10,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, tournamentID;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -692,6 +692,7 @@ function handleWebSocketMessageTournament(message, config) {
             }
             break;
         case 'fintournoi':
+            position = message.position;
             sendAPIover();
             setTimeout(() => {
                 const boardTwo = document.getElementById('board_four');
@@ -1045,7 +1046,7 @@ async function sendAPIover() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`,
         },
-        body: JSON.stringify({status: 'completed'}),
+        body: JSON.stringify({status: 'completed', results: position}),
     };
 
     try {

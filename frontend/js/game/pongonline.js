@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { v4 as uuidv4 } from 'uuid';
 import {listenerPongOnline} from '../logic/unloadpongonline.js';
 
 const scene = new THREE.Scene();
@@ -10,13 +11,14 @@ const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
 sessionStorage.setItem("gameOverO", "false");
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, opponentID, animationID;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
+let playerdID = uuidv4();
 
 
 let gameID;
@@ -261,7 +263,7 @@ function initGameSimpson () {
         //console.log("isConfigReady set to true");
     }
 
-    window.startGame = function(config) {
+window.startGame = function(config) {
         console.log('JE COMMENCE REELEMENT LE JEU avec la config : ', config);
         if (config['Map'] == 'Simpson') {
             modelPath = '/frontend/js/game/models/modelSimpson.glb';
@@ -473,11 +475,27 @@ function animate(vitesse) {
                 sendBallPosition();
                 if (scoreP1 == 5) {
                     p1WIN.visible = true;
+                    if(playerNumber == 1) {
+                        result = 1;
+                    }
+                    else {
+                        result = 0;
+                    }
+                    sendAPIWL(result);
                     handleGameOver();
+                    
                 } else {
                     p2WIN.visible = true;
+                    if(playerNumber == 1) {
+                        result = 0;
+                    }
+                    else {
+                        result = 1;
+                    }
+                    sendAPIWL(result);
                     handleGameOver();
                 }
+
                 
             }
             //gestion des paddles
@@ -585,6 +603,7 @@ function connectWebSocket(config) {
     ws.onopen = () => {
         console.log('WebSocket connection opened');
         ws.send(JSON.stringify({ type: 'config', config }));
+        ws.send(JSON.stringify({ type: 'playerID', playerID: playerID }));
         console.log('Sending configuration:', config);
     };
 
@@ -625,6 +644,9 @@ function handleWebSocketMessage(message, config) {
         case 'clientCount':
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
+            break;
+        case 'playerdID':
+            opponentID = message.playerID;
             break;
         case 'start':
             playerNumber = message.playerNumber;
@@ -777,3 +799,53 @@ function sendScore(playerNumber) {
 }
 
 showQuestion();
+
+async function sendAPIWL(result) {
+    const access = sessionStorage.getItem("access");
+    let message;
+    if(result == 1) {
+        message = "'win against'  + opponentID";
+    }
+    else {
+        message = "'lose against'  + opponentID";
+    }
+
+
+    const init = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`,
+        },
+        body: JSON.stringify({message}),
+    };
+
+    try {
+        let hostnameport = "https://" + window.location.host
+
+        const response = await fetch(hostnameport + '/api/players/details', init);
+
+        if (response.status != 200) {
+
+            // const error = await response.text();
+            
+
+            
+            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
+            // // msgElement.classList.add("text-danger");
+            return;
+        }
+        if (response.status === 200) {
+            const data = await response.json();
+
+            // msgElement.textContent = "Nickname changed";
+            // msgElement.classList.remove("text-danger");
+            // msgElement.classList.add("text-success");
+
+            // window.location.reload();
+        }
+
+    } catch (e) {
+        console.error(e);
+    }
+}
