@@ -804,10 +804,10 @@ async function sendAPIWL(result) {
     const access = sessionStorage.getItem("access");
     let message;
     if(result == 1) {
-        message = "'win against'  + opponentID";
+        message = "'win against'  + opponentID + new Date().getTime()";
     }
     else {
-        message = "'lose against'  + opponentID";
+        message = "'lose against'  + opponentID + new Date().getTime()";
     }
 
 
