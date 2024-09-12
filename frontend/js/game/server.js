@@ -119,6 +119,7 @@ async function tournamentConnection(data) {
         gameEvents.emit('playerJoined', data.playerID);
         console.log('tabSize du début', tabSize);
     } else if(data.type === 'tournoi') {
+
         tournoiSize = data.config['Taille du tournoi'];
         console.log('tournoisize', tournoiSize);
         tabSize = tournoiSize;
@@ -178,6 +179,7 @@ async function tournamentLogic(data) {
             players[0].send(JSON.stringify({ type: 'fintournoi'}));
         }, 2000);
         playersID = [];
+
 
     }
 }

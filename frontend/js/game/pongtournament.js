@@ -10,7 +10,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, tournamentID;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -599,6 +599,7 @@ function selectOption(option) {
         // Proceed with the join logic
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
+        sendAPIjoin();
         // console.log('config dans startGameTournament:', configuration);
         return;
     }
@@ -611,6 +612,7 @@ function selectOption(option) {
         // Start the game with the selected configuration
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
+        sendAPIcreate(configuration);
         //console.log('config dans startGameTournament:', configuration);
     }
 }
@@ -690,6 +692,7 @@ function handleWebSocketMessageTournament(message, config) {
             }
             break;
         case 'fintournoi':
+            sendAPIover();
             setTimeout(() => {
                 const boardTwo = document.getElementById('board_four');
                 if (boardTwo && boardTwo.contains(renderer.domElement)) {
@@ -945,4 +948,132 @@ function resetGameVariables() {
     sessionStorage.setItem("gameOverT", "false");
 
     console.log("Game variables reset.");
+}
+
+async function sendAPIcreate(configuration) {
+ 
+    const access = sessionStorage.getItem("access");
+
+    const init = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`,
+        },
+        body: JSON.stringify({tournament_size: configuration['Taille du tournoi']}),
+    };
+
+    try {
+        let hostnameport = "https://" + window.location.host
+
+        const response = await fetch(hostnameport + '/api/tournaments/create', init);
+
+        if (response.status != 201) {
+
+            // const error = await response.text();
+            
+
+            
+            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
+            // // msgElement.classList.add("text-danger");
+            return;
+        }
+        if (response.status === 201) {
+            const data = await response.json();
+
+            tournamentID = data.tournament_id;
+
+            // msgElement.textContent = "Nickname changed";
+            // msgElement.classList.remove("text-danger");
+            // msgElement.classList.add("text-success");
+
+            // window.location.reload();
+        }
+
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function sendAPIjoin() {
+    const access = sessionStorage.getItem("access");
+
+    const init = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`,
+        },
+    };
+
+    try {
+        let hostnameport = "https://" + window.location.host
+
+        const response = await fetch(hostnameport + '/api/tournaments/' + tournamentID + '/add_me', init);
+
+        if (response.status != 200) {
+
+            // const error = await response.text();
+            
+
+            
+            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
+            // // msgElement.classList.add("text-danger");
+            return;
+        }
+        if (response.status === 200) {
+            const data = await response.json();
+
+            // msgElement.textContent = "Nickname changed";
+            // msgElement.classList.remove("text-danger");
+            // msgElement.classList.add("text-success");
+
+            // window.location.reload();
+        }
+
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function sendAPIover() {
+    const access = sessionStorage.getItem("access");
+
+    const init = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`,
+        },
+        body: JSON.stringify({status: 'completed'}),
+    };
+
+    try {
+        let hostnameport = "https://" + window.location.host
+
+        const response = await fetch(hostnameport + '/api/tournaments/' + tournamentID, init);
+
+        if (response.status != 200) {
+
+            // const error = await response.text();
+            
+
+            
+            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
+            // // msgElement.classList.add("text-danger");
+            return;
+        }
+        if (response.status === 200) {
+            const data = await response.json();
+
+            // msgElement.textContent = "Nickname changed";
+            // msgElement.classList.remove("text-danger");
+            // msgElement.classList.add("text-success");
+
+            // window.location.reload();
+        }
+
+    } catch (e) {
+        console.error(e);
+    }
 }
