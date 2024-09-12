@@ -57,7 +57,7 @@ class OTPManager(models.Model):
         if datetime.now() > self.otp_valid_date:
             return False
         totp = pyotp.TOTP(self.otp_secret_key, interval=60)
-        return totp.verify(otp)
+        return totp.verify(otp, valid_window=1)
 
     def __str__(self):
         return f'OTPManager for {self.id}'
