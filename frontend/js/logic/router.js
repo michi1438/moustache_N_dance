@@ -13,6 +13,7 @@ import { unloadScript } from "./ponglocallogic.js"
 //import handleXX from "./XX.js"
 import handlePongLocal from "./ponglocallogic.js"
 import handleLogin from "./login.js"
+import handleLogin42 from "./login42.js"
 import handleUserInfo from "./userinfo.js"
 import handlePongOnline from "../game/pongonline.js"
 import handlePongTournament from "../game/pongtournament.js"
@@ -36,6 +37,13 @@ const routes = {
 		view: handleIndex.renderIndex,
 		// load: handleIndex.loadIndex,
 		listener: handleIndex.listenerIndex
+	},
+	"callback42": {
+		title: "Callback42",
+		path: "/callback/",
+		view: handleIndex.renderIndex,
+		// load: handleLogin.loadLogin,
+		listener: handleLogin42.listenerCallback42
 	},
 	"login": {
 		title: "Login",
@@ -142,7 +150,6 @@ export default async function router(value) {
 window.onload = async function()
 {
 	const currentPath = window.location.pathname;
-	// console.log(currentPath);
 	var found = false
 
 	for (const route in routes)

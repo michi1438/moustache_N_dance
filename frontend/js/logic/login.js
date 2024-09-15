@@ -86,6 +86,8 @@ async function verifyOTP(loginForm) {
 async function connectUser(loginForm) {
 
 	// remove a potential error message from the field
+	// TODO dans le login(normal) on a le login et le mdp qui apparaissent dans la request, je met ca la comme ca on oublie pas...
+	//
 	document.getElementById("form__login--errorMsg").textContent = "";
 
 	const input = loginForm.elements;
@@ -270,52 +272,17 @@ async function createUser(createAccountForm) {
 
 async function connectUser42() {
 
-	try {
+	let hostnameport = "https://" + window.location.host;
 
+	const clientId = 'u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf'; //TODO get key from .env
+    const redirectUri = encodeURIComponent(hostnameport + '/callback/');
+    const responseType = 'code';
+    const scope = 'public';
 
-		window.location = ('https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf&redirect_uri=https%3A%2F%2Flocalhost%3A10443%2Flogin%2F&response_type=code');
-		if (!response.ok) {
-			throw new Error(`HTTP error, status = ${response.status}`);
-		}
+    // Construct the authorization URL
+    const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
 
-		const address = await response.json();
-
-
-		const response = fetch(hostnameport + '/api/players/fortytwo_token', init);
-		const init = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-		};
-
-		let hostnameport = "https://" + window.location.host
-
-		if (response.status === 200) {
-			// login is successful -> redirect to profile
-
-			const data = await response.json();
-
-			sessionStorage.setItem("username", data["username"]);
-			sessionStorage.setItem("email", data["email"]);
-			if (data["avatar"])
-				sessionStorage.setItem("avatar", data["avatar"]);
-			if (data["nickname"])
-				sessionStorage.setItem("nickname", data["nickname"]);
-			sessionStorage.setItem("access", data["access"]); //pour lolo
-			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
-
-			// Manually call the hide function of the boostrap Modal element
-			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
-			await modal.hide();
-
-			document.getElementById("login").textContent = "Logout";
-			document.getElementById("login").value = "logout";
-			router("index");
-			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
-		}
-		
-	} catch (e) {
-		console.error("Error 42: ", e);
-	}
+	window.location = (authUrl);
 };
 
 function listenerLogin() {

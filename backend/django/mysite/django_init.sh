@@ -1,7 +1,7 @@
 
 echo "DJANGO_INIT.SH"
 
-wait-for-it -h postgres -p 5432 -t 30
+wait-for-it -h postgres -p 5432 -t 40
 sleep 3 
 
 echo "Create migrations==========="

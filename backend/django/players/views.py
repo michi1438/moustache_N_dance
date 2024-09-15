@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 import requests
 import os 
+from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers 
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -158,16 +160,53 @@ def player_details(request):
 # 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
-    urls = 'https://api.intra.42.fr/oauth/token'
-    x = requests.post(urls, data={'grant_type': 'client_credentials', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.GET.get('code'), 'redirect_uri': 'https://localhost:10443/'})
-    print("####################################################################")
-    print (x.json()['access_token'])
-    return Response()
+
+    try:
+        urls = 'https://api.intra.42.fr/oauth/token'
+        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost:8443/callback/'})
+        token = x.json()['access_token']
+
+        urls = 'https://api.intra.42.fr/v2/me'
+        x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
+        player, created = Player.objects.get_or_create(
+            username = x.json()['login'] + "_42",
+            first_name = x.json()['first_name'],
+            last_name = x.json()['last_name'],
+            email = x.json()['email']
+            #avatar = x.json()['image'],
+            #player.token42 = x.json()['token'],
+        )
+        #print (x.json())
+        player.save()
+
+        refresh = RefreshToken.for_user(player)
+        return Response({"username": str(player.username),
+            "email": str(player.email),
+            "first_name": str(player.first_name),
+            "last_name": str(player.last_name),
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+                         #"token42": str(player.token)
+            }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {'42_login error': f"{type(e).__name__}: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+
+#    serializer = PlayerSerializer(data=request.data)
+#        player = Player(**serializer.validated_data)
+#        player.set_password(serializer.validated_data['password'])
+#        player.save()
+#        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
 
 # def otp_view(request):
 #     if request.method == "POST":

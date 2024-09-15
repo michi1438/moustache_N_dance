@@ -6,7 +6,7 @@
 #    By: mguerga <mguerga@42lausanne.ch>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 11:40:19 by mguerga           #+#    #+#              #
-#    Updated: 2024/08/28 11:57:24 by mguerga          ###   ########.fr        #
+#    Updated: 2024/09/12 14:02:55 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #laulau le nullos ^^
@@ -40,8 +40,7 @@ services:
     networks:
       - backend_nw
     ports:
-      - 80:80
-      - 443:443
+      - 8443:443
     restart: on-failure
     depends_on:
       - django 
