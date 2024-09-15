@@ -12,11 +12,12 @@ import { unloadScript } from "./ponglocallogic.js"
 // Importe le script de chaque page qui gere le load et listener
 //import handleXX from "./XX.js"
 import handlePongLocal from "./ponglocallogic.js"
+import handlePongOnline from "./unloadpongonline.js"
 import handleLogin from "./login.js"
 import handleLogin42 from "./login42.js"
 import handleUserInfo from "./userinfo.js"
-import handlePongOnline from "../game/pongonline.js"
-import handlePongTournament from "../game/pongtournament.js"
+//import handlePongOnline from "../game/pongonline.js"
+import handlePongTournament from "./unloadpongtournament.js"
 // Cas particulier pour index
 import handleIndex from "./index.js"
 

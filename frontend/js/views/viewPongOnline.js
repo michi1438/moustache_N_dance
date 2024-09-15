@@ -15,7 +15,7 @@ export default function renderPongOnline() {
 				</div>
 				<div id="countdownDisplay" class="position-absolute h1">
 				</div>
-				<div id="board_two">
+				<div id="board_three">
 				</div>
 			</div>
 		</div>

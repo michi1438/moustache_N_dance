@@ -15,7 +15,7 @@ export default function renderPongTournament() {
 				</div>
 				<div id="countdownDisplay" class="position-absolute h1">
 				</div>
-				<div id="board_two" class="text-bg-dark border border-black border-5">
+				<div id="board_four" class="text-bg-dark border border-black border-5">
 				</div>
 				
 			</div>

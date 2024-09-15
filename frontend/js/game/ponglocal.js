@@ -11,7 +11,7 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, gameOver = false;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -351,7 +351,7 @@ function initGameSimpson () {
     
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
-    countdownDisplay.id = 'countdownDisplay';
+    //countdownDisplay.id = 'countdownDisplay';
     console.log("isModelLoaded:", isModelLoaded, "isConfigReady:", isConfigReady);
     
     let countdownInterval = setInterval(() => {
@@ -461,7 +461,7 @@ function animate(vitesse) {
 						listenerPongLocal();
 					}, 3000);
     			}
-			}, 3000);
+			    }, 3000);
 			}
 			//gestion des paddles
 			if (paddle1 && paddle2) {
