@@ -982,7 +982,8 @@ async function sendAPIcreate(configuration) {
         if (response.status === 201) {
             const data = await response.json();
 
-            tournamentID = data.tournament_id;
+            tournamentID = 1;
+            //data.tournament_id;
 
             // msgElement.textContent = "Nickname changed";
             // msgElement.classList.remove("text-danger");
@@ -1010,7 +1011,7 @@ async function sendAPIjoin() {
     try {
         let hostnameport = "https://" + window.location.host
 
-        const response = await fetch(hostnameport + '/api/tournaments/' + tournamentID + '/add_me', init);
+        const response = await fetch(hostnameport + '/api/tournaments/' + '1' + '/add_me', init);
 
         if (response.status != 200) {
 

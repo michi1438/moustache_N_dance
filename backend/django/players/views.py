@@ -179,7 +179,7 @@ def authorize_fortytwo(request):
 
     try:
         urls = 'https://api.intra.42.fr/oauth/token'
-        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost:8443/callback/'})
+        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost/callback/'})
         token = x.json()['access_token']
 
         urls = 'https://api.intra.42.fr/v2/me'
