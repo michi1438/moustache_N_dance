@@ -14,7 +14,7 @@ from .serializers import TournamentSerializer
 def list_tournaments(request):
     tournaments = Tournament.objects.all()
     serializer = TournamentSerializer(tournaments, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # CREER UN TOURNOI
 @api_view(['POST'])
@@ -27,7 +27,7 @@ def create_tournament(request):
     if serializer.is_valid():
         tournament = serializer.save(created_by=player)
         tournament.participants.add(player)
-        return Response(tournament.id, status=status.HTTP_201_CREATED)
+        return Response({"tournament_id" : tournament.id}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN TOURNOI
@@ -41,13 +41,13 @@ def tournament_details(request, tournament_id):
 
     if request.method == 'GET':
         serializer = TournamentSerializer(tournament)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'PUT':
         serializer = TournamentSerializer(tournament, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
@@ -68,5 +68,14 @@ def add_participant(request, tournament_id):
     if player in tournament.participants.all():
         return Response({"error": f'Player {player.username} is already a participant'}, status=status.HTTP_400_BAD_REQUEST)
 
-    tournament.participants.add(player)
+    # Verifier si le nombre de player est egal au tournamenet size
+    # si c'est le cas, mettre a jour le status a ongoing et ne plus laisser de players rejoindre
+    if len(tournament.participants.all()) < tournament.tournament_size:
+        tournament.participants.add(player)
+        if len(tournament.participants.all()) == tournament.tournament_size:
+            tournament.status = "ongoing"
+            tournament.save()
+    else:
+        return Response({"error": "Tournament already full"}, status=status.HTTP_400_BAD_REQUEST)
+
     return Response({"message": f'Player {player.username} added successfully to tournament {tournament.id}'}, status=status.HTTP_200_OK)

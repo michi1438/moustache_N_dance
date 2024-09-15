@@ -43,7 +43,7 @@ def getPlayers(request):
 def list_players(request):
     players = Player.objects.all()
     serializer = PlayerSerializer(players, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # CREER UN JOUEUR
 @api_view(['POST'])
@@ -58,7 +58,7 @@ def create_player(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN JOUEUR (accessible par le joueur lui-meme uniquement)
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def player_details(request):
 
@@ -66,7 +66,7 @@ def player_details(request):
 
     if request.method == 'GET':
         serializer = PlayerSerializer(player)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'PUT':
         serializer = PlayerSerializer(player, data=request.data, partial=True)
@@ -75,7 +75,20 @@ def player_details(request):
                 player.set_password(serializer.validated_data['password'])
                 serializer.validated_data['password'] = player.password
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = PlayerSerializer(player, data=request.data, partial=True)
+        if serializer.is_valid():
+            if 'wins' in serializer.validated_data:
+                player.wins += serializer.validated_data['wins']
+            elif 'losses' in serializer.validated_data:
+                player.losses += serializer.validated_data['losses']
+            if 'history' in serializer.validated_data:
+                player.history += serializer.validated_data['history']
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
@@ -374,9 +387,9 @@ def requests_received(request):
     player = request.user
 
     friend_requests_received = FriendRequest.objects.filter(to_player=player)
-    sender_ids = friend_requests_received.values_list('from_player_id', flat=True)
+    sender_usernames = friend_requests_received.values_list('from_player_username', flat=True)
 
-    return Response({"sender_ids": list(sender_ids)}, status=status.HTTP_200_OK)
+    return Response({"sender_usernames": list(sender_usernames)}, status=status.HTTP_200_OK)
 
 # LISTER SES DEMANDES D'AMI ENVOYEES
 @api_view(['GET'])
@@ -385,19 +398,19 @@ def requests_sent(request):
     player = request.user
 
     friend_requests_sent = FriendRequest.objects.filter(from_player=player)
-    receiver_ids = friend_requests_sent.values_list('to_player_id', flat=True)
+    receiver_usernames = friend_requests_sent.values_list('to_player_username', flat=True)
 
-    return Response({"receiver_ids": list(receiver_ids)}, status=status.HTTP_200_OK)
+    return Response({"receiver_usernames": list(receiver_usernames)}, status=status.HTTP_200_OK)
 
 # DEMANDE D'AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_request(request):
-    to_player_id = request.data['to_player_id']
+    to_player_username = request.data['to_player_username']
     from_player = request.user
 
     try:
-        to_player = Player.objects.get(id=to_player_id)
+        to_player = Player.objects.get(username=to_player_username)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -420,12 +433,12 @@ def friend_request(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_response(request):
-    requester_id = request.data['requester_id'] # id du demandeur
+    requester_username = request.data['requester_username'] # id du demandeur
     action = request.data['action'] # accept ou reject
     player = request.user
 
     try:
-        requester = Player.objects.get(id=requester_id)
+        requester = Player.objects.get(username=requester_username)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -450,11 +463,11 @@ def friend_response(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_delete(request):
-    friend_id = request.data['friend_id']
+    friend_username = request.data['friend_username']
     player = request.user
 
     try:
-        friend = Player.objects.get(id=friend_id)
+        friend = Player.objects.get(username=friend_username)
 
         if friend in player.friends.all():
             player.friends.remove(friend)

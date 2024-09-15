@@ -7,29 +7,6 @@ import pyotp
 from datetime import datetime, timedelta
 from django.core.mail import send_mail
 
-class Tournament(models.Model):
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tournaments_created', on_delete=models.CASCADE)
-    created_on = models.DateTimeField(auto_now_add=True)
-    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='tournaments_participated', blank=True) 
-    results = models.JSONField(blank=True, null=True)
-
-    SIZE_CHOICES = [
-            (4, '4 Players'),
-            (8, '8 Players'),
-            (16, '16 Players'),
-            ]
-    tournament_size = models.IntegerField(default=0, choices=SIZE_CHOICES)
-
-    STATUS_CHOICES = [
-            ('upcoming', 'Upcoming'),
-            ('ongoing', 'Ongoing'),
-            ('completed', 'Completed'),
-            ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='upcoming') 
-
-    def __str__(self):
-        return f'Tournament created by {self.created_by}'
-
 class FriendRequest(models.Model):
     from_player = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sent_requests', on_delete=models.CASCADE)
     to_player = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_requests', on_delete=models.CASCADE)
@@ -73,6 +50,7 @@ class Player(AbstractUser):
     otp = models.OneToOneField(OTPManager, on_delete=models.CASCADE, null=True, blank=True)
     online = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
+    history = models.JSONField(blank=True, null=True)
 
     def send_otp(self):
         if not self.otp:
