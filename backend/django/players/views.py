@@ -32,7 +32,7 @@ def create_player(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN JOUEUR (accessible par le joueur lui-meme uniquement)
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def player_details(request):
 
@@ -48,10 +48,19 @@ def player_details(request):
             if 'password' in serializer.validated_data:
                 player.set_password(serializer.validated_data['password'])
                 serializer.validated_data['password'] = player.password
-            #else if 'wins' in serializer.validated_data:
-            #else if 'losses' in serializer.validated_data:
-            #else if 'history' in serializer.validated_data:
-                
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = PlayerSerializer(player, data=request.data, partial=True)
+        if serializer.is_valid():
+            if 'wins' in serializer.validated_data:
+                player.wins += serializer.validated_data['wins']
+            elif 'losses' in serializer.validated_data:
+                player.losses += serializer.validated_data['losses']
+            if 'history' in serializer.validated_data:
+                player.history += serializer.validated_data['history']
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

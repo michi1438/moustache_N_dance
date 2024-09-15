@@ -68,7 +68,14 @@ def add_participant(request, tournament_id):
     if player in tournament.participants.all():
         return Response({"error": f'Player {player.username} is already a participant'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Verifier si le nombre de player est egal au tournamenet size, si c'est le cas, mettre a jour le status a ongoing
+    # Verifier si le nombre de player est egal au tournamenet size
+    # si c'est le cas, mettre a jour le status a ongoing et ne plus laisser de players rejoindre
+    if len(tournament.participants.all()) < tournament.tournament_size:
+        tournament.participants.add(player)
+        if len(tournament.participants.all()) == tournament.tournament_size:
+            tournament.status = "ongoing"
+            tournament.save()
+    else:
+        return Response({"error": "Tournament already full"}, status=status.HTTP_400_BAD_REQUEST)
 
-    tournament.participants.add(player)
     return Response({"message": f'Player {player.username} added successfully to tournament {tournament.id}'}, status=status.HTTP_200_OK)
