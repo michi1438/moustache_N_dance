@@ -429,7 +429,7 @@ async function loadFriend() {
 				document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
 			}
 			else {
-				essionStorage.setItem("friend1_id", "");
+				sessionStorage.setItem("friend1_id", "");
 				sessionStorage.setItem("friend1_status", "");
 			}
 			if (data[1]) {
@@ -442,7 +442,7 @@ async function loadFriend() {
 				document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
 			}
 			else {
-				essionStorage.setItem("friend2_id", "");
+				sessionStorage.setItem("friend2_id", "");
 				sessionStorage.setItem("friend2_status", "");
 			}
 			if (data[2]) {
