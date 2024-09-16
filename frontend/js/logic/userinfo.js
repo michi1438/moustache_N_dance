@@ -1,7 +1,5 @@
 import router from "./router.js"
 
-var csrftoken;
-
 async function updateNickname(nicknameForm) {
 
 	const msgElement = document.getElementById("form__updateNickname--msg");
@@ -249,10 +247,7 @@ async function updateAvatar() {
 	let data = new FormData();
 	data.append('avatar', document.getElementById("form__updateAvatar--input").files[0]);
 
-	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Avatar changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
+	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); 
 	
 	const access = sessionStorage.getItem("access");
 
@@ -287,6 +282,49 @@ async function updateAvatar() {
 			msgElement.classList.add("text-success");
 
 			window.location.reload();
+		}
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+async function loadGameStat() {
+	
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'GET',
+		headers: {
+			'Authorization': `Bearer ${access}`,
+		},
+	};
+
+	try {
+
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/profile', init);
+
+		if (response.status === 400) {
+			const error = await response.text();
+
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+
+			sessionStorage.setItem("wins", data["wins"]);
+			sessionStorage.setItem("losses", data["losses"]);
+			const gameHistory = document.getElementById("game_history");
+			var i = 0;
+			if (data.history) {
+				while (data.history[i]) {
+					const div = document.createElement('div');
+					div.textContent = data.history[i];
+					gameHistory.appendChild(div);
+					i++
+				}
+			}
+			
 		}
 	} catch (e) {
 		console.error(e);
@@ -387,9 +425,11 @@ async function loadFriend() {
 					sessionStorage.setItem("friend1_status", "online");
 				else
 					sessionStorage.setItem("friend1_status", "offline");
+				document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
+				document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
 			}
 			else {
-				sessionStorage.setItem("friend1_id", "");
+				essionStorage.setItem("friend1_id", "");
 				sessionStorage.setItem("friend1_status", "");
 			}
 			if (data[1]) {
@@ -398,9 +438,11 @@ async function loadFriend() {
 					sessionStorage.setItem("friend2_status", "online");
 				else
 					sessionStorage.setItem("friend2_status", "offline");
+				document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
+				document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
 			}
 			else {
-				sessionStorage.setItem("friend2_id", "");
+				essionStorage.setItem("friend2_id", "");
 				sessionStorage.setItem("friend2_status", "");
 			}
 			if (data[2]) {
@@ -409,19 +451,14 @@ async function loadFriend() {
 					sessionStorage.setItem("friend3_status", "online");
 				else
 					sessionStorage.setItem("friend3_status", "offline");
+				document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
+				document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
 			}
 			else {
 				sessionStorage.setItem("friend3_id", "");
 				sessionStorage.setItem("friend3_status", "");
 			}
-			document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
-			document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
-			document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
-			document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
-			document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
-			document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
 
-			// window.location.reload();
 		}
 
 	} catch (e) {
@@ -530,8 +567,10 @@ async function deleteFriend(friend_id) {
 
 function listenerUserInfo() {
 
-	if (sessionStorage.getItem("username"))
+	if (sessionStorage.getItem("username")) {
 		loadFriend();
+		loadGameStat();
+	}
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
 		sessionStorage.getItem("avatar") : "/frontend/img/avatar.png";
@@ -546,8 +585,20 @@ function listenerUserInfo() {
 	const emailForm = document.getElementById("form__updateEmail");
 	const friendForm = document.getElementById("form__add_friend");
 
+	if (sessionStorage.getItem("username").includes("_42")) {
+		document.getElementById("btn__updatePassword").disabled = true;
+		document.getElementById("btn__updateUserName").disabled = true;
+		document.getElementById("btn__updateEmail").disabled = true;
+	}
+
 	var xValues = ["Wins", "Losses"];
-	var yValues = [70, 30];
+	var wins = sessionStorage.getItem("wins")
+	var losses = sessionStorage.getItem("losses") 
+	if (losses == 0 && wins == 0) {
+		losses = 50;
+		wins = 50;
+	}
+	var yValues = [wins, losses];
 	var barColors = [
 	"#1e7145",
 	"#fe8d63",

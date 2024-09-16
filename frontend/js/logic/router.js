@@ -3,7 +3,6 @@ import renderPongLocal from "../views/viewPongLocal.js"
 import renderPongOnline from "../views/viewPongOnline.js"
 import renderLogin from "../views/viewLogin.js"
 import render404_error from "../views/view404_error.js"
-import renderStats from "../views/viewStats.js"
 import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
@@ -71,13 +70,6 @@ const routes = {
 		view: render404_error,
 		// load: handle404_error.load404_error,
 		// listener: handle404_error.listener404_error
-	},
-	"stats": {
-		title: "Stats",
-		path: "/stats/",
-		view: renderStats,
-		// load: handleStats.loadStats,
-		// listener: handleStats.listenerStats
 	},
 	"userinfo": {
 		title: "User Info",
@@ -164,8 +156,11 @@ window.onload = async function()
 				if (sessionStorage.getItem("username")){
 					document.getElementById("login").textContent = "Logout";
 					document.getElementById("login").value = "logout";
+					document.querySelectorAll(".log__item").forEach(btn => {
+						btn.disabled = false;
+					});
 				}
-				
+
 				document.title = routes[route].title;
 				routes[route].listener();  // Attach event listener
 			// }
@@ -212,6 +207,10 @@ async function handleLogout() {
 			if (response.status === 205) {
 				sessionStorage.clear();
 				router("login");
+				document.querySelectorAll(".log__item").forEach(btn => {
+					btn.disabled = true;
+				});
+				
 			}
 		} catch (e) {
 			console.error(e);

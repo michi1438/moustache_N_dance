@@ -66,6 +66,8 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]); //pour lolo
 			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
+			sessionStorage.setItem("wins", data["wins"]);
+			sessionStorage.setItem("losses", data["losses"]);
 			// if (data["friends"])
 			// 	sessionStorage.setItem("friends", data["friends"]);
 
@@ -75,6 +77,9 @@ async function verifyOTP(loginForm) {
 
 			document.getElementById("login").textContent = "Logout";
 			document.getElementById("login").value = "logout";
+			document.querySelectorAll(".log__item").forEach(btn => {
+				btn.disabled = false;
+			});
 			router("index");
 			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 		}
@@ -190,6 +195,16 @@ async function createUser(createAccountForm) {
 	const usernameRegex = /^[a-zA-Z0-9@./+\-_]{1,150}$/g;
 	if (!input.username.value.match(usernameRegex)){
 		document.getElementById("form__createAccount--msg").textContent = "Invalid username";
+		document.getElementById("form__createAccount--msg").classList.add("text-danger");
+		return;
+	}
+	if (!input.username.value.match(usernameRegex)){
+		document.getElementById("form__createAccount--msg").textContent = "Invalid username";
+		document.getElementById("form__createAccount--msg").classList.add("text-danger");
+		return;
+	}
+	if (input.username.value.includes("_42")){
+		document.getElementById("form__createAccount--msg").textContent = "_42 is not allowed in Username";
 		document.getElementById("form__createAccount--msg").classList.add("text-danger");
 		return;
 	}
