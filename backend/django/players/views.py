@@ -86,8 +86,12 @@ def player_details(request):
             elif 'losses' in serializer.validated_data:
                 player.losses += serializer.validated_data['losses']
             if 'history' in serializer.validated_data:
+                if not isinstance(serializer.validated_data['history'], list):
+                    return Response({"error": "History should be a list entry"}, status=status.HTTP_400_BAD_REQUEST)
                 player.history += serializer.validated_data['history']
-            serializer.save()
+            else:
+                return Response({"error": "Invalid field"}, status=status.HTTP_400_BAD_REQUEST)
+            player.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

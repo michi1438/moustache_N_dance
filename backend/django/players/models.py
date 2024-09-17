@@ -50,7 +50,7 @@ class Player(AbstractUser):
     otp = models.OneToOneField(OTPManager, on_delete=models.CASCADE, null=True, blank=True)
     online = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
-    history = models.JSONField(blank=True, null=True)
+    history = models.JSONField(default=list, blank=True)
 
     def send_otp(self):
         if not self.otp:
