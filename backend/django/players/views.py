@@ -57,7 +57,7 @@ def player_details(request):
         if serializer.is_valid():
             if 'wins' in serializer.validated_data:
                 player.wins += serializer.validated_data['wins']
-            elif 'losses' in serializer.validated_data:
+            if 'losses' in serializer.validated_data:
                 player.losses += serializer.validated_data['losses']
             if 'history' in serializer.validated_data:
                 if not isinstance(serializer.validated_data['history'], list):
