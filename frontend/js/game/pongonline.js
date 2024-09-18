@@ -10,15 +10,16 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
+sessionStorage.setItem("opponent", "KOICOUBE");
 sessionStorage.setItem("gameOverO", "false");
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, opponentID, animationID;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, result;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
-let playerdID = uuidv4();
+let playerID = uuidv4();
 
 
 let gameID;
@@ -603,7 +604,6 @@ function connectWebSocket(config) {
     ws.onopen = () => {
         console.log('WebSocket connection opened');
         ws.send(JSON.stringify({ type: 'config', config }));
-        ws.send(JSON.stringify({ type: 'playerID', playerID: playerID }));
         console.log('Sending configuration:', config);
     };
 
@@ -645,13 +645,14 @@ function handleWebSocketMessage(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
-        case 'playerdID':
-            opponentID = message.playerID;
+        case 'nickname':
+            sessionStorage.setItem("opponent", message.nickname);
             break;
         case 'start':
             playerNumber = message.playerNumber;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
+            ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
             window.startGame(message.config);
         case 'paddle':
             if (message.player === 1) {
@@ -726,7 +727,6 @@ function handleGameOver() {
         if (boardTwo && boardTwo.contains(renderer.domElement)) {
             boardTwo.removeChild(renderer.domElement);
             console.log("Game stopped and board_three cleared.");
-            sessionStorage.setItem("gameOverO", "true");
             setTimeout(() => {
                 listenerPongOnline();
                 // Fermer la connexion WebSocket
@@ -801,23 +801,33 @@ function sendScore(playerNumber) {
 showQuestion();
 
 async function sendAPIWL(result) {
+    sessionStorage.setItem("gameOverO", "true");
     const access = sessionStorage.getItem("access");
+    const timestamp = new Date().getTime();
+    const date = new Date(timestamp);
+    const formattedDate = date.toLocaleDateString('fr-FR');
     let message;
+    let win;
+    let lose;
     if(result == 1) {
-        message = "'win against'  + opponentID + new Date().getTime()";
+        message = ['Win against ' + sessionStorage.getItem("opponent") + ' date: ' + formattedDate];
+        win = 1;
+        lose = 0;
     }
     else {
-        message = "'lose against'  + opponentID + new Date().getTime()";
+        message = ['Lose against ' + sessionStorage.getItem("opponent") + ' date: ' + formattedDate];
+        win = 0;
+        lose = 1;
     }
 
 
     const init = {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${access}`,
         },
-        body: JSON.stringify({message}),
+        body: JSON.stringify({history: message, wins: win, losses: lose}),
     };
 
     try {

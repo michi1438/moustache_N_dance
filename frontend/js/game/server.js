@@ -61,9 +61,9 @@ wss.on('connection', (ws) => {
                     playerConfigs[matchingPlayers[0]] = null;
                     playerConfigs[matchingPlayers[1]] = null;
                 }
-            } else if(data.type === 'playerID') {
+            } else if(data.type === 'nickname') {
                 //renvoie a l'autre joueur(sur le meme gameID) le playerID de l'autre joueur
-                broadcast(ws, { type: 'playerID', playerID: data.playerID });
+                broadcast(ws, { type: 'nickname', nickname: data.nickname });
             } else if (data.type === 'winner') {
                 console.log('Winner:', data.winner);
                 gameID = data.gameID;
