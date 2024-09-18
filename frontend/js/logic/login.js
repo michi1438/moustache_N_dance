@@ -230,7 +230,7 @@ async function createUser(createAccountForm) {
 	try {
 		let hostnameport = "https://" + window.location.host;
 
-		const response = await fetch(hostnameport + '/api/players/register', init);
+		const response = await fetch(hostnameport + '/api/players/create', init);
 
 		if (!response.ok || response.status == 500) {
 			document.getElementById("form__createAccount--msg").textContent = "Erreur " + response.status;

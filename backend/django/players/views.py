@@ -1,26 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib import messages
-# from .utils import send_otp
+import os, requests
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.utils import timezone
-import pyotp
-from django.contrib.auth.models import User
-from django.middleware.csrf import get_token
-import requests
-import os 
-from django.core.exceptions import ObjectDoesNotExist
-from django.core import serializers 
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from .models import *
 from .serializers import *
 
@@ -101,82 +90,6 @@ def player_details(request):
         player.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# class login_view(APIView):
-# 	permission_classes = [AllowAny]
-
-# 	def post(self, request , *args, **kwargs):
-# 		try:
-# 			user = authenticate(
-# 				request,
-# 				username=request.data['username'],
-# 				password=request.data['password'],
-# 			)
-# 			if user is not None:
-# 				# if user.is_2fa_verified:
-# 				# 	# Si 2FA est activé, ne pas connecter l'utilisateur immédiatement
-# 				# 	return Response(
-# 				# 		{
-# 				# 			'message': '2FA is enabled. Please provide OTP.',
-# 				# 			'require_2fa': True,
-# 				# 			'user_id': user.id
-# 				# 		},
-# 				# 		status=status.HTTP_200_OK
-# 				# 	)
-# 				# else:
-# 					# Si 2FA n'est pas activé, connecter l'utilisateur normalement
-# 					login(request, user)
-# 					csrf_token = get_token(request)
-# 					print("csrf_token : ", csrf_token)
-# 					return Response(data=PlayerSerializer(user).data, status=status.HTTP_200_OK)
-# 			raise ValueError('Invalid credentials')
-# 		except Exception as e:
-# 			return Response(
-# 				{'message': f"{type(e).__name__}: {str(e)}"},
-# 				status=status.HTTP_401_UNAUTHORIZED
-# 			)
-
-# def login_view(request):
-#     if request.method == "POST":
-#         username = request.POST["username"]
-#         password = request.POST["password"]
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             send_otp(request)
-#             request.session['username'] = username
-#             return redirect('otp')
-#         else:
-#             messages.success(request, ("OUAICH T'ES QUI TOI !?"))
-#             return redirect('login')
-
-#     else:
-#         return render(request, 'auth/login.html', {})
-
-# class register_view(APIView):
-# 	permission_classes = [AllowAny]
-
-# 	def post(self, request, *args, **kwargs):
-# 		email = request.data.get('email')
-# 		username= request.data.get('username')
-		
-# 		if User.objects.filter(email=email).exists():
-# 			return Response(
-# 				{'email': 'Email already exists'},
-# 				status=status.HTTP_400_BAD_REQUEST
-# 			)
-
-# 		serializer = PlayerSerializer(data=request.data)
-# 		if serializer.is_valid():
-# 			serializer.save()
-# 			return Response(
-# 				{
-# 					'data': serializer.data,
-# 					'message': 'User registered successfully'
-# 				},
-# 				status=status.HTTP_201_CREATED
-# 			)
-# 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
@@ -214,87 +127,6 @@ def authorize_fortytwo(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-
-
-#    serializer = PlayerSerializer(data=request.data)
-#        player = Player(**serializer.validated_data)
-#        player.set_password(serializer.validated_data['password'])
-#        player.save()
-#        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-
-
-# def otp_view(request):
-#     if request.method == "POST":
-#         otp = request.POST['otp']
-#         username = request.session['username']
-
-#         otp_secret_key = request.session['otp_secret_key']
-#         otp_valid_date = request.session['otp_valid_date']
-
-#         if otp_secret_key and otp_valid_date is not None:
-#             valid_date = datetime.fromisoformat(otp_valid_date)
-
-#             if valid_date > datetime.now():
-#                 totp = pyotp.TOTP(otp_secret_key, interval=60)
-
-#                 if totp.verify(otp):
-#                     user = get_object_or_404(User, username=username)
-#                     login(request, user)
-
-#                     del request.session['otp_secret_key']
-#                     del request.session['otp_valid_date']
-
-#                     return redirect('home')
-#                 else:
-#                     messages.success(request, ("invalid otp code!"))
-#             else:
-#                 messages.success(request, ("otp code has expired!"))
-#         else:
-#             messages.success(request, ("something went wrong, retry later..."))
-
-#     return render(request, 'auth/otp.html', {}) 
-
-# class logout_view(APIView):
-# 	permission_classes = [IsAuthenticated]
-
-# 	def post(self, request, *args, **kwargs):
-# 		try:
-# 			logout(request)
-# 			return Response(
-# 				{'message': 'User logged out successfully'},
-# 				status=status.HTTP_200_OK
-# 			)
-# 		except Exception as e:
-# 			return Response(
-# 				{'message': f"{type(e).__name__}: {str(e)}"},
-# 				status=status.HTTP_400_BAD_REQUEST
-# 			)
-
-# def logout_view(request):
-#     logout(request)
-#     messages.success(request, ("DECONNEXION REUSSIE ! GG !"))
-#     return redirect('login')
-
-# def register_view(request):
-#     if request.method == "POST":
-#         form = UserCreationForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             username = form.cleaned_data['username']
-#             password = form.cleaned_data['password1']
-#             user = authenticate(username=username, password=password)
-#             login(request, user)
-#             messages.success(request, ("Registration successful!"))
-#             return redirect('home')
-#     else:
-#         form = UserCreationForm()
-#     return render(request, 'auth/register.html', {
-#         'form':form,
-#         })
-        # return Response({"message": "Player deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
 # LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login_view(request):
@@ -305,10 +137,6 @@ def login_view(request):
 
     player = authenticate(request, username=username, password=password)
     if player is not None:
-        login(request, player) #to remove
-        # csrf_token = get_token(request)
-        # print("csrf_token : ", csrf_token)
-        # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
         player.send_otp()
         return Response({"message": "OTP sent to user",
             "id": str(player.id)
@@ -336,11 +164,11 @@ def verify_otp(request):
     if player.otp.verify_otp(otp):
         player.online = True
         player.save()
-        # return Response(data=PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
         refresh = RefreshToken.for_user(player)
         serializer = PlayerSerializer(player)
         return Response({
+            #TODO a nettoyer en fin de projet (pareil pour toutes les Responses)
             "message": "OTP is valid",
             "username": str(player.username),
             "nickname": str(player.nickname),
@@ -377,7 +205,7 @@ def logout(request):
 
 # LISTER SES AMIS
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def list_friends(request):
     player = request.user
     friends = player.friends.all()
@@ -391,9 +219,9 @@ def requests_received(request):
     player = request.user
 
     friend_requests_received = FriendRequest.objects.filter(to_player=player)
-    sender_usernames = friend_requests_received.values_list('from_player_username', flat=True)
+    sender_ids = friend_requests_received.values_list('from_player_id', flat=True)
 
-    return Response({"sender_usernames": list(sender_usernames)}, status=status.HTTP_200_OK)
+    return Response({"sender_ids": list(sender_ids)}, status=status.HTTP_200_OK)
 
 # LISTER SES DEMANDES D'AMI ENVOYEES
 @api_view(['GET'])
@@ -402,19 +230,19 @@ def requests_sent(request):
     player = request.user
 
     friend_requests_sent = FriendRequest.objects.filter(from_player=player)
-    receiver_usernames = friend_requests_sent.values_list('to_player_username', flat=True)
+    receiver_ids = friend_requests_sent.values_list('to_player_id', flat=True)
 
-    return Response({"receiver_usernames": list(receiver_usernames)}, status=status.HTTP_200_OK)
+    return Response({"receiver_ids": list(receiver_ids)}, status=status.HTTP_200_OK)
 
 # DEMANDE D'AMI
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_request(request):
-    to_player_username = request.data['to_player_username']
+    to_player_id = request.data['to_player_id']
     from_player = request.user
 
     try:
-        to_player = Player.objects.get(username=to_player_username)
+        to_player = Player.objects.get(id=to_player_id)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -437,12 +265,12 @@ def friend_request(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_response(request):
-    requester_username = request.data['requester_username'] # id du demandeur
+    requester_id = request.data['requester_id'] # id du demandeur
     action = request.data['action'] # accept ou reject
     player = request.user
 
     try:
-        requester = Player.objects.get(username=requester_username)
+        requester = Player.objects.get(id=requester_id)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -467,11 +295,11 @@ def friend_response(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def friend_delete(request):
-    friend_username = request.data['friend_username']
+    friend_id = request.data['friend_id']
     player = request.user
 
     try:
-        friend = Player.objects.get(username=friend_username)
+        friend = Player.objects.get(id=friend_id)
 
         if friend in player.friends.all():
             player.friends.remove(friend)
@@ -480,4 +308,3 @@ def friend_delete(request):
         
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {friend_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
-

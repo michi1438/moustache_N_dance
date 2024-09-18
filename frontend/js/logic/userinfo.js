@@ -34,7 +34,7 @@ async function updateNickname(nicknameForm) {
 	try {
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status != 200) {
 
@@ -95,7 +95,7 @@ async function updateUsername(usernameForm) {
 	try {
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status != 200) {
 
@@ -155,7 +155,7 @@ async function updateEmail(emailForm) {
 	try {
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status != 200) {
 
@@ -216,7 +216,7 @@ async function updatePassword(passwordForm) {
 
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status != 200) {
 			const error = await response.text();
@@ -268,7 +268,7 @@ async function updateAvatar() {
 
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status === 400) {
 			const error = await response.text();
