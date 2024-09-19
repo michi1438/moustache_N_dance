@@ -32,7 +32,60 @@ function loadPongTournament() {
     document.body.appendChild(scriptTournamentPong);
 	}
 
+async function fetchTournaments(){
+	try {
+		const token = sessionStorage.getItem('access');
+		if (!token) {
+			throw new Error('Token JWT manquant');
+		}
+
+		const response = await fetch('/api/tournaments/list',{
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (!response.ok) {
+			throw new Error(`Erreur: ${response.statusText}`);
+		}
+
+		const tournaments = await response.json();
+		return tournaments;
+
+	} catch (error) {
+		console.error('Erreur lors du listing des tournois: ', error);
+		return [];
+	}
+}
+
+function renderTournamentList(tournaments){
+	const tournamentListContainer = document.getElementById('tournament-list');
+
+	if (tournaments.length === 0){
+		tournamentListContainer.innerHTML = '<p>Aucun tournoi pour le moment.</p>';
+		return;
+	}
+
+	const listHTML = tournaments.map(tournament => `
+		<li class="list-group-item">
+			Created by <strong>${tournament.created_by}</strong> - 
+			Status <strong>${tournament.status}</strong>
+		</li>
+		`).join(' ');
+
+	tournamentListContainer.innerHTML = `<ul class="list-group">${listHTML}</ul>`;
+}
+
+async function initializeTournamentPage(){
+	const tournaments = await fetchTournaments();
+	renderTournamentList(tournaments);
+}
+
 export function listenerPongTournament() {
+
+	initializeTournamentPage();
 
 	if (sessionStorage.getItem("gameOverT") != "true") 
 		loadPongTournament();
