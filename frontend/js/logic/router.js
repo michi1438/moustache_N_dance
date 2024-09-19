@@ -200,15 +200,15 @@ async function handleLogout() {
 		document.getElementById("login").textContent = "Login";
 		document.getElementById("login").value = "login";
 
-		const access = sessionStorage.getItem("access");
 		const inputValues = {
 			refresh: sessionStorage.getItem("refresh"),
+			access: sessionStorage.getItem("access"),
 		};
 
 		const init = {
 			method: "POST",
-			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
-			body: JSON.stringify(inputValues,),
+			headers: { 'Authorization': `Bearer ${inputValues.access}`, 'Content-Type': 'application/json'},
+			body: JSON.stringify(inputValues)
 		}
 
 		try {

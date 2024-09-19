@@ -31,6 +31,7 @@ async function call_local_api(init) {
 			if (data["nickname"])
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]); //pour lolo
+			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
 
 			// Manually call the hide function of the boostrap Modal element
 			//var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
