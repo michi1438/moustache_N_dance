@@ -9,7 +9,6 @@ import { unloadScript } from "./ponglocallogic.js"
 
 
 // Importe le script de chaque page qui gere le load et listener
-//import handleXX from "./XX.js"
 import handlePongLocal from "./ponglocallogic.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
@@ -33,14 +32,12 @@ const routes = {
 		title: "Moustache & Dance",
 		path: "/",
 		view: handleIndex.renderIndex,
-		// load: handleIndex.loadIndex,
 		listener: handleIndex.listenerIndex
 	},
 	"login": {
 		title: "Login",
 		path: "/login/",
 		view: renderLogin,
-		// load: handleLogin.loadLogin,
 		listener: handleLogin.listenerLogin
 	},
 	"ponglocal": {
@@ -54,28 +51,23 @@ const routes = {
 		title: "Pong Online",
 		path: "/pongonline/",
 		view: renderPongOnline,
-		// load: handlePongOnline.loadPongOnline,
 		listener: handlePongOnline.listenerPongOnline
 	},
 	"pongtournament": {
 		title: "Pong Tournament",
 		path: "/pongtournament/",
 		view: renderPongTournament,
-		// load: handlePongTournament.loadPongTournament,
 		listener: handlePongTournament.listenerPongTournament
 	},
 	"404_error": {
 		title: "404 error",
 		path: "/404_error/",
 		view: render404_error,
-		// load: handle404_error.load404_error,
-		// listener: handle404_error.listener404_error
 	},
 	"userinfo": {
 		title: "User Info",
 		path: "/userinfo/",
 		view: renderUserInfo,
-		// load: handleUserInfo.loadUserInfo,
 		listener: handleUserInfo.listenerUserInfo
 	},
 
@@ -99,26 +91,8 @@ export default async function router(value) {
 			window.history.pushState({}, "", page.path);
 			document.title = page.title;
 			page.listener();
-			// console.log(window.location.pathname);
 		}
 
-
-	// if (await page.load() === 1) {
-	// 	document.getElementById("main__content").innerHTML = page.view();
-
-	// 	document.getElementById("topbar__profile--username").textContent =
-	// 		sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-	// 	document.getElementById("topbar__profile--avatar").src =
-	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-	// 	document.getElementById("topbar__profile--avatar").alt =
-	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
-	// 	document.title = page.title;
-
-	// 	window.history.pushState({}, "", page.path);
-
-	// 	page.listener();
-	// }
 	else {
 		console.log("Error Page not found");
 		router("404_error");
@@ -134,25 +108,15 @@ export default async function router(value) {
 window.onload = async function()
 {
 	const currentPath = window.location.pathname;
-	// console.log(currentPath);
 	var found = false
 
 	for (const route in routes)
 	{
 		if (routes[route].path === currentPath)
 		{
-			// if (await routes[route].load() === 1)
-			// {
-
 				found = true
 				document.getElementById('main__content').innerHTML = routes[route].view();  // Render the HTML content for the page
 
-				// document.getElementById("topbar__profile--username").textContent =
-				// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-				// document.getElementById("topbar__profile--avatar").src =
-				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-				// document.getElementById("topbar__profile--avatar").alt =
-				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
 				if (sessionStorage.getItem("username")){
 					document.getElementById("login").textContent = "Logout";
 					document.getElementById("login").value = "logout";
@@ -165,11 +129,8 @@ window.onload = async function()
 				routes[route].listener();  // Attach event listener
 			// }
 		}
-		// else
-		// 	router("login");
-		// return;
-		
 	}
+
 	if (found === false)
 	{
 		router("404_error")
@@ -226,15 +187,6 @@ async function handleLogout() {
 */
 document.addEventListener("DOMContentLoaded", () => {
 
-	// if (window.location.search.split("=")[0] == "?code") {
-	// 	let code = window.location.search.split("=")[1];
-	// 	load42Profile(code);
-	// }
-
-	// if (window.location.pathname === "/") {
-	// 	loadIndex();
-	// }
-
 	document.getElementById("login").addEventListener("click", (e) => {
 		e.preventDefault();
 		handleLogout();
@@ -246,7 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			if (element.value !== window.location.pathname.replaceAll("/", "")) {
 				router(element.value);
-				// console.log(window.location.pathname);
 			}
 		})
 	});
@@ -258,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
 */
 window.addEventListener("popstate", async (e) => {
 	e.preventDefault();
-	// console.log(window.location.pathname);
 	// Get the current url, remove all '/' and if the url is null assign it to 'index'
 	let url = window.location.pathname.replaceAll("/", "");
 	if (url === "")
@@ -273,24 +223,6 @@ window.addEventListener("popstate", async (e) => {
 		page.listener();
 		return;
 	}
-
-
-	// if (await page.load() === 1) {
-		// document.getElementById("main__content").innerHTML = page.view();
-
-		// document.getElementById("topbar__profile--username").textContent =
-		// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-		// document.getElementById("topbar__profile--avatar").src =
-		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-		// document.getElementById("topbar__profile--avatar").alt =
-		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
-		// document.title = page.title;
-
-	// 	page.listener();
-	// }
-	// else
-	// 	loadIndex();
 });
 
 export { router }

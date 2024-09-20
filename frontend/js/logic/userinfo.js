@@ -36,11 +36,10 @@ async function updateNickname(nicknameForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["nickname"])
+				msgElement.textContent = errorMsg["nickname"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -97,11 +96,10 @@ async function updateUsername(usernameForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["username"])
+				msgElement.textContent = errorMsg["username"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -157,11 +155,10 @@ async function updateEmail(emailForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["email"])
+				msgElement.textContent = errorMsg["email"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -218,7 +215,7 @@ async function updatePassword(passwordForm) {
 
 		if (response.status != 200) {
 			const error = await response.text();
-			console.log("undpate password", error)
+			console.log("update password", error)
 			msgElement.textContent = error.replace(/["{}[\]]/g, '');
 			msgElement.classList.add("text-danger");
 			return;
@@ -385,8 +382,6 @@ async function addFriend(friendForm) {
 			msgElement.textContent = "Friend request sent";
 			msgElement.classList.remove("text-danger");
 			msgElement.classList.add("text-success");
-
-			// window.location.reload();
 		}
 
 	} catch (e) {
@@ -485,8 +480,6 @@ async function loadFriend() {
 			else
 				sessionStorage.setItem("friends_received", "");
 			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
-
-			// window.location.reload();
 		}
 	} catch (e) {
 		console.error(e);
@@ -715,36 +708,6 @@ function listenerUserInfo() {
 	});
 };
 
-// async function loadUpdateInfo() {
-
-// 	csrftoken = document.cookie.split("; ").find((row) => row.startsWith("csrftoken"))?.split("=")[1];
-
-// 	const init = {
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 			'X-CSRFToken': csrftoken,
-// 		}
-// 	};
-
-// 	try {
-
-// 		let hostnameport = "https://" + window.location.host
-
-// 		const response = await fetch(hostnameport + '/api/profile/', init);
-
-// 		if (!response.ok) {
-// 			const text = await response.text();
-// 			throw new Error(text.replace(/["{}[\]]/g, ''));
-// 		}
-
-// 		return 1;
-// 	} catch (e) {
-// 		console.error("loadUpdateInfor: " + e);
-// 		return 0;
-// 	}
-// };
-
 export default {
 	listenerUserInfo,
-	// loadUpdateInfo
 };

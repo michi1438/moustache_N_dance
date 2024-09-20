@@ -1,5 +1,5 @@
 import router from "./router.js"
-// import { connect_socket_friend } from "./friends.js";
+
 async function verifyOTP(loginForm) {
 
 	// remove a potential error message from the field
@@ -29,7 +29,7 @@ async function verifyOTP(loginForm) {
 
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/verify_otp', init); // will use another URL
+		const response = await fetch(hostnameport + '/api/players/verify_otp', init);
 
 		if (!response.ok || response.status == 500) {
 			document.getElementById("form__login--errorMsg").textContent = "Erreur " + response.status;
@@ -45,6 +45,8 @@ async function verifyOTP(loginForm) {
 				document.getElementById("form__login--errorMsg").textContent = "Incorrect Credentials";
 			else if (response.status == 422)
 				document.getElementById("form__login--errorMsg").textContent = errorMsg;
+			else if (response.status == 401)
+				document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 			else {
 				if (Object.keys(errorMsg) == "Erreur")
 					document.getElementById("form__login--errorMsg").textContent = errorMsg["Error"];
@@ -54,7 +56,6 @@ async function verifyOTP(loginForm) {
 			return;
 		}
 		if (response.status === 200) {
-			// login is successful -> redirect to profile
 
 			const data = await response.json();
 
@@ -64,12 +65,8 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("avatar", data["avatar"]);
 			if (data["nickname"])
 				sessionStorage.setItem("nickname", data["nickname"]);
-			sessionStorage.setItem("access", data["access"]); //pour lolo
-			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
-			sessionStorage.setItem("wins", data["wins"]);
-			sessionStorage.setItem("losses", data["losses"]);
-			// if (data["friends"])
-			// 	sessionStorage.setItem("friends", data["friends"]);
+			sessionStorage.setItem("access", data["access"]);
+			sessionStorage.setItem("refresh", data["refresh"]);
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
@@ -81,7 +78,6 @@ async function verifyOTP(loginForm) {
 				btn.disabled = false;
 			});
 			router("index");
-			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 		}
 	} catch (e) {
 		console.error("Error connect user: ", e);
@@ -119,7 +115,7 @@ async function connectUser(loginForm) {
 
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/login', init); // will use another URL
+		const response = await fetch(hostnameport + '/api/players/login', init);
 
 		if (!response.ok || response.status == 500) {
 			document.getElementById("form__login--errorMsg").textContent = "Erreur " + response.status;
@@ -135,9 +131,11 @@ async function connectUser(loginForm) {
 				document.getElementById("form__login--errorMsg").textContent = "Incorrect Credentials";
 			else if (response.status == 422)
 				document.getElementById("form__login--errorMsg").textContent = errorMsg;
+			else if (response.status == 401)
+				document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 			else {
 				if (Object.keys(errorMsg) == "Erreur")
-					document.getElementById("form__login--errorMsg").textContent = errorMsg["Error"];
+					document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 				else
 					document.getElementById("form__login--errorMsg").textContent = "Error";
 			}
@@ -158,24 +156,6 @@ async function connectUser(loginForm) {
 				e.preventDefault();
 				verifyOTP(loginForm);
 			});
-			// login is successful -> redirect to profile
-
-			// const data = await response.json();
-
-			// sessionStorage.setItem("username", data["username"]);
-			// sessionStorage.setItem("email", data["email"]);
-			// if (data["avatar"])
-			// 	sessionStorage.setItem("avatar", data["avatar"]);
-			// sessionStorage.setItem("nickname", data["nickname"]);
-
-			// // Manually call the hide function of the boostrap Modal element
-			// var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
-			// await modal.hide();
-
-			// document.getElementById("login").textContent = "Logout";
-			// document.getElementById("login").value = "logout";
-			// router("index");
-			// document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 		}
 	} catch (e) {
 		console.error("Error connect user: ", e);
@@ -227,12 +207,6 @@ async function createUser(createAccountForm) {
 		password: input.password_one.value,
 		email: input.email.value,
 	};
-	
-	//TO DELETE !
-	// console.log('User created with following credentials:');
-	// sessionStorage.setItem("username", inputValues.username);
-	// sessionStorage.setItem("email", inputValues.email);
-	// sessionStorage.setItem("password", inputValues.password);
 
 	const init = {
 		method: 'POST',
@@ -245,30 +219,21 @@ async function createUser(createAccountForm) {
 
 		const response = await fetch(hostnameport + '/api/players/register', init);
 
-		if (!response.ok || response.status == 500) {
+		if (response.status == 500) {
 			document.getElementById("form__createAccount--msg").textContent = "Erreur " + response.status;
 			document.getElementById("form__createAccount--msg").classList.add("text-danger");
 			document.getElementById("form__createAccount--msg").classList.remove("text-success");
 		}
-		else if (response.status == 203) {
-			var errorMsg = await response.text();
-			errorMsg = JSON.parse(errorMsg);
+		else if (response.status == 400) {
+			const errorMsg = await response.json();
+			document.getElementById("form__createAccount--msg").textContent = "Error"
 
-			if (Object.keys(errorMsg)[0] == "42 API") {
-				document.getElementById("form__createAccount--msg").textContent = Object.values(errorMsg);
-			}
-			else if (Object.keys(errorMsg)[0] == "username") {
-				document.getElementById("form__createAccount--msg").textContent = "Invalid username"
-				document.getElementById("form__input--usernameError").textContent = Object.values(errorMsg);
-			}
-			else if (Object.keys(errorMsg)[0] == "email") {
-				document.getElementById("form__createAccount--msg").textContent = "Invalid email";
-				document.getElementById("form__input--emailError").textContent = Object.values(errorMsg);
-			}
-			else if (Object.keys(errorMsg)[0] == "password") {
-				document.getElementById("form__createAccount--msg").textContent = "Invalid password";
-				document.getElementById("form__input--passwordError").textContent = Object.values(errorMsg);
-			}
+			if (errorMsg["username"])
+				document.getElementById("form__input--usernameError").textContent = errorMsg["username"][0];
+			if (errorMsg["email"])
+				document.getElementById("form__input--emailError").textContent = errorMsg["email"][0];
+			if (errorMsg["password"])
+				document.getElementById("form__input--emailError").textContent = errorMsg["password"][0];
 
 			document.getElementById("form__createAccount--msg").classList.add("text-danger");
 			document.getElementById("form__createAccount--msg").classList.remove("text-success");
@@ -389,33 +354,6 @@ function listenerLogin() {
 	
 };
 
-async function loadLogin() {
-
-	// document.querySelectorAll(".dropdown-item").forEach(btn => {
-	// 	btn.setAttribute("disabled", true);
-	// });
-	// document.getElementById("topbar__logout").setAttribute("disabled", true);
-
-	try {
-		let hostnameport = "https://" + window.location.host
-		const response = await fetch(hostnameport + '/api/players/login');
-
-		if (response.status === 202) {
-
-			// document.querySelectorAll(".dropdown-item").forEach(btn => {
-			// 	btn.removeAttribute("disabled");
-			// });
-			// document.getElementById("topbar__logout").removeAttribute("disabled");
-
-			router("index");
-		}
-		return 1;
-	} catch (e) {
-		console.error(e);
-	}
-};
-
 export default {
 	listenerLogin,
-	loadLogin
 };
