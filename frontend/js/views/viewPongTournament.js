@@ -14,12 +14,13 @@ export default function renderPongTournament() {
 				</div>
 
 				<div id="countdownDisplay" class="position-absolute h1"></div>
+				<div id="waitingDisplay" class="position-absolute h2">En attente des autres joueurs...</div>
 
-				<div id="board_four" class="text-bg-dark border border-black"></div>
+				<div id="board_four" class="text-bg-dark"></div>
 
 				</br></br></br>
 
-				<div id="tournament-list" class="text-bg-dark mb-4 p-3 w-80">
+				<div id="tournament-list" class="text-white bg-dark mb-4 p-3 w-80">
 					<!-- Liste des tournois injectee dynamiquement -->
 				</div>
 

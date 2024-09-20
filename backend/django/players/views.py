@@ -127,6 +127,7 @@ def authorize_fortytwo(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+# TODO autoriser uniquement si la personne est pas deja loguee
 # LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login_view(request):

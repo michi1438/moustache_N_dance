@@ -359,6 +359,7 @@ function initGameSimpson () {
     }
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
+    let waitingDisplay = document.getElementById('waitingDisplay');
     countdownDisplay.id = 'countdownDisplay';
     
     
@@ -377,6 +378,7 @@ function initGameSimpson () {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocketTournament();
             let countdownInterval = setInterval(() => {
+                waitingDisplay.style.display = 'none';
                 countdownDisplay.style.display = 'block';
                 countdownDisplay.innerText = countdown;
                 countdown--;
@@ -602,9 +604,11 @@ async function getTournamentStatus(){
 
 function showQuestion() {
 	const configMenu = document.getElementById('config-menu');
+    const tournamentList = document.getElementById('tournament-list');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
 	configMenu.style.display = 'block';
+	tournamentList.style.display = 'block';
 
     const currentQuestion = questions[currentQuestionIndex];
     questionContainer.textContent = currentQuestion.question;
@@ -624,6 +628,8 @@ function showQuestion() {
 
 function selectOption(option) {
     const configMenu = document.getElementById('config-menu');
+    const tournamentList = document.getElementById('tournament-list');
+    const waitingDisplay = document.getElementById('waitingDisplay');
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
     
@@ -637,6 +643,8 @@ function selectOption(option) {
 
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
         configMenu.style.display = 'none';
+        tournamentList.style.display = 'none';
+        waitingDisplay.style.display = 'block';
         // Proceed with the join logic
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
@@ -649,6 +657,8 @@ function selectOption(option) {
         showQuestion();
     } else {
         configMenu.style.display = 'none';
+        tournamentList.style.display = 'none';
+        waitingDisplay.style.display = 'block';
         // Start the game with the selected configuration
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
@@ -748,9 +758,9 @@ function handleWebSocketMessageTournament(message, config) {
                             ws.close();
                             console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
                         }
-                    }, 3000);
+                    }, 4500);
                 }
-            }, 3000);
+            }, 4500);
             break;
         case 'ball':
             ball.position.x = message.position.x;
@@ -1022,7 +1032,8 @@ async function sendAPIcreate(configuration) {
         if (response.status === 201) {
             const data = await response.json();
 
-            //tournamentID = data.tournament_id;
+            const tournamentID = data.tournament_id;
+			sessionStorage.setItem('upcoming_tournament_ID', tournamentID);
 
             // msgElement.textContent = "Nickname changed";
             // msgElement.classList.remove("text-danger");

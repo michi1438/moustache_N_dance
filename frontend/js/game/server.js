@@ -180,10 +180,9 @@ async function tournamentLogic(data) {
         //envoyer un message au vainqueur pour lui dire que le tournoi est fini
         setTimeout(() => {
             players[0].send(JSON.stringify({ type: 'fintournoi', position: position }));
+			position = [];
+			playersID = [];
         }, 2000);
-        playersID = [];
-
-
     }
 }
 

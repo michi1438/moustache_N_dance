@@ -12,7 +12,7 @@ from .serializers import TournamentSerializer
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_tournaments(request):
-    tournaments = Tournament.objects.all()
+    tournaments = Tournament.objects.select_related('created_by').prefetch_related('participants').all()
     serializer = TournamentSerializer(tournaments, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
