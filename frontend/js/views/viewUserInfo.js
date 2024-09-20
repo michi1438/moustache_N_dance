@@ -219,7 +219,7 @@ export default function renderUserInfo() {
 									<div class="mb-1" id="form__add_friend--msg"></div>
 									<div class="mb-2">
 										<div class="text-dark">
-											Nickname
+											Username
 										</div>
 										<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="add_friend_nickname">
 										<div id="form__add_friend--msg" class="text-danger"></div>
@@ -286,6 +286,11 @@ export default function renderUserInfo() {
 				<div class="col text-end">
 					<button class="btn btn-outline-secondary text-light" id="btn__friend4_accept">
 						Accept
+					</button>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__friend4_reject">
+						Reject
 					</button>
 				</div>
 			</div>

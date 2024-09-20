@@ -351,6 +351,12 @@ async function addFriend(friendForm) {
 		return;
 	}
 
+	if (sessionStorage.getItem("username") == input.add_friend_nickname.value) {
+		msgElement.textContent = "You cannot add yourself";
+		msgElement.classList.add("text-danger");
+		return;
+	}
+
 	const access = sessionStorage.getItem("access");
 
 	const init = {
@@ -367,21 +373,29 @@ async function addFriend(friendForm) {
 
 		const response = await fetch(hostnameport + '/api/players/friends/request', init);
 
-		if (response.status != 201) {
+		if (response.status === 200) {
+
+			const msg = await response.json();
+						
+			msgElement.textContent = msg["message"];
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
+		}
+
+		if (response.status === 201) {
+
+			msgElement.textContent = "Friend request sent";
+			
+			msgElement.classList.add("text-success");
+		}
+
+		if (response.status !== 201 && response.status !== 200) {
 
 			const error = await response.text();
-			
-
 			
 			msgElement.textContent = error.replace(/["{}[\]]/g, '');
 			msgElement.classList.add("text-danger");
 			return;
-		}
-		if (response.status === 201) {
-
-			msgElement.textContent = "Friend request sent";
-			msgElement.classList.remove("text-danger");
-			msgElement.classList.add("text-success");
 		}
 
 	} catch (e) {
@@ -415,7 +429,7 @@ async function loadFriend() {
 		if (response.status === 200) {
 			const data = await response.json();
 			if (data[0]) {
-				sessionStorage.setItem("friend1_id", data[0].id);
+				sessionStorage.setItem("friend1_id", data[0].username);
 				if (data[0].online === true)
 					sessionStorage.setItem("friend1_status", "online");
 				else
@@ -428,7 +442,7 @@ async function loadFriend() {
 				sessionStorage.setItem("friend1_status", "");
 			}
 			if (data[1]) {
-				sessionStorage.setItem("friend2_id", data[1].id);
+				sessionStorage.setItem("friend2_id", data[1].username);
 				if (data[1].online === true)
 					sessionStorage.setItem("friend2_status", "online");
 				else
@@ -441,7 +455,7 @@ async function loadFriend() {
 				sessionStorage.setItem("friend2_status", "");
 			}
 			if (data[2]) {
-				sessionStorage.setItem("friend3_id", data[2].id);
+				sessionStorage.setItem("friend3_id", data[2].username);
 				if (data[2].online === true)
 					sessionStorage.setItem("friend3_status", "online");
 				else
@@ -475,8 +489,8 @@ async function loadFriend() {
 			const data = await response.json();
 			if (sessionStorage.getItem("friend3_id"))
 				sessionStorage.setItem("friends_received", "Maximum Friends reached");
-			else if (data.sender_ids[0])
-				sessionStorage.setItem("friends_received", data.sender_ids[0]);
+			else if (data.sender_id)
+				sessionStorage.setItem("friends_received", data.sender_id);
 			else
 				sessionStorage.setItem("friends_received", "");
 			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
@@ -499,6 +513,41 @@ async function acceptFriend(friend_id) {
 			'Authorization': `Bearer ${access}`,
 		},
 		body: JSON.stringify({requester_id: friend_id, action: "accept"}),
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/response', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+			loadFriend();
+			window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
+async function rejectFriend(friend_id) {
+
+	const access = sessionStorage.getItem("access");
+
+	const init = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({requester_id: friend_id, action: "reject"}),
 	};
 
 	try {
@@ -650,6 +699,13 @@ function listenerUserInfo() {
 			document.getElementById("form__updatePassword--msg").textContent = "";
 		});
 			});
+	document.getElementById("modal__add_friend").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		friendForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__add_friend--msg").textContent = "";
+		});
+			});
 
 	nicknameForm.addEventListener("submit", e => {
 		e.preventDefault();
@@ -705,6 +761,11 @@ function listenerUserInfo() {
 		e.preventDefault();
 		if (document.getElementById("friend4__nickname--big").textContent)
 			acceptFriend(document.getElementById("friend4__nickname--big").textContent);
+	});
+	document.getElementById("btn__friend4_reject").addEventListener("click", (e) => {
+		e.preventDefault();
+		if (document.getElementById("friend4__nickname--big").textContent)
+			rejectFriend(document.getElementById("friend4__nickname--big").textContent);
 	});
 };
 

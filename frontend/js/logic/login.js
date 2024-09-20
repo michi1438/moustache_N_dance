@@ -146,6 +146,7 @@ async function connectUser(loginForm) {
 			document.getElementById("otp").classList.add("d-block");
 			document.getElementById("form__login--btn").classList.add("d-none");
 			document.getElementById("form__login--btn").disabled = true;
+			document.getElementById("btn__createAccount").disabled = true;
 			document.getElementById("form__loginOTP--btn").classList.remove("d-none");
 
 			const data = await response.json();
