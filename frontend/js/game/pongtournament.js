@@ -708,9 +708,9 @@ function handleWebSocketMessageTournament(message, config) {
                             ws.close();
                             console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
                         }
-                    }, 3000);
+                    }, 3500);
                 }
-            }, 3000);
+            }, 3500);
             break;
         case 'ball':
             ball.position.x = message.position.x;
