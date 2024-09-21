@@ -1,4 +1,4 @@
-import router from "./router.js"
+import { monitorTokenExpiration } from "./router.js"
 
 async function updateNickname(nicknameForm) {
 
@@ -18,7 +18,7 @@ async function updateNickname(nicknameForm) {
 		return;
 	}
 	
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -78,7 +78,7 @@ async function updateUsername(usernameForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -137,7 +137,7 @@ async function updateEmail(emailForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -196,7 +196,7 @@ async function updatePassword(passwordForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -246,7 +246,7 @@ async function updateAvatar() {
 
 	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); 
 	
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -287,7 +287,7 @@ async function updateAvatar() {
 
 async function loadGameStat() {
 	
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'GET',
@@ -357,7 +357,7 @@ async function addFriend(friendForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -405,7 +405,7 @@ async function addFriend(friendForm) {
 
 async function loadFriend() {
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'GET',
@@ -504,7 +504,7 @@ async function acceptFriend(friend_id) {
 
 	if (sessionStorage.getItem("friends_received") === "Maximum Friends reached")
 		return;
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -539,7 +539,7 @@ async function acceptFriend(friend_id) {
 
 async function rejectFriend(friend_id) {
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -574,7 +574,7 @@ async function rejectFriend(friend_id) {
 
 async function deleteFriend(friend_id) {
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -597,7 +597,6 @@ async function deleteFriend(friend_id) {
 			return;
 		}
 		if (response.status === 200) {
-			const data = await response.json();
 			loadFriend();
 			window.location.reload();
 		}
@@ -607,11 +606,12 @@ async function deleteFriend(friend_id) {
 	}
 };
 
-function listenerUserInfo() {
+async function listenerUserInfo() {
 
 	if (sessionStorage.getItem("username")) {
-		loadFriend();
-		loadGameStat();
+		const loadF = await loadFriend().then(() => {
+			loadGameStat();
+		});
 	}
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?

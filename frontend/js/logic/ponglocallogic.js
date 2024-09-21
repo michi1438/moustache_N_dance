@@ -1,6 +1,5 @@
 
 export function unloadScript() {
-	console.log("Ponglocal script unloaded");
     // Désactiver les scripts chargés dynamiquement
     document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
         script.setAttribute('data-disabled', 'true');

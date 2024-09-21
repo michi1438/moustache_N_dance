@@ -17,8 +17,6 @@ async function verifyOTP(loginForm) {
 		return;
 	}
 
-	const token = sessionStorage.getItem("token");
-
 	const init = {
 		method: "POST",
 		headers: { 'Content-Type': 'application/json'},
@@ -67,6 +65,7 @@ async function verifyOTP(loginForm) {
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]);
 			sessionStorage.setItem("refresh", data["refresh"]);
+			
 
 			// Manually call the hide function of the boostrap Modal element
 			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');

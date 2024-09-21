@@ -7,14 +7,12 @@ import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
 
-
 // Importe le script de chaque page qui gere le load et listener
 import handlePongLocal from "./ponglocallogic.js"
 import handleLogin from "./login.js"
 import handleUserInfo from "./userinfo.js"
 import handlePongOnline from "../game/pongonline.js"
 import handlePongTournament from "../game/pongtournament.js"
-// Cas particulier pour index
 import handleIndex from "./index.js"
 
 /**
@@ -137,6 +135,73 @@ window.onload = async function()
 	}
 };
 
+// Fonction pour décoder un JWT (partie payload)
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];  // Récupère la partie payload
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+// Fonction pour rafraîchir le token
+async function refreshToken() {
+    
+	const access = sessionStorage.getItem("access");
+		const inputValues = {
+			refresh: sessionStorage.getItem("refresh"),
+		};
+
+		const init = {
+			method: "POST",
+			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
+			body: JSON.stringify(inputValues,),
+		}
+
+		try {
+
+			let hostnameport = "https://" + window.location.host
+
+			const response = await fetch(hostnameport + '/api/players/token_refresh', init);
+
+			if (response.status === 200) {
+				const data = await response.json();
+
+				sessionStorage.setItem("access", data["access"]);
+				sessionStorage.setItem("refresh", data["refresh"]);
+				return data["access"];
+			}
+		} catch (e) {
+			console.error(e);
+		}
+}
+
+// Surveiller et rafraîchir automatiquement le token
+export async function monitorTokenExpiration() {
+    const accessToken = sessionStorage.getItem('access');
+    if (accessToken) {
+        const decodedToken = parseJwt(accessToken);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeUntilExpiration = decodedToken.exp - currentTime;
+		console.log(timeUntilExpiration);	
+
+        // Déclenche le rafraîchissement 1 minutes avant l'expiration
+        const refreshThreshold = 60; // 1 minutes
+
+        if (timeUntilExpiration < refreshThreshold) {
+            const newaccessToken = await refreshToken();
+			return newaccessToken;
+        } else {
+            // Planifier un rafraîchissement 1 minutes avant l'expiration
+            setTimeout(refreshToken, (timeUntilExpiration - refreshThreshold) * 1000);
+			return accessToken;
+        }
+    }
+}
+
+
 /**
  * Logout handler function
  * Send a PATCH request to the server to logout the user
@@ -147,10 +212,11 @@ async function handleLogout() {
 	if (document.getElementById("login").value == "logout"){
 		document.getElementById("login").textContent = "Login";
 		document.getElementById("login").value = "login";
-
-		const access = sessionStorage.getItem("access");
+		
+		const access = await monitorTokenExpiration();
 		const inputValues = {
 			refresh: sessionStorage.getItem("refresh"),
+			access: access,
 		};
 
 		const init = {
