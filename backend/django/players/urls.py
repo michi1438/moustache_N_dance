@@ -9,6 +9,7 @@ urlpatterns = [
         path('details', views.player_details),
         path('login', views.login_view, name="login"),
         path('logout', views.logout, name="logout"),
+        path('profile', views.player_details, name="profile"),
         path('token_refresh', TokenRefreshView.as_view(), name="token_refresh"),
         path('verify_otp', views.verify_otp, name="otp"),
         path('authorize_fortytwo/', views.authorize_fortytwo, name="authorize_fortytwo"),

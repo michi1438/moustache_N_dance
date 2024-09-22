@@ -43,6 +43,9 @@ export default function renderLogin() {
 									<div class="text-dark">
 										One Time Password
 									</div>
+									<div class="text-dark">
+										(Check your email)
+									</div>
 									<input type="password" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="otp">
 									<div class="form__input--errorMsg text-danger"></div>
 								</div>
@@ -75,14 +78,14 @@ export default function renderLogin() {
 										Username
 									</div>
 									<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="username">
-									<div id="form__input--usernameError" class="h6 text-danger"></div>
+									<div id="form__input--usernameError" class="text-danger"></div>
 								</div>
 								<div class="mb-2">
 									<div class="text-dark">
 										Email
 									</div>
 									<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="email">
-									<div id="form__input--emailError" class="h6 text-danger"></div>
+									<div id="form__input--emailError" class="text-danger"></div>
 								</div>
 								<div class="mb-2">
 									<div class="text-dark">
