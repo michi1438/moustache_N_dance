@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { v4 as uuidv4 } from 'uuid';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
 
 const scene = new THREE.Scene();
@@ -10,6 +13,8 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
+const labelRenderer = new CSS2DRenderer();
+sessionStorage.setItem("opponent", "KOICOUBE");
 let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID;
 let soundPlayed = false;
 let isModelLoaded = false;
@@ -397,6 +402,7 @@ function initGameSimpson () {
             player.result = -1;
             console.log(scene);
             console.log('gameoversent avant dappelller animate', gameOverSent);
+            nicknamesIG(config);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -676,11 +682,15 @@ function handleWebSocketMessageTournament(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
+        case 'nickname':
+            sessionStorage.setItem("opponent", message.nickname);
+            break;
         case 'startT':
             player.playerNumber = message.playerNumber;
             player.gameID = message.gameID;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
+            ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
             window.startGameTournament(message.config);
         case 'paddle':
             if (message.player === 1) {
@@ -708,9 +718,9 @@ function handleWebSocketMessageTournament(message, config) {
                             ws.close();
                             console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
                         }
-                    }, 3500);
+                    }, 4500);
                 }
-            }, 3500);
+            }, 4500);
             break;
         case 'ball':
             ball.position.x = message.position.x;
@@ -1078,4 +1088,79 @@ async function sendAPIover() {
     } catch (e) {
         console.error(e);
     }
+}
+
+function nicknamesIG(config) {
+    // Autres initialisations de jeu...
+
+    // Charger la police et créer les textes
+    const fontLoader = new FontLoader();
+    let player1Nickname, player2Nickname, textMaterial1, textMaterial2, adaptedFont;
+    if(config['Map'] == 'Classique') {
+        adaptedFont = '/frontend/js/game/fonts/helvetiker_regular.typeface.json';
+    }
+    else if(config['Map'] == 'Simpson') {
+        adaptedFont = '/frontend/js/game/fonts/Simpsonfont_Regular.json';
+    }
+
+    fontLoader.load(adaptedFont, function (font) {
+        if(player.playerNumber == 1) {
+            player1Nickname = sessionStorage.getItem("nickname");
+            player2Nickname = sessionStorage.getItem("opponent");
+        }
+        else {
+            player1Nickname = sessionStorage.getItem("opponent");
+            player2Nickname = sessionStorage.getItem("nickname");
+        }
+        if(config['Map'] == 'Classique') {
+            textMaterial1 = new THREE.MeshPhongMaterial({ color: 0x6666ff });
+            textMaterial2 = new THREE.MeshPhongMaterial({ color: 0xff6666 });
+        }
+        else if(config['Map'] == 'Simpson') {
+            textMaterial1 = new THREE.MeshPhongMaterial({ color: 0xf9f639 });
+            textMaterial2 = new THREE.MeshPhongMaterial({ color: 0x5375f5 });
+        }
+
+        // Créer le texte pour le joueur 1
+        const player1TextGeometry = new TextGeometry(player1Nickname, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const player1TextMesh = new THREE.Mesh(player1TextGeometry, textMaterial1);
+        player1TextMesh.position.set(-14, 4, -12); // Position en haut à gauche
+        player1TextMesh.rotation.set(-Math.PI / 8, 0, 0); // Inclinaison sur l'axe z
+        player1TextMesh.castShadow = true;
+        scene.add(player1TextMesh);
+
+        // Créer le texte pour le joueur 2
+        const player2TextGeometry = new TextGeometry(player2Nickname, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const player2TextMesh = new THREE.Mesh(player2TextGeometry, textMaterial2);
+        player2TextMesh.position.set(10, 4, -12); // Position en haut à droite
+        player2TextMesh.rotation.set(-Math.PI / 8, 0, 0); 
+        player2TextMesh.castShadow = true;
+        scene.add(player2TextMesh);
+    });
+
+    // Ajouter le renderer CSS2D
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild(labelRenderer.domElement);
 }
