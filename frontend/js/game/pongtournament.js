@@ -15,7 +15,7 @@ renderer.setSize(700, 500);
 const loader = new GLTFLoader();
 const labelRenderer = new CSS2DRenderer();
 sessionStorage.setItem("opponent", "KOICOUBE");
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID;
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID, avancement;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -688,6 +688,7 @@ function handleWebSocketMessageTournament(message, config) {
         case 'startT':
             player.playerNumber = message.playerNumber;
             player.gameID = message.gameID;
+            avancement = message.avancement;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
             ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
@@ -1095,7 +1096,7 @@ function nicknamesIG(config) {
 
     // Charger la police et créer les textes
     const fontLoader = new FontLoader();
-    let player1Nickname, player2Nickname, textMaterial1, textMaterial2, adaptedFont;
+    let player1Nickname, player2Nickname, textMaterial1, textMaterial2, avancementMaterial, adaptedFont;
     if(config['Map'] == 'Classique') {
         adaptedFont = '/frontend/js/game/fonts/helvetiker_regular.typeface.json';
     }
@@ -1120,7 +1121,7 @@ function nicknamesIG(config) {
             textMaterial1 = new THREE.MeshPhongMaterial({ color: 0xf9f639 });
             textMaterial2 = new THREE.MeshPhongMaterial({ color: 0x5375f5 });
         }
-
+        avancementMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
         // Créer le texte pour le joueur 1
         const player1TextGeometry = new TextGeometry(player1Nickname, {
             font: font,
@@ -1135,7 +1136,7 @@ function nicknamesIG(config) {
         });
         const player1TextMesh = new THREE.Mesh(player1TextGeometry, textMaterial1);
         player1TextMesh.position.set(-14, 4, -12); // Position en haut à gauche
-        player1TextMesh.rotation.set(-Math.PI / 8, 0, 0); // Inclinaison sur l'axe z
+        player1TextMesh.rotation.set(-Math.PI / 8, 0, 0); 
         player1TextMesh.castShadow = true;
         scene.add(player1TextMesh);
 
@@ -1156,7 +1157,26 @@ function nicknamesIG(config) {
         player2TextMesh.rotation.set(-Math.PI / 8, 0, 0); 
         player2TextMesh.castShadow = true;
         scene.add(player2TextMesh);
+
+        // Créer le texte pour le avancement
+        const avancementTextGeometry = new TextGeometry(avancement, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const avancementTextMesh = new THREE.Mesh(avancementTextGeometry, avancementMaterial);
+        avancementTextMesh.position.set(-2, 4, -12);
+        avancementTextMesh.rotation.set(-Math.PI / 8, 0, 0); 
+        avancementTextMesh.castShadow = true;
+        scene.add(avancementTextMesh);
     });
+
 
     // Ajouter le renderer CSS2D
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
