@@ -12,6 +12,7 @@ urlpatterns = [
         path('token_refresh', TokenRefreshView.as_view(), name="token_refresh"),
         path('verify_otp', views.verify_otp, name="otp"),
         path('authorize_fortytwo/', views.authorize_fortytwo, name="authorize_fortytwo"),
+        path('fetch_authpage/', views.fetch_authpage, name="fetch_authpage"),
         path('friends/list', views.list_friends),
         path('friends/requests_received', views.requests_received),
         path('friends/requests_sent', views.requests_sent),

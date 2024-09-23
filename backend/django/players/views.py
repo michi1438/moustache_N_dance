@@ -1,4 +1,5 @@
 import os, requests
+from urllib.parse import urlencode
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.utils import timezone
@@ -89,6 +90,32 @@ def player_details(request):
             player.otp.delete()
         player.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def fetch_authpage(request):
+    
+    try:
+        authUri = 'https://api.intra.42.fr/oauth/authorize'
+        redirectUri = 'https://' + os.environ.get("DJANGO_ALLOWED_HOSTS") + '/callback/'
+
+        params ={
+            'client_id': os.environ.get("ID_API"),
+            'redirect_uri': redirectUri,
+            'response_type': 'code',
+            'scope': 'public'
+        }
+
+        auth_url = '{}?{}'.format(authUri, urlencode(params))
+
+        return Response(auth_url, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {'42_authpage error': f"{type(e).__name__}: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])

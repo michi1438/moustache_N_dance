@@ -272,17 +272,17 @@ async function createUser(createAccountForm) {
 
 async function connectUser42() {
 
-	let hostnameport = "https://" + window.location.host;
+	try {
+		let hostnameport = "https://" + window.location.host;
+		
+		const response = await fetch(hostnameport + '/api/players/fetch_authpage/')
+		
+		const authUrl = await response.json();
 
-	const clientId = 'u-s4t2ud-09574b041e6625b7aef3cdc2aec6cde849eaf3599586914c061fe6124dc00edf'; //TODO get key from .env
-    const redirectUri = encodeURIComponent(hostnameport + '/callback/');
-    const responseType = 'code';
-    const scope = 'public';
-
-    // Construct the authorization URL
-    const authUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
-
-	window.location = (authUrl);
+		window.location.href = (authUrl);
+	} catch (e) {
+		console.error("Error ro page 42Auth : ", e);
+	}
 };
 
 function listenerLogin() {
