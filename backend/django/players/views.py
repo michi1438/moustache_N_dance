@@ -95,10 +95,9 @@ def player_details(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def fetch_authpage(request):
-    
     try:
         authUri = 'https://api.intra.42.fr/oauth/authorize'
-        redirectUri = 'https://' + os.environ.get("DJANGO_ALLOWED_HOSTS") + '/callback/'
+        redirectUri = 'https://' + request.get_host() + '/callback/'
 
         params ={
             'client_id': os.environ.get("ID_API"),
@@ -123,7 +122,7 @@ def authorize_fortytwo(request):
 
     try:
         urls = 'https://api.intra.42.fr/oauth/token'
-        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost/callback/'})
+        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://' + request.get_host() + '/callback/'})
         token = x.json()['access_token']
 
         urls = 'https://api.intra.42.fr/v2/me'
