@@ -792,6 +792,7 @@ function handleWebSocketMessageTournament(message, config) {
             }
         case 'deco':
             console.log('Player', message.player, 'disconnected');
+			waitingDisplay.style.display = 'block';
             if(message.player == 0) {
                 scoreP2 = 5;
                 scoreP1 = 0;

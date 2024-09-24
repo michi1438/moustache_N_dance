@@ -14,7 +14,7 @@ export default function renderPongTournament() {
 				</div>
 
 				<div id="countdownDisplay" class="position-absolute h1"></div>
-				<div id="waitingDisplay" class="position-absolute h2">En attente des autres joueurs...</div>
+				<div id="waitingDisplay" class="position-absolute h2">En attente de votre adversaire...</div>
 
 				<div id="board_four" class="text-bg-dark"></div>
 
