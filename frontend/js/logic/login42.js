@@ -31,6 +31,7 @@ async function call_local_api(init) {
 			if (data["nickname"])
 				sessionStorage.setItem("nickname", data["nickname"]);
 			sessionStorage.setItem("access", data["access"]); //pour lolo
+			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
 
 			// Manually call the hide function of the boostrap Modal element
 			//var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
@@ -42,6 +43,7 @@ async function call_local_api(init) {
 			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 
 		}
+		//TODO : else if error 400 ou autre, afficher l erreur
 	}
 	catch (e) {
 		console.error("Error create user42: ", e);
@@ -78,4 +80,3 @@ export default {
 	listenerCallback42,
 	loadLogin42
 };
-

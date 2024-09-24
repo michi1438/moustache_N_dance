@@ -41,7 +41,6 @@ class OTPManager(models.Model):
 
 class Player(AbstractUser):
     nickname = models.CharField(unique=True, max_length=50, null=True, blank=True)
-    login = models.CharField(unique=True, max_length=50, null=True, blank=True)
     email = models.EmailField(unique=True, blank=False, null=False)
     avatar = models.ImageField(upload_to='staticfiles/avatars/', null=True, blank=True)
     wins = models.IntegerField(default=0)
@@ -51,6 +50,11 @@ class Player(AbstractUser):
     online = models.BooleanField(default=False)
     friends = models.ManyToManyField('self', symmetrical=True, blank=True)
     history = models.JSONField(default=list, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.nickname:
+            self.nickname = self.username
+        super(Player, self).save(*args, **kwargs)
 
     def send_otp(self):
         if not self.otp:
