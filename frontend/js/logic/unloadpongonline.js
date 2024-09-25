@@ -26,6 +26,10 @@ function loadPongOnline() {
         script.removeAttribute('data-disabled');
     });
     const scriptOnlinePong = document.createElement('script');
+	
+	const waitingDisplay = document.getElementById('waitingDisplay');
+	waitingDisplay.style.display = 'none';
+
     scriptOnlinePong.type = 'module';
     scriptOnlinePong.src = '/frontend/js/game/pongonline.js?' + new Date().getTime(); // Ajoute un horodatage à l'URL
     scriptOnlinePong.setAttribute('data-pong', 'dynamic');  // Marqueur pour identifier les scripts chargés dynamiquement

@@ -12,7 +12,7 @@ from .serializers import TournamentSerializer
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_tournaments(request):
-    tournaments = Tournament.objects.all()
+    tournaments = Tournament.objects.select_related('created_by').prefetch_related('participants').all()
     serializer = TournamentSerializer(tournaments, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -20,6 +20,8 @@ def list_tournaments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_tournament(request):
+    if Tournament.objects.filter(status__in=['ongoing', 'upcoming']).exists():
+        return Response({"error": "Cannot create. A tournament is already ongoing or upcoming"}, status=status.HTTP_400_BAD_REQUEST)
 
     player = request.user
 
@@ -62,7 +64,7 @@ def add_participant(request, tournament_id):
         tournament = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist:
         return Response({"error": f'Tournament with id {tournament_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
-
+    
     player = request.user
 
     if player in tournament.participants.all():

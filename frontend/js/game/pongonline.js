@@ -359,6 +359,7 @@ window.startGame = function(config) {
     }
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
+    let waitingDisplay = document.getElementById('waitingDisplay');
     countdownDisplay.id = 'countdownDisplay';
     
     
@@ -377,6 +378,7 @@ window.startGame = function(config) {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocket();
             let countdownInterval = setInterval(() => {
+                waitingDisplay.style.display = 'none';
                 countdownDisplay.style.display = 'block';
                 countdownDisplay.innerText = countdown;
                 countdown--;
@@ -576,6 +578,7 @@ function showQuestion() {
 
 function selectOption(option) {
 	const configMenu = document.getElementById('config-menu');
+    const waitingDisplay = document.getElementById('waitingDisplay');
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
     
@@ -584,6 +587,7 @@ function selectOption(option) {
         showQuestion();
     } else {
         configMenu.style.display = 'none';
+        waitingDisplay.style.display = 'block';
         // Start the game with the selected configuration
         //console.log('Configuration:', configuration);
 		document.getElementById('board_three').appendChild(renderer.domElement);

@@ -110,6 +110,10 @@ def authorize_fortytwo(request):
             #player.token42 = x.json()['token'],
         )
         #print (x.json())
+        if not created and player.online:
+            return Response({"error": "Player is already logged in."}, status=status.HTTP_400_BAD_REQUEST)
+
+        player.online = True
         player.save()
 
         refresh = RefreshToken.for_user(player)
@@ -127,6 +131,7 @@ def authorize_fortytwo(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+# TODO autoriser uniquement si la personne est pas deja loguee
 # LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login_view(request):
@@ -137,6 +142,8 @@ def login_view(request):
 
     player = authenticate(request, username=username, password=password)
     if player is not None:
+        if player.online:
+            return Response({"error": "Player is already logged in."}, status=status.HTTP_400_BAD_REQUEST)
         player.send_otp()
         return Response({"message": "OTP sent to user",
             "id": str(player.id)
