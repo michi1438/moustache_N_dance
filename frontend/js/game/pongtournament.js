@@ -6,6 +6,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
+import { monitorTokenExpiration } from "../logic/router.js"
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -1015,7 +1016,7 @@ function resetGameVariables() {
 
 async function sendAPIcreate(configuration) {
  
-    const access = sessionStorage.getItem("access");
+    const access = await monitorTokenExpiration();
 
     const init = {
         method: 'POST',
@@ -1060,7 +1061,7 @@ async function sendAPIcreate(configuration) {
 }
 
 async function sendAPIjoin() {
-    const access = sessionStorage.getItem("access");
+    const access = await monitorTokenExpiration();
     const tournamentID = sessionStorage.getItem("upcoming_tournament_ID");
 
     const init = {
@@ -1102,7 +1103,7 @@ async function sendAPIjoin() {
 }
 
 async function sendAPIover() {
-    const access = sessionStorage.getItem("access");
+    const access = await monitorTokenExpiration();
     const tournamentID = sessionStorage.getItem("upcoming_tournament_ID");
 
     const init = {

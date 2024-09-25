@@ -300,7 +300,7 @@ async function loadGameStat() {
 
 		let hostnameport = "https://" + window.location.host
 
-		const response = await fetch(hostnameport + '/api/players/profile', init);
+		const response = await fetch(hostnameport + '/api/players/details', init);
 
 		if (response.status === 400) {
 			const error = await response.text();

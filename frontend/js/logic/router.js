@@ -159,7 +159,7 @@ function parseJwt(token) {
 // Fonction pour rafraîchir le token
 async function refreshToken() {
     
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 		const inputValues = {
 			refresh: sessionStorage.getItem("refresh"),
 		};
