@@ -182,6 +182,7 @@ async function tournamentLogic(data) {
             players[0].send(JSON.stringify({ type: 'fintournoi', position: position }));
         }, 2000);
         playersID = [];
+        position = [];
 
 
     }
