@@ -575,19 +575,22 @@ let configuration = {};
 getTournamentStatus();
 
 async function getTournamentStatus(){
-	try {
-		const token = sessionStorage.getItem('access');
-		if (!token) {
-			throw new Error('Token JWT manquant');
-		}
 
-		const response = await fetch('/api/tournaments/list',{
-			method: 'GET',
-			headers: {
-				'Authorization': `Bearer ${token}`,
-				'Content-Type': 'application/json'
-			}
-		});
+	const access = await monitorTokenExpiration();
+
+	const init = {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+	};
+
+	try {
+
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/tournaments/list', init);
 
 		if (!response.ok) {
 			throw new Error(`Erreur: ${response.statusText}`);

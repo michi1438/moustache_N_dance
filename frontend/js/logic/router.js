@@ -145,6 +145,8 @@ window.onload = async function()
 	}
 };
 
+let isRefreshing = false; //flag pour eviter les appels simultanes au refresh token
+
 // Fonction pour décoder un JWT (partie payload)
 function parseJwt(token) {
     const base64Url = token.split('.')[1];  // Récupère la partie payload
@@ -158,36 +160,45 @@ function parseJwt(token) {
 
 // Fonction pour rafraîchir le token
 async function refreshToken() {
+
+	if (isRefreshing){
+		return;
+	}
+	isRefreshing = true;
     
-	const access = sessionStorage.getItem("access");
-	//const access = await monitorTokenExpiration();
-		const inputValues = {
-			refresh: sessionStorage.getItem("refresh"),
-		};
+	const inputValues = {
+		refresh: sessionStorage.getItem("refresh"),
+	};
 
-		const init = {
-			method: "POST",
-			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
-			body: JSON.stringify(inputValues,),
+	const init = {
+		method: "POST",
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(inputValues),
+	}
+
+	try {
+
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/token_refresh', init);
+
+		if (response.status === 200) {
+			const data = await response.json();
+
+			sessionStorage.setItem("access", data["access"]);
+			sessionStorage.setItem("refresh", data["refresh"]);
+			return data["access"];
+		} else {
+			console.error('Failed to refresh token');
 		}
-
-		try {
-
-			let hostnameport = "https://" + window.location.host
-
-			const response = await fetch(hostnameport + '/api/players/token_refresh', init);
-
-			if (response.status === 200) {
-				const data = await response.json();
-
-				sessionStorage.setItem("access", data["access"]);
-				sessionStorage.setItem("refresh", data["refresh"]);
-				return data["access"];
-			}
-		} catch (e) {
-			console.error(e);
-		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		isRefreshing = false;
+	}
 }
+
+let refreshTimeoutId = null;
 
 // Surveiller et rafraîchir automatiquement le token
 export async function monitorTokenExpiration() {
@@ -203,12 +214,15 @@ export async function monitorTokenExpiration() {
 
         if (timeUntilExpiration < refreshThreshold) {
             const newaccessToken = await refreshToken();
-			// sessionStorage.setItem("access", newaccessToken);
-			// sessionStorage.setItem("refresh", newaccessToken.refresh); //supercool
-			return newaccessToken;
+			return newaccessToken || accessToken;
         } else {
+			// Si un timeout a deja ete lance par un autre appel, l'annuler
+			if (refreshTimeoutId){
+				clearTimeout(refreshTimeoutId);
+			}
             // Planifier un rafraîchissement 1 minutes avant l'expiration
-            setTimeout(refreshToken, (timeUntilExpiration - refreshThreshold) * 1000);
+            refreshTimeoutId = setTimeout(refreshToken, (timeUntilExpiration - refreshThreshold) * 1000);
+
 			return accessToken;
         }
     }
