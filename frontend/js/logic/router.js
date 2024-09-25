@@ -3,14 +3,11 @@ import renderPongLocal from "../views/viewPongLocal.js"
 import renderPongOnline from "../views/viewPongOnline.js"
 import renderLogin from "../views/viewLogin.js"
 import render404_error from "../views/view404_error.js"
-import renderStats from "../views/viewStats.js"
 import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
 
-
 // Importe le script de chaque page qui gere le load et listener
-//import handleXX from "./XX.js"
 import handlePongLocal from "./ponglocallogic.js"
 import handlePongOnline from "./unloadpongonline.js"
 import handleLogin from "./login.js"
@@ -36,7 +33,6 @@ const routes = {
 		title: "Moustache & Dance",
 		path: "/",
 		view: handleIndex.renderIndex,
-		// load: handleIndex.loadIndex,
 		listener: handleIndex.listenerIndex
 	},
 	"callback42": {
@@ -50,7 +46,6 @@ const routes = {
 		title: "Login",
 		path: "/login/",
 		view: renderLogin,
-		// load: handleLogin.loadLogin,
 		listener: handleLogin.listenerLogin
 	},
 	"ponglocal": {
@@ -64,35 +59,23 @@ const routes = {
 		title: "Pong Online",
 		path: "/pongonline/",
 		view: renderPongOnline,
-		// load: handlePongOnline.loadPongOnline,
 		listener: handlePongOnline.listenerPongOnline
 	},
 	"pongtournament": {
 		title: "Pong Tournament",
 		path: "/pongtournament/",
 		view: renderPongTournament,
-		// load: handlePongTournament.loadPongTournament,
 		listener: handlePongTournament.listenerPongTournament
 	},
 	"404_error": {
 		title: "404 error",
 		path: "/404_error/",
 		view: render404_error,
-		// load: handle404_error.load404_error,
-		// listener: handle404_error.listener404_error
-	},
-	"stats": {
-		title: "Stats",
-		path: "/stats/",
-		view: renderStats,
-		// load: handleStats.loadStats,
-		// listener: handleStats.listenerStats
 	},
 	"userinfo": {
 		title: "User Info",
 		path: "/userinfo/",
 		view: renderUserInfo,
-		// load: handleUserInfo.loadUserInfo,
 		listener: handleUserInfo.listenerUserInfo
 	},
 
@@ -116,26 +99,8 @@ export default async function router(value) {
 			window.history.pushState({}, "", page.path);
 			document.title = page.title;
 			page.listener();
-			// console.log(window.location.pathname);
 		}
 
-
-	// if (await page.load() === 1) {
-	// 	document.getElementById("main__content").innerHTML = page.view();
-
-	// 	document.getElementById("topbar__profile--username").textContent =
-	// 		sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-	// 	document.getElementById("topbar__profile--avatar").src =
-	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-	// 	document.getElementById("topbar__profile--avatar").alt =
-	// 		sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
-	// 	document.title = page.title;
-
-	// 	window.history.pushState({}, "", page.path);
-
-	// 	page.listener();
-	// }
 	else {
 		console.log("Error Page not found");
 		router("404_error");
@@ -157,37 +122,95 @@ window.onload = async function()
 	{
 		if (routes[route].path === currentPath)
 		{
-			// if (await routes[route].load() === 1)
-			// {
-
 				found = true
 				document.getElementById('main__content').innerHTML = routes[route].view();  // Render the HTML content for the page
 
-				// document.getElementById("topbar__profile--username").textContent =
-				// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-				// document.getElementById("topbar__profile--avatar").src =
-				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-				// document.getElementById("topbar__profile--avatar").alt =
-				// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
 				if (sessionStorage.getItem("username")){
 					document.getElementById("login").textContent = "Logout";
 					document.getElementById("login").value = "logout";
+					document.querySelectorAll(".log__item").forEach(btn => {
+						btn.disabled = false;
+					});
 				}
-				
+
 				document.title = routes[route].title;
 				routes[route].listener();  // Attach event listener
 			// }
 		}
-		// else
-		// 	router("login");
-		// return;
-		
 	}
+
 	if (found === false)
 	{
 		router("404_error")
 	}
 };
+
+// Fonction pour décoder un JWT (partie payload)
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];  // Récupère la partie payload
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+// Fonction pour rafraîchir le token
+async function refreshToken() {
+    
+	const access = sessionStorage.getItem("access");
+		const inputValues = {
+			refresh: sessionStorage.getItem("refresh"),
+		};
+
+		const init = {
+			method: "POST",
+			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
+			body: JSON.stringify(inputValues,),
+		}
+
+		try {
+
+			let hostnameport = "https://" + window.location.host
+
+			const response = await fetch(hostnameport + '/api/players/token_refresh', init);
+
+			if (response.status === 200) {
+				const data = await response.json();
+
+				sessionStorage.setItem("access", data["access"]);
+				sessionStorage.setItem("refresh", data["refresh"]);
+				return data["access"];
+			}
+		} catch (e) {
+			console.error(e);
+		}
+}
+
+// Surveiller et rafraîchir automatiquement le token
+export async function monitorTokenExpiration() {
+    const accessToken = sessionStorage.getItem('access');
+    if (accessToken) {
+        const decodedToken = parseJwt(accessToken);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeUntilExpiration = decodedToken.exp - currentTime;
+		console.log(timeUntilExpiration);	
+
+        // Déclenche le rafraîchissement 1 minutes avant l'expiration
+        const refreshThreshold = 60; // 1 minutes
+
+        if (timeUntilExpiration < refreshThreshold) {
+            const newaccessToken = await refreshToken();
+			return newaccessToken;
+        } else {
+            // Planifier un rafraîchissement 1 minutes avant l'expiration
+            setTimeout(refreshToken, (timeUntilExpiration - refreshThreshold) * 1000);
+			return accessToken;
+        }
+    }
+}
+
 
 /**
  * Logout handler function
@@ -199,10 +222,11 @@ async function handleLogout() {
 	if (document.getElementById("login").value == "logout"){
 		document.getElementById("login").textContent = "Login";
 		document.getElementById("login").value = "login";
-
-		const access = sessionStorage.getItem("access");
+		
+		const access = await monitorTokenExpiration();
 		const inputValues = {
 			refresh: sessionStorage.getItem("refresh"),
+			access: access,
 		};
 
 		const init = {
@@ -220,6 +244,10 @@ async function handleLogout() {
 			if (response.status === 205) {
 				sessionStorage.clear();
 				router("login");
+				document.querySelectorAll(".log__item").forEach(btn => {
+					btn.disabled = true;
+				});
+				
 			}
 		} catch (e) {
 			console.error(e);
@@ -235,15 +263,6 @@ async function handleLogout() {
 */
 document.addEventListener("DOMContentLoaded", () => {
 
-	// if (window.location.search.split("=")[0] == "?code") {
-	// 	let code = window.location.search.split("=")[1];
-	// 	load42Profile(code);
-	// }
-
-	// if (window.location.pathname === "/") {
-	// 	loadIndex();
-	// }
-
 	document.getElementById("login").addEventListener("click", (e) => {
 		e.preventDefault();
 		handleLogout();
@@ -255,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			if (element.value !== window.location.pathname.replaceAll("/", "")) {
 				router(element.value);
-				// console.log(window.location.pathname);
 			}
 		})
 	});
@@ -267,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
 */
 window.addEventListener("popstate", async (e) => {
 	e.preventDefault();
-	// console.log(window.location.pathname);
 	// Get the current url, remove all '/' and if the url is null assign it to 'index'
 	let url = window.location.pathname.replaceAll("/", "");
 	if (url === "")
@@ -282,24 +299,6 @@ window.addEventListener("popstate", async (e) => {
 		page.listener();
 		return;
 	}
-
-
-	// if (await page.load() === 1) {
-		// document.getElementById("main__content").innerHTML = page.view();
-
-		// document.getElementById("topbar__profile--username").textContent =
-		// 	sessionStorage.getItem("username") ? sessionStorage.getItem("username") : "user";
-		// document.getElementById("topbar__profile--avatar").src =
-		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("avatar") : "/frontend/img/person-circle-Bootstrap.svg";
-		// document.getElementById("topbar__profile--avatar").alt =
-		// 	sessionStorage.getItem("avatar") ? sessionStorage.getItem("username") + " avatar" : "temp avatar";
-
-		// document.title = page.title;
-
-	// 	page.listener();
-	// }
-	// else
-	// 	loadIndex();
 });
 
 export { router }

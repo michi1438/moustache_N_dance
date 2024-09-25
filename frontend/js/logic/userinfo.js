@@ -1,6 +1,4 @@
-import router from "./router.js"
-
-var csrftoken;
+import { monitorTokenExpiration } from "./router.js"
 
 async function updateNickname(nicknameForm) {
 
@@ -20,7 +18,7 @@ async function updateNickname(nicknameForm) {
 		return;
 	}
 	
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -38,11 +36,10 @@ async function updateNickname(nicknameForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["nickname"])
+				msgElement.textContent = errorMsg["nickname"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -81,7 +78,7 @@ async function updateUsername(usernameForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -99,11 +96,10 @@ async function updateUsername(usernameForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["username"])
+				msgElement.textContent = errorMsg["username"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -141,7 +137,7 @@ async function updateEmail(emailForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -159,11 +155,10 @@ async function updateEmail(emailForm) {
 
 		if (response.status != 200) {
 
-			const error = await response.text();
-			
+			const errorMsg = await response.json();
 
-			
-			msgElement.textContent = error.replace(/["{}[\]]/g, '');
+			if (errorMsg["email"])
+				msgElement.textContent = errorMsg["email"][0];
 			msgElement.classList.add("text-danger");
 			return;
 		}
@@ -201,7 +196,7 @@ async function updatePassword(passwordForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -220,7 +215,7 @@ async function updatePassword(passwordForm) {
 
 		if (response.status != 200) {
 			const error = await response.text();
-			console.log("undpate password", error)
+			console.log("update password", error)
 			msgElement.textContent = error.replace(/["{}[\]]/g, '');
 			msgElement.classList.add("text-danger");
 			return;
@@ -249,12 +244,9 @@ async function updateAvatar() {
 	let data = new FormData();
 	data.append('avatar', document.getElementById("form__updateAvatar--input").files[0]);
 
-	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); // TO DELETE AFTER BACKEND !
-	msgElement.textContent = "Avatar changed"; // TO DELETE AFTER BACKEND !
-	msgElement.classList.remove("text-danger"); // TO DELETE AFTER BACKEND !
-	msgElement.classList.add("text-success"); // TO DELETE AFTER BACKEND !
+	sessionStorage.setItem("avatar", URL.createObjectURL(document.getElementById("form__updateAvatar--input").files[0])); 
 	
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'PUT',
@@ -293,6 +285,49 @@ async function updateAvatar() {
 	}
 };
 
+async function loadGameStat() {
+	
+	const access = await monitorTokenExpiration();
+
+	const init = {
+		method: 'GET',
+		headers: {
+			'Authorization': `Bearer ${access}`,
+		},
+	};
+
+	try {
+
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/profile', init);
+
+		if (response.status === 400) {
+			const error = await response.text();
+
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+
+			sessionStorage.setItem("wins", data["wins"]);
+			sessionStorage.setItem("losses", data["losses"]);
+			const gameHistory = document.getElementById("game_history");
+			var i = 0;
+			if (data.history) {
+				while (data.history[i]) {
+					const div = document.createElement('div');
+					div.textContent = data.history[i];
+					gameHistory.appendChild(div);
+					i++
+				}
+			}
+			
+		}
+	} catch (e) {
+		console.error(e);
+	}
+};
+
 async function addFriend(friendForm) {
 
 	const msgElement = document.getElementById("form__add_friend--msg");
@@ -316,7 +351,13 @@ async function addFriend(friendForm) {
 		return;
 	}
 
-	const access = sessionStorage.getItem("access");
+	if (sessionStorage.getItem("username") == input.add_friend_nickname.value) {
+		msgElement.textContent = "You cannot add yourself";
+		msgElement.classList.add("text-danger");
+		return;
+	}
+
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -332,23 +373,29 @@ async function addFriend(friendForm) {
 
 		const response = await fetch(hostnameport + '/api/players/friends/request', init);
 
-		if (response.status != 201) {
+		if (response.status === 200) {
+
+			const msg = await response.json();
+						
+			msgElement.textContent = msg["message"];
+			msgElement.classList.remove("text-danger");
+			msgElement.classList.add("text-success");
+		}
+
+		if (response.status === 201) {
+
+			msgElement.textContent = "Friend request sent";
+			
+			msgElement.classList.add("text-success");
+		}
+
+		if (response.status !== 201 && response.status !== 200) {
 
 			const error = await response.text();
-			
-
 			
 			msgElement.textContent = error.replace(/["{}[\]]/g, '');
 			msgElement.classList.add("text-danger");
 			return;
-		}
-		if (response.status === 201) {
-
-			msgElement.textContent = "Friend request sent";
-			msgElement.classList.remove("text-danger");
-			msgElement.classList.add("text-success");
-
-			// window.location.reload();
 		}
 
 	} catch (e) {
@@ -358,7 +405,7 @@ async function addFriend(friendForm) {
 
 async function loadFriend() {
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'GET',
@@ -382,46 +429,45 @@ async function loadFriend() {
 		if (response.status === 200) {
 			const data = await response.json();
 			if (data[0]) {
-				sessionStorage.setItem("friend1_id", data[0].id);
+				sessionStorage.setItem("friend1_id", data[0].username);
 				if (data[0].online === true)
 					sessionStorage.setItem("friend1_status", "online");
 				else
 					sessionStorage.setItem("friend1_status", "offline");
+				document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
+				document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
 			}
 			else {
 				sessionStorage.setItem("friend1_id", "");
 				sessionStorage.setItem("friend1_status", "");
 			}
 			if (data[1]) {
-				sessionStorage.setItem("friend2_id", data[1].id);
+				sessionStorage.setItem("friend2_id", data[1].username);
 				if (data[1].online === true)
 					sessionStorage.setItem("friend2_status", "online");
 				else
 					sessionStorage.setItem("friend2_status", "offline");
+				document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
+				document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
 			}
 			else {
 				sessionStorage.setItem("friend2_id", "");
 				sessionStorage.setItem("friend2_status", "");
 			}
 			if (data[2]) {
-				sessionStorage.setItem("friend3_id", data[2].id);
+				sessionStorage.setItem("friend3_id", data[2].username);
 				if (data[2].online === true)
 					sessionStorage.setItem("friend3_status", "online");
 				else
 					sessionStorage.setItem("friend3_status", "offline");
+				document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
+				document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
 			}
 			else {
 				sessionStorage.setItem("friend3_id", "");
 				sessionStorage.setItem("friend3_status", "");
 			}
-			document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
-			document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
-			document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
-			document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
-			document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
-			document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
 
-			// window.location.reload();
 		}
 
 	} catch (e) {
@@ -443,13 +489,11 @@ async function loadFriend() {
 			const data = await response.json();
 			if (sessionStorage.getItem("friend3_id"))
 				sessionStorage.setItem("friends_received", "Maximum Friends reached");
-			else if (data.sender_ids[0])
-				sessionStorage.setItem("friends_received", data.sender_ids[0]);
+			else if (data.sender_id)
+				sessionStorage.setItem("friends_received", data.sender_id);
 			else
 				sessionStorage.setItem("friends_received", "");
 			document.getElementById("friend4__nickname--big").textContent = sessionStorage.getItem("friends_received");
-
-			// window.location.reload();
 		}
 	} catch (e) {
 		console.error(e);
@@ -460,7 +504,7 @@ async function acceptFriend(friend_id) {
 
 	if (sessionStorage.getItem("friends_received") === "Maximum Friends reached")
 		return;
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -493,9 +537,44 @@ async function acceptFriend(friend_id) {
 	}
 };
 
+async function rejectFriend(friend_id) {
+
+	const access = await monitorTokenExpiration();
+
+	const init = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${access}`,
+		},
+		body: JSON.stringify({requester_id: friend_id, action: "reject"}),
+	};
+
+	try {
+		let hostnameport = "https://" + window.location.host
+
+		const response = await fetch(hostnameport + '/api/players/friends/response', init);
+
+		if (response.status != 200) {
+
+			const error = await response.text();
+
+			return;
+		}
+		if (response.status === 200) {
+			const data = await response.json();
+			loadFriend();
+			window.location.reload();
+		}
+
+	} catch (e) {
+		console.error(e);
+	}
+};
+
 async function deleteFriend(friend_id) {
 
-	const access = sessionStorage.getItem("access");
+	const access = await monitorTokenExpiration();
 
 	const init = {
 		method: 'POST',
@@ -518,7 +597,6 @@ async function deleteFriend(friend_id) {
 			return;
 		}
 		if (response.status === 200) {
-			const data = await response.json();
 			loadFriend();
 			window.location.reload();
 		}
@@ -528,10 +606,13 @@ async function deleteFriend(friend_id) {
 	}
 };
 
-function listenerUserInfo() {
+async function listenerUserInfo() {
 
-	if (sessionStorage.getItem("username"))
-		loadFriend();
+	if (sessionStorage.getItem("username")) {
+		const loadF = await loadFriend().then(() => {
+			loadGameStat();
+		});
+	}
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
 		sessionStorage.getItem("avatar") : "/frontend/img/avatar.png";
@@ -546,8 +627,20 @@ function listenerUserInfo() {
 	const emailForm = document.getElementById("form__updateEmail");
 	const friendForm = document.getElementById("form__add_friend");
 
+	if (sessionStorage.getItem("username").includes("_42")) {
+		document.getElementById("btn__updatePassword").disabled = true;
+		document.getElementById("btn__updateUserName").disabled = true;
+		document.getElementById("btn__updateEmail").disabled = true;
+	}
+
 	var xValues = ["Wins", "Losses"];
-	var yValues = [70, 30];
+	var wins = sessionStorage.getItem("wins")
+	var losses = sessionStorage.getItem("losses") 
+	if (losses == 0 && wins == 0) {
+		losses = 50;
+		wins = 50;
+	}
+	var yValues = [wins, losses];
 	var barColors = [
 	"#1e7145",
 	"#fe8d63",
@@ -606,6 +699,13 @@ function listenerUserInfo() {
 			document.getElementById("form__updatePassword--msg").textContent = "";
 		});
 			});
+	document.getElementById("modal__add_friend").addEventListener("hidden.bs.modal", e => {
+		e.preventDefault();
+		friendForm.querySelectorAll(".input__field").forEach(inputElement => {
+			inputElement.value = "";
+			document.getElementById("form__add_friend--msg").textContent = "";
+		});
+			});
 
 	nicknameForm.addEventListener("submit", e => {
 		e.preventDefault();
@@ -662,38 +762,13 @@ function listenerUserInfo() {
 		if (document.getElementById("friend4__nickname--big").textContent)
 			acceptFriend(document.getElementById("friend4__nickname--big").textContent);
 	});
+	document.getElementById("btn__friend4_reject").addEventListener("click", (e) => {
+		e.preventDefault();
+		if (document.getElementById("friend4__nickname--big").textContent)
+			rejectFriend(document.getElementById("friend4__nickname--big").textContent);
+	});
 };
-
-// async function loadUpdateInfo() {
-
-// 	csrftoken = document.cookie.split("; ").find((row) => row.startsWith("csrftoken"))?.split("=")[1];
-
-// 	const init = {
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 			'X-CSRFToken': csrftoken,
-// 		}
-// 	};
-
-// 	try {
-
-// 		let hostnameport = "https://" + window.location.host
-
-// 		const response = await fetch(hostnameport + '/api/profile/', init);
-
-// 		if (!response.ok) {
-// 			const text = await response.text();
-// 			throw new Error(text.replace(/["{}[\]]/g, ''));
-// 		}
-
-// 		return 1;
-// 	} catch (e) {
-// 		console.error("loadUpdateInfor: " + e);
-// 		return 0;
-// 	}
-// };
 
 export default {
 	listenerUserInfo,
-	// loadUpdateInfo
 };

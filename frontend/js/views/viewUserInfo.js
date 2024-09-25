@@ -82,7 +82,7 @@ export default function renderUserInfo() {
 						<div id="update__username--big" class="fw-bold"></div>
 					</div>
 					<div class="col">
-						<button class="btn btn-outline-secondary text-light" data-bs-toggle="modal" data-bs-target="#modal__updateUsername" id="btn__updateName">
+						<button class="btn btn-outline-secondary text-light" data-bs-toggle="modal" data-bs-target="#modal__updateUsername" id="btn__updateUserName">
 							Change
 						</button>
 					</div>
@@ -154,7 +154,7 @@ export default function renderUserInfo() {
 				<div class="list-group d-flex align-items-center">
 					<div class="row my-4"></div>
 					<div class="row my-2">
-						<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__updatePassword" id="btn__updatePasswordt">Change Password
+						<button class="btn btn-outline-secondary text-light" type="button" data-bs-toggle="modal" data-bs-target="#modal__updatePassword" id="btn__updatePassword">Change Password
 					</div>
 					<div class="row my-5"></div>
 				</div>
@@ -197,12 +197,8 @@ export default function renderUserInfo() {
 			<div class="col-6 text-start">
 				<div class="row my-5">
 					<div class="col">
-						Games:
-						<div id="games" class="fw-bold"></div>
-					</div>
-					<div class="col">
-						Dates:
-						<div id="games_dates" class="fw-bold"></div>
+						Game History:
+						<div id="game_history" class="fw-bold"></div>
 					</div>
 				</div>
 				<div class="row">
@@ -223,7 +219,7 @@ export default function renderUserInfo() {
 									<div class="mb-1" id="form__add_friend--msg"></div>
 									<div class="mb-2">
 										<div class="text-dark">
-											Nickname
+											Username
 										</div>
 										<input type="text" class="p-1 border border-1 border-secondary rounded bg-light input__field" name="add_friend_nickname">
 										<div id="form__add_friend--msg" class="text-danger"></div>
@@ -290,6 +286,11 @@ export default function renderUserInfo() {
 				<div class="col text-end">
 					<button class="btn btn-outline-secondary text-light" id="btn__friend4_accept">
 						Accept
+					</button>
+				</div>
+				<div class="col text-end">
+					<button class="btn btn-outline-secondary text-light" id="btn__friend4_reject">
+						Reject
 					</button>
 				</div>
 			</div>
