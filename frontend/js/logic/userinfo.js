@@ -641,6 +641,7 @@ async function listenerUserInfo() {
 		wins = 50;
 	}
 	var yValues = [wins, losses];
+	console.log("YVALUES", yValues);
 	var barColors = [
 	"#1e7145",
 	"#fe8d63",

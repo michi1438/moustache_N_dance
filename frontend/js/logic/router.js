@@ -159,7 +159,8 @@ function parseJwt(token) {
 // Fonction pour rafraîchir le token
 async function refreshToken() {
     
-	const access = await monitorTokenExpiration();
+	const access = sessionStorage.getItem("access");
+	//const access = await monitorTokenExpiration();
 		const inputValues = {
 			refresh: sessionStorage.getItem("refresh"),
 		};
@@ -195,13 +196,15 @@ export async function monitorTokenExpiration() {
         const decodedToken = parseJwt(accessToken);
         const currentTime = Math.floor(Date.now() / 1000);
         const timeUntilExpiration = decodedToken.exp - currentTime;
-		console.log(timeUntilExpiration);	
+		console.log("time until expir", timeUntilExpiration);	
 
         // Déclenche le rafraîchissement 1 minutes avant l'expiration
         const refreshThreshold = 60; // 1 minutes
 
         if (timeUntilExpiration < refreshThreshold) {
             const newaccessToken = await refreshToken();
+			// sessionStorage.setItem("access", newaccessToken);
+			// sessionStorage.setItem("refresh", newaccessToken.refresh); //supercool
 			return newaccessToken;
         } else {
             // Planifier un rafraîchissement 1 minutes avant l'expiration
