@@ -15,6 +15,7 @@
 	</style>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   </head>
   <body>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
@@ -48,15 +49,14 @@
 						<a class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Game</a>
 						<ul class="dropdown-menu">
 							<li><button class="dropdown-item nav__item" value="ponglocal">Local</button></li>
-							<li><button class="dropdown-item nav__item" value="pongonline">Online</button></li>
-							<li><button class="dropdown-item nav__item" value="pongtournament">Tournoi</button></li>
+							<li><button class="dropdown-item nav__item log__item" disabled="true" value="pongonline">Online</button></li>
+							<li><button class="dropdown-item nav__item log__item" disabled="true" value="pongtournament">Tournoi</button></li>
 						</ul>
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">User</a>
 						<ul class="dropdown-menu">
-							<li><button class="dropdown-item nav__item" value="userinfo">Profile</button></li>
-							<li><button class="dropdown-item nav__item" value="stats">Stats</button></li>
+							<li><button class="dropdown-item nav__item log__item" disabled="true" value="userinfo">Profile</button></li>
 						</ul>
 					</li>
 					<li class="nav-item ms-2 d-md-inline">

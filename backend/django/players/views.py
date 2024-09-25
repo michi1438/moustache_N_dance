@@ -134,6 +134,11 @@ def authorize_fortytwo(request):
             last_name = x.json()['last_name'],
             email = x.json()['email']
         )
+        #print (x.json())
+        if not created and player.online:
+            return Response({"error": "Player is already logged in."}, status=status.HTTP_400_BAD_REQUEST)
+
+        player.online = True
         player.save()
 
         refresh = RefreshToken.for_user(player)
@@ -150,6 +155,7 @@ def authorize_fortytwo(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+# TODO autoriser uniquement si la personne est pas deja loguee
 # LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login_view(request):
@@ -160,6 +166,8 @@ def login_view(request):
 
     player = authenticate(request, username=username, password=password)
     if player is not None:
+        if player.online:
+            return Response({"error": "Player is already logged in."}, status=status.HTTP_400_BAD_REQUEST)
         player.send_otp()
         return Response({"message": "OTP sent to user",
             "id": str(player.id)
@@ -196,6 +204,9 @@ def verify_otp(request):
             "username": str(player.username),
             "nickname": str(player.nickname),
             "email": str(player.email),
+            "email": str(player.email),
+            "wins": str(player.wins),
+            "losses": str(player.losses),
             "avatar": player.avatar.url if player.avatar else None,
             "refresh": str(refresh),
             "access": str(refresh.access_token),
@@ -243,8 +254,11 @@ def requests_received(request):
 
     friend_requests_received = FriendRequest.objects.filter(to_player=player)
     sender_ids = friend_requests_received.values_list('from_player_id', flat=True)
-
-    return Response({"sender_ids": list(sender_ids)}, status=status.HTTP_200_OK)
+    if (sender_ids):
+        sender = Player.objects.get(id=sender_ids[0])
+        return Response({"sender_id": sender.username}, status=status.HTTP_200_OK)
+    else:
+        return Response({"sender_id": ""}, status=status.HTTP_200_OK)
 
 # LISTER SES DEMANDES D'AMI ENVOYEES
 @api_view(['GET'])
@@ -254,7 +268,7 @@ def requests_sent(request):
 
     friend_requests_sent = FriendRequest.objects.filter(from_player=player)
     receiver_ids = friend_requests_sent.values_list('to_player_id', flat=True)
-
+	
     return Response({"receiver_ids": list(receiver_ids)}, status=status.HTTP_200_OK)
 
 # DEMANDE D'AMI
@@ -265,7 +279,7 @@ def friend_request(request):
     from_player = request.user
 
     try:
-        to_player = Player.objects.get(id=to_player_id)
+        to_player = Player.objects.get(username=to_player_id)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -293,7 +307,7 @@ def friend_response(request):
     player = request.user
 
     try:
-        requester = Player.objects.get(id=requester_id)
+        requester = Player.objects.get(username=requester_id)
     except Player.DoesNotExist:
         return Response({"error": f'Player with id {requester_id} does not exist'},status=status.HTTP_404_NOT_FOUND)
 
@@ -322,7 +336,7 @@ def friend_delete(request):
     player = request.user
 
     try:
-        friend = Player.objects.get(id=friend_id)
+        friend = Player.objects.get(username=friend_id)
 
         if friend in player.friends.all():
             player.friends.remove(friend)

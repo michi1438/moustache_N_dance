@@ -39,6 +39,7 @@ async function call_local_api(init) {
 			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 
 		}
+		//TODO : else if error 400 ou autre, afficher l erreur
 	}
 	catch (e) {
 		console.error("Error create user42: ", e);
@@ -64,4 +65,3 @@ export default {
 	listenerCallback42,
 	loadLogin42
 };
-

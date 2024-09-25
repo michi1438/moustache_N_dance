@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { v4 as uuidv4 } from 'uuid';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
 
 const scene = new THREE.Scene();
@@ -10,7 +13,9 @@ const renderer = new THREE.WebGLRenderer();
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.setSize(700, 500);
 const loader = new GLTFLoader();
-let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID;
+const labelRenderer = new CSS2DRenderer();
+sessionStorage.setItem("opponent", "KOICOUBE");
+let paddle1, paddle2, ball, plane, topWall, bottomWall, scoreP1, scoreP2, scoreP1object = [], scoreP2object = [], p1WIN, p2WIN, title, sound, sound1, sound2, sound3, modelPath, animationID, position, tournamentID, avancement;
 let soundPlayed = false;
 let isModelLoaded = false;
 let isConfigReady = false;
@@ -19,10 +24,8 @@ let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
 let player = {};
 let gameOverSent = false;
-player.playerID = uuidv4();
+player.playerID = sessionStorage.getItem('id');
 sessionStorage.setItem("gameOverT", "false");
-//sessionStorage.getItem('id');
-
 
 let gameID;
 let ws;
@@ -361,6 +364,7 @@ function initGameSimpson () {
     }
     let countdown = 3;
     let countdownDisplay = document.getElementById('countdownDisplay');
+    let waitingDisplay = document.getElementById('waitingDisplay');
     countdownDisplay.id = 'countdownDisplay';
     
     
@@ -379,6 +383,7 @@ function initGameSimpson () {
             //console.log("Both isModelLoaded and isConfigReady are true. Starting animation.");
             //connectWebSocketTournament();
             let countdownInterval = setInterval(() => {
+                waitingDisplay.style.display = 'none';
                 countdownDisplay.style.display = 'block';
                 countdownDisplay.innerText = countdown;
                 countdown--;
@@ -397,6 +402,7 @@ function initGameSimpson () {
             player.result = -1;
             console.log(scene);
             console.log('gameoversent avant dappelller animate', gameOverSent);
+            nicknamesIG(config);
             animate(vitesse);
             sound.play();
             clearInterval(checkReadyInterval); // Clear the interval once conditions are met
@@ -546,7 +552,7 @@ document.addEventListener('keyup', (event) => {
 const questions = [
     {
         question: "Créer / Rejoindre",
-        options: ["Créer", "Rejoindre"]
+        options: [] // cette option sera remplie dynamiquement
     },
     {
         question: "Taille du tournoi",
@@ -565,11 +571,50 @@ const questions = [
 let currentQuestionIndex = 0;
 let configuration = {};
 
+getTournamentStatus();
+
+async function getTournamentStatus(){
+	try {
+		const token = sessionStorage.getItem('access');
+		if (!token) {
+			throw new Error('Token JWT manquant');
+		}
+
+		const response = await fetch('/api/tournaments/list',{
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (!response.ok) {
+			throw new Error(`Erreur: ${response.statusText}`);
+		}
+
+		const tournaments = await response.json();
+
+		const activeTournaments = tournaments.filter(t => t.status === 'upcoming');
+		if (activeTournaments.length > 0) {
+			questions[0].options = ["Rejoindre le tournoi"];
+			const tournamentID = activeTournaments[0].id;
+			sessionStorage.setItem('upcoming_tournament_ID', tournamentID);
+		} else {
+			questions[0].options = ["Créer un nouveau tournoi"];
+		}
+		showQuestion();
+	} catch (error) {
+		console.error('Erreur lors du listing des tournois: ', error);
+	}
+}
+
 function showQuestion() {
 	const configMenu = document.getElementById('config-menu');
+    const tournamentList = document.getElementById('tournament-list');
 	const questionContainer = document.getElementById('question-container');
 	const optionsContainer = document.getElementById('options-container');
 	configMenu.style.display = 'block';
+	tournamentList.style.display = 'block';
 
     const currentQuestion = questions[currentQuestionIndex];
     questionContainer.textContent = currentQuestion.question;
@@ -589,17 +634,26 @@ function showQuestion() {
 
 function selectOption(option) {
     const configMenu = document.getElementById('config-menu');
+    const tournamentList = document.getElementById('tournament-list');
+    const waitingDisplay = document.getElementById('waitingDisplay');
     const currentQuestion = questions[currentQuestionIndex];
     configuration[currentQuestion.question] = option;
     
 
-    if (currentQuestionIndex === 0 && option === "Rejoindre") {
+    if (currentQuestionIndex === 0 && option === "Rejoindre le tournoi") {
+
+		// TODO recuperer le status de la requete pour savoir
+		// si on peut effectivement ajouter le player ou si on renvoie une erreur
+		// (pareil pour les autres appels API)
+        sendAPIjoin(); 
+
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
         configMenu.style.display = 'none';
+        tournamentList.style.display = 'none';
+        waitingDisplay.style.display = 'block';
         // Proceed with the join logic
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
-        sendAPIjoin();
         // console.log('config dans startGameTournament:', configuration);
         return;
     }
@@ -609,6 +663,8 @@ function selectOption(option) {
         showQuestion();
     } else {
         configMenu.style.display = 'none';
+        tournamentList.style.display = 'none';
+        waitingDisplay.style.display = 'block';
         // Start the game with the selected configuration
         document.getElementById('board_four').appendChild(renderer.domElement);
         connectWebSocketTournament(configuration);
@@ -628,11 +684,11 @@ function connectWebSocketTournament(config) {
     ws.onopen = () => {
         console.log('WebSocket connection opened');
         //console.log('Sending configuration and playerID:', config, playerID);
-        if(config['Créer / Rejoindre'] == 'Créer') {
+        if(config['Créer / Rejoindre'] == 'Créer un nouveau tournoi') {
             ws.send(JSON.stringify({ type: 'tournoi', config: config, playerID: player.playerID }));
         }
-        else if(config['Créer / Rejoindre'] == 'Rejoindre') {
-            //console.log('Sending rejoindre and playerID:', playerID);
+        else if(config['Créer / Rejoindre'] == 'Rejoindre le tournoi') {
+            //console.log('Sending  le tournoi en coursrejoindre and playerID:', playerID);
             ws.send(JSON.stringify({ type: 'Rejoindre', playerID: player.playerID }));
         }
         //console.log('Sending configuration and playerID:', config, playerID);
@@ -676,11 +732,16 @@ function handleWebSocketMessageTournament(message, config) {
             //console.log('Connected clients:', message.count);
             connectedPlayers = message.count;
             break;
+        case 'nickname':
+            sessionStorage.setItem("opponent", message.nickname);
+            break;
         case 'startT':
             player.playerNumber = message.playerNumber;
             player.gameID = message.gameID;
+            avancement = message.avancement;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
+            ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
             window.startGameTournament(message.config);
         case 'paddle':
             if (message.player === 1) {
@@ -708,9 +769,9 @@ function handleWebSocketMessageTournament(message, config) {
                             ws.close();
                             console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
                         }
-                    }, 3500);
+                    }, 4500);
                 }
-            }, 3500);
+            }, 4500);
             break;
         case 'ball':
             ball.position.x = message.position.x;
@@ -742,6 +803,7 @@ function handleWebSocketMessageTournament(message, config) {
             }
         case 'deco':
             console.log('Player', message.player, 'disconnected');
+			waitingDisplay.style.display = 'block';
             if(message.player == 0) {
                 scoreP2 = 5;
                 scoreP1 = 0;
@@ -982,8 +1044,8 @@ async function sendAPIcreate(configuration) {
         if (response.status === 201) {
             const data = await response.json();
 
-            tournamentID = 1;
-            //data.tournament_id;
+            const tournamentID = data.tournament_id;
+			sessionStorage.setItem('upcoming_tournament_ID', tournamentID);
 
             // msgElement.textContent = "Nickname changed";
             // msgElement.classList.remove("text-danger");
@@ -999,6 +1061,7 @@ async function sendAPIcreate(configuration) {
 
 async function sendAPIjoin() {
     const access = sessionStorage.getItem("access");
+    const tournamentID = sessionStorage.getItem("upcoming_tournament_ID");
 
     const init = {
         method: 'POST',
@@ -1011,7 +1074,7 @@ async function sendAPIjoin() {
     try {
         let hostnameport = "https://" + window.location.host
 
-        const response = await fetch(hostnameport + '/api/tournaments/' + '1' + '/add_me', init);
+        const response = await fetch(hostnameport + '/api/tournaments/' + tournamentID + '/add_me', init);
 
         if (response.status != 200) {
 
@@ -1040,6 +1103,7 @@ async function sendAPIjoin() {
 
 async function sendAPIover() {
     const access = sessionStorage.getItem("access");
+    const tournamentID = sessionStorage.getItem("upcoming_tournament_ID");
 
     const init = {
         method: 'PUT',
@@ -1078,4 +1142,98 @@ async function sendAPIover() {
     } catch (e) {
         console.error(e);
     }
+}
+
+function nicknamesIG(config) {
+    // Autres initialisations de jeu...
+
+    // Charger la police et créer les textes
+    const fontLoader = new FontLoader();
+    let player1Nickname, player2Nickname, textMaterial1, textMaterial2, avancementMaterial, adaptedFont;
+    if(config['Map'] == 'Classique') {
+        adaptedFont = '/frontend/js/game/fonts/helvetiker_regular.typeface.json';
+    }
+    else if(config['Map'] == 'Simpson') {
+        adaptedFont = '/frontend/js/game/fonts/Simpsonfont_Regular.json';
+    }
+
+    fontLoader.load(adaptedFont, function (font) {
+        if(player.playerNumber == 1) {
+            player1Nickname = sessionStorage.getItem("nickname");
+            player2Nickname = sessionStorage.getItem("opponent");
+        }
+        else {
+            player1Nickname = sessionStorage.getItem("opponent");
+            player2Nickname = sessionStorage.getItem("nickname");
+        }
+        if(config['Map'] == 'Classique') {
+            textMaterial1 = new THREE.MeshPhongMaterial({ color: 0x6666ff });
+            textMaterial2 = new THREE.MeshPhongMaterial({ color: 0xff6666 });
+        }
+        else if(config['Map'] == 'Simpson') {
+            textMaterial1 = new THREE.MeshPhongMaterial({ color: 0xf9f639 });
+            textMaterial2 = new THREE.MeshPhongMaterial({ color: 0x5375f5 });
+        }
+        avancementMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        // Créer le texte pour le joueur 1
+        const player1TextGeometry = new TextGeometry(player1Nickname, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const player1TextMesh = new THREE.Mesh(player1TextGeometry, textMaterial1);
+        player1TextMesh.position.set(-14, 4, -12); // Position en haut à gauche
+        player1TextMesh.rotation.set(-Math.PI / 8, 0, 0); 
+        player1TextMesh.castShadow = true;
+        scene.add(player1TextMesh);
+
+        // Créer le texte pour le joueur 2
+        const player2TextGeometry = new TextGeometry(player2Nickname, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const player2TextMesh = new THREE.Mesh(player2TextGeometry, textMaterial2);
+        player2TextMesh.position.set(10, 4, -12); // Position en haut à droite
+        player2TextMesh.rotation.set(-Math.PI / 8, 0, 0); 
+        player2TextMesh.castShadow = true;
+        scene.add(player2TextMesh);
+
+        // Créer le texte pour le avancement
+        const avancementTextGeometry = new TextGeometry(avancement, {
+            font: font,
+            size: 1,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.05,
+            bevelSize: 0.05,
+            bevelOffset: 0,
+            bevelSegments: 5
+        });
+        const avancementTextMesh = new THREE.Mesh(avancementTextGeometry, avancementMaterial);
+        avancementTextMesh.position.set(-2, 4, -12);
+        avancementTextMesh.rotation.set(-Math.PI / 8, 0, 0); 
+        avancementTextMesh.castShadow = true;
+        scene.add(avancementTextMesh);
+    });
+
+
+    // Ajouter le renderer CSS2D
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0px';
+    document.body.appendChild(labelRenderer.domElement);
 }
