@@ -23,6 +23,8 @@ let tournoiSize;
 let configTournoi = {};
 let gamePromises = [];
 let position = [];
+let avancement = ['Huitieme', 'Quart', 'Demi', 'Finale'];
+let j = 0;
 let gamePromise;
 
 
@@ -124,6 +126,15 @@ async function tournamentConnection(data) {
     } else if(data.type === 'tournoi') {
 
         tournoiSize = data.config['Taille du tournoi'];
+        if(tournoiSize == 16){
+            j = 0;
+        }
+        else if(tournoiSize == 8){
+            j = 1;
+        }
+        else if(tournoiSize == 4){
+            j = 2;
+        }
         console.log('tournoisize', tournoiSize);
         tabSize = tournoiSize;
         //tabSize = playersID.length;
@@ -147,6 +158,9 @@ async function tournamentLogic(data) {
         await new Promise(resolve => setTimeout(resolve, 8000));
         await startGames();
         playersID = [];
+        console.log('avancement', avancement[j]);
+        j += 1;
+        console.log('avancement', avancement[j]);
         try {
             await Promise.all(gamePromises);
         } catch (error) {
@@ -182,6 +196,7 @@ async function tournamentLogic(data) {
             players[0].send(JSON.stringify({ type: 'fintournoi', position: position }));
 			position = [];
 			playersID = [];
+            j = 0;
         }, 2000);
     }
 }
@@ -200,8 +215,8 @@ async function startGames() {
         gameID = uuidv4();
         players[[i]].gameID = gameID;
         players[[i+1]].gameID = gameID;
-        players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi}));
-        players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi}));
+        players[[i]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 1, config: configTournoi, avancement: avancement[j]}));
+        players[[i+1]].send(JSON.stringify({ type: 'startT', gameID: gameID, playerNumber: 2, config: configTournoi, avancement: avancement[j]}));
         // Créez une promesse pour chaque partie
         gamePromise = new Promise((resolve) => {
             gamePromises.push({ gameID, resolve });
