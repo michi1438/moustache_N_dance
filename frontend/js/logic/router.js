@@ -189,7 +189,7 @@ async function refreshToken() {
 			sessionStorage.setItem("refresh", data["refresh"]);
 			return data["access"];
 		} else {
-			console.error('Failed to refresh token');
+			showError("Failed to refresh token. Please logout and login again.");
 		}
 	} catch (e) {
 		console.error(e);
@@ -228,7 +228,6 @@ export async function monitorTokenExpiration() {
     }
 }
 
-
 /**
  * Logout handler function
  * Send a PATCH request to the server to logout the user
@@ -264,7 +263,11 @@ async function handleLogout() {
 				document.querySelectorAll(".log__item").forEach(btn => {
 					btn.disabled = true;
 				});
+			} else {
+				const errorMsg = await response.json();
 				
+				showError(errorMsg["error"]);
+				return;
 			}
 		} catch (e) {
 			console.error(e);
@@ -318,4 +321,19 @@ window.addEventListener("popstate", async (e) => {
 	}
 });
 
-export { router }
+function showError(message) {
+    const errorBanner = document.getElementById('errorBanner');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Met à jour le message d'erreur
+    errorMessage.textContent = message;
+
+    // Affiche le bandeau
+    errorBanner.style.display = 'block';
+}
+
+//export { router }
+export {
+	router,
+	showError,
+};

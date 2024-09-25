@@ -7,6 +7,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import {listenerPongTournament} from '../logic/unloadpongtournament.js';
 import { monitorTokenExpiration } from "../logic/router.js"
+import { showError } from "../logic/router.js"
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -1037,12 +1038,9 @@ async function sendAPIcreate(configuration) {
 
         if (response.status != 201) {
 
-            // const error = await response.text();
-            
-
-            
-            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
-            // // msgElement.classList.add("text-danger");
+            const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
             return;
         }
         if (response.status === 201) {
@@ -1050,12 +1048,6 @@ async function sendAPIcreate(configuration) {
 
             const tournamentID = data.tournament_id;
 			sessionStorage.setItem('upcoming_tournament_ID', tournamentID);
-
-            // msgElement.textContent = "Nickname changed";
-            // msgElement.classList.remove("text-danger");
-            // msgElement.classList.add("text-success");
-
-            // window.location.reload();
         }
 
     } catch (e) {
@@ -1082,24 +1074,11 @@ async function sendAPIjoin() {
 
         if (response.status != 200) {
 
-            // const error = await response.text();
-            
-
-            
-            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
-            // // msgElement.classList.add("text-danger");
+            const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
             return;
         }
-        if (response.status === 200) {
-            const data = await response.json();
-
-            // msgElement.textContent = "Nickname changed";
-            // msgElement.classList.remove("text-danger");
-            // msgElement.classList.add("text-success");
-
-            // window.location.reload();
-        }
-
     } catch (e) {
         console.error(e);
     }
@@ -1124,23 +1103,10 @@ async function sendAPIover() {
         const response = await fetch(hostnameport + '/api/tournaments/' + tournamentID, init);
 
         if (response.status != 200) {
-
-            // const error = await response.text();
-            
-
-            
-            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
-            // // msgElement.classList.add("text-danger");
+            const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
             return;
-        }
-        if (response.status === 200) {
-            const data = await response.json();
-
-            // msgElement.textContent = "Nickname changed";
-            // msgElement.classList.remove("text-danger");
-            // msgElement.classList.add("text-success");
-
-            // window.location.reload();
         }
 
     } catch (e) {

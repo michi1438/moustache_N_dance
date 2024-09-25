@@ -847,23 +847,13 @@ async function sendAPIWL(result) {
         const response = await fetch(hostnameport + '/api/players/details', init);
 
         if (response.status != 200) {
-
-            // const error = await response.text();
-            
-
-            
-            // // msgElement.textContent = error.replace(/["{}[\]]/g, '');
-            // // msgElement.classList.add("text-danger");
+            const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
             return;
         }
         if (response.status === 200) {
             const data = await response.json();
-
-            // msgElement.textContent = "Nickname changed";
-            // msgElement.classList.remove("text-danger");
-            // msgElement.classList.add("text-success");
-
-            // window.location.reload();
         }
 
     } catch (e) {

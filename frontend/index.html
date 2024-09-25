@@ -36,14 +36,14 @@
 			<button class="px-2 btn nav__item" value="index">
 				<img src="/frontend/img/golden-moustache.png" id ="image" alt="Main" class="dropdown-item" width="40" height="40"/>
 			</button>
+
 			<!-- toggle button for mobile nav -->
 			<button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
-			  </button>
-			<div class="collapse navbar-collapse justify-content-end align-items-center"
-			id="main-nav">
+			</button>
 
-				<!-- NAVBAR LINKS -->
+			<!-- NAVBAR LINKS -->
+			<div class="collapse navbar-collapse justify-content-end align-items-center" id="main-nav">
 				<ul class="nav nav-pills">
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Game</a>
@@ -66,7 +66,7 @@
 			</div>
 		</div>
 	</nav>
-	</div>
+
 	<!-- MAIN CONTENT -->
 	<div class="container-fluid">
 		<div class="row">
@@ -78,11 +78,34 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="container-fluid px-0">
 		<div id="footer" class="row">
 			<div class="text-center">©2024 Moustache & Dance @ 42Lausanne</div>
 		</div>
 	</div>
+
+	<!-- ERROR MESSAGES -->
+	<style>
+    #errorBanner {
+        position: fixed;
+        top: 10px;  /* Ajuste la position du message */
+		left: 50%;
+        transform: translateX(-50%);
+        width: 40%;
+        z-index: 9999;  /* S'assure que le message d'erreur est au-dessus des autres éléments */
+        opacity: 0.9;   /* Transparence */
+    }
+	</style>
+	<div id="errorBanner" class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none;">
+		<span id="errorMessage"><!-- ERROR CONTENT --></span>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+
 	<script type="module" src="/frontend/js/logic/router.js"></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
   </body>
 </html>

@@ -46,10 +46,10 @@ async function verifyOTP(loginForm) {
 			else if (response.status == 401)
 				document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 			else {
-				if (Object.keys(errorMsg) == "Erreur")
-					document.getElementById("form__login--errorMsg").textContent = errorMsg["Error"];
+				if (Object.keys(errorMsg) == "error")
+					document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 				else
-					document.getElementById("form__login--errorMsg").textContent = "Error";
+					document.getElementById("form__login--errorMsg").textContent = "error";
 			}
 			return;
 		}
@@ -135,10 +135,10 @@ async function connectUser(loginForm) {
 			else if (response.status == 401)
 				document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 			else {
-				if (Object.keys(errorMsg) == "Erreur")
+				if (Object.keys(errorMsg) == "error")
 					document.getElementById("form__login--errorMsg").textContent = errorMsg["error"];
 				else
-					document.getElementById("form__login--errorMsg").textContent = "Error";
+					document.getElementById("form__login--errorMsg").textContent = "error";
 			}
 			return;
 		}
@@ -250,6 +250,7 @@ async function createUser(createAccountForm) {
 	}
 };
 
+// TODO lzit : a quoi sert cette fonction, pourquoi aucune verification de status d'erreur? voir les autres appels API pour faire pareil si possible
 async function connectUser42() {
 
 	try {

@@ -112,7 +112,7 @@ def fetch_authpage(request):
 
     except Exception as e:
         return Response(
-            {'42_authpage error': f"{type(e).__name__}: {str(e)}"},
+            {'error': f"{type(e).__name__}: {str(e)}"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -151,7 +151,7 @@ def authorize_fortytwo(request):
             }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
-            {'42_login error': f"{type(e).__name__}: {str(e)}"},
+            {'error': f"{type(e).__name__}: {str(e)}"},
             status=status.HTTP_400_BAD_REQUEST
         )
 

@@ -1,4 +1,5 @@
 import router from "./router.js"
+import { showError } from "./router.js"
 
 function listenerCallback42() {
 
@@ -38,8 +39,12 @@ async function call_local_api(init) {
 			router("index");
 			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 
+		} else {
+			const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
+			return;
 		}
-		//TODO : else if error 400 ou autre, afficher l erreur
 	}
 	catch (e) {
 		console.error("Error create user42: ", e);
@@ -54,8 +59,12 @@ async function loadLogin42() {
 
 		if (response.status === 200) {
 			router("index");
+		} else {
+			const errorMsg = await response.json();
+			
+            showError(errorMsg["error"]);
+			return;
 		}
-		return 1;
 	} catch (e) {
 		console.error(e);
 	}
