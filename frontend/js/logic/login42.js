@@ -33,10 +33,15 @@ async function call_local_api(init) {
 			sessionStorage.setItem("access", data["access"]);
 			sessionStorage.setItem("refresh", data["refresh"]);
 
+			var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
+			await modal.hide();
+
 			document.getElementById("login").textContent = "Logout";
 			document.getElementById("login").value = "logout";
+			document.querySelectorAll(".log__item").forEach(btn => {
+				btn.disabled = false;
+			});
 			router("index");
-			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
 
 		}
 		//TODO : else if error 400 ou autre, afficher l erreur

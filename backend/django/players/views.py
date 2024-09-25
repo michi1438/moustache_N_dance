@@ -129,6 +129,7 @@ def authorize_fortytwo(request):
         x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
         #TODO Maybe manually sanitize the data...
         player, created = Player.objects.get_or_create(
+            nickname = x.json()['login'] + "_42",
             username = x.json()['login'] + "_42",
             first_name = x.json()['first_name'],
             last_name = x.json()['last_name'],
@@ -144,6 +145,7 @@ def authorize_fortytwo(request):
         refresh = RefreshToken.for_user(player)
         return Response({"username": str(player.username),
             "email": str(player.email),
+            "nickname": str(player.nickname),
             "first_name": str(player.first_name),
             "last_name": str(player.last_name),
             "refresh": str(refresh),
