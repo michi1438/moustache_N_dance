@@ -3,7 +3,7 @@ import renderPongLocal from "../views/viewPongLocal.js"
 import renderPongOnline from "../views/viewPongOnline.js"
 import renderLogin from "../views/viewLogin.js"
 import render404_error from "../views/view404_error.js"
-import renderStats from "../views/viewStats.js"
+import renderStats from "../views/viewStats.js" //TODO Are we keeping the Stats page ??
 import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"

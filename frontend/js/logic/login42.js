@@ -30,12 +30,8 @@ async function call_local_api(init) {
 				sessionStorage.setItem("avatar", data["avatar"]);
 			if (data["nickname"])
 				sessionStorage.setItem("nickname", data["nickname"]);
-			sessionStorage.setItem("access", data["access"]); //pour lolo
-			sessionStorage.setItem("refresh", data["refresh"]); //pour lolo
-
-			// Manually call the hide function of the boostrap Modal element
-			//var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
-			//await modal.hide();
+			sessionStorage.setItem("access", data["access"]);
+			sessionStorage.setItem("refresh", data["refresh"]);
 
 			document.getElementById("login").textContent = "Logout";
 			document.getElementById("login").value = "logout";
@@ -51,22 +47,11 @@ async function call_local_api(init) {
 
 async function loadLogin42() {
 
-	// document.querySelectorAll(".dropdown-item").forEach(btn => {
-	// 	btn.setAttribute("disabled", true);
-	// });
-	// document.getElementById("topbar__logout").setAttribute("disabled", true);
-
 	try {
 		let hostnameport = "https://" + window.location.host
 		const response = await fetch(hostnameport + '/api/players/authorize_fortytwo');
 
 		if (response.status === 200) {
-
-			// document.querySelectorAll(".dropdown-item").forEach(btn => {
-			// 	btn.removeAttribute("disabled");
-			// });
-			// document.getElementById("topbar__logout").removeAttribute("disabled");
-
 			router("index");
 		}
 		return 1;

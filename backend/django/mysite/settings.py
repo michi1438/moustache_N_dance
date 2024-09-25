@@ -61,11 +61,11 @@ REST_FRAMEWORK = {
             ),
         }
 
-SIMPLE_JWT = {
+SIMPLE_JWT = { #TODO check that the monitoring of refresh tokens take into account ROTATE_REFRESH_TOKENS and BLACKLIST_AFTER_ROTATION.
         'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=5),
         'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
-        'ROTATE_REFRESH_TOKENS' : False,
-        'BLACKLIST_AFTER_ROTATION' : False,
+        'ROTATE_REFRESH_TOKENS' : True,
+        'BLACKLIST_AFTER_ROTATION' : True,
         }
 
 LOGGING = {

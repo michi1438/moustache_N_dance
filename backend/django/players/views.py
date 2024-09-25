@@ -116,7 +116,7 @@ def fetch_authpage(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-@api_view(['GET', 'POST'])
+@api_view(['POST']) #TODO I don't think I need the GET in here...
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
 
@@ -127,15 +127,13 @@ def authorize_fortytwo(request):
 
         urls = 'https://api.intra.42.fr/v2/me'
         x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
+        #TODO Maybe manually sanitize the data...
         player, created = Player.objects.get_or_create(
             username = x.json()['login'] + "_42",
             first_name = x.json()['first_name'],
             last_name = x.json()['last_name'],
             email = x.json()['email']
-            #avatar = x.json()['image'],
-            #player.token42 = x.json()['token'],
         )
-        #print (x.json())
         player.save()
 
         refresh = RefreshToken.for_user(player)
@@ -145,7 +143,6 @@ def authorize_fortytwo(request):
             "last_name": str(player.last_name),
             "refresh": str(refresh),
             "access": str(refresh.access_token)
-                         #"token42": str(player.token)
             }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
@@ -218,7 +215,7 @@ def logout(request):
             return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         token = RefreshToken(refresh_token)
-      ##  token.blacklist()
+        token.blacklist()
 
         player = request.user
         player.online = False
