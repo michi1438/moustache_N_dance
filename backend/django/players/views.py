@@ -1,4 +1,5 @@
 import os, requests
+from urllib.parse import urlencode
 from django.contrib.auth import authenticate
 from datetime import datetime
 from django.utils import timezone
@@ -90,24 +91,48 @@ def player_details(request):
         player.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET', 'POST'])
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def fetch_authpage(request):
+    try:
+        authUri = 'https://api.intra.42.fr/oauth/authorize'
+        redirectUri = 'https://' + request.get_host() + '/callback/'
+
+        params ={
+            'client_id': os.environ.get("ID_API"),
+            'redirect_uri': redirectUri,
+            'response_type': 'code',
+            'scope': 'public'
+        }
+
+        auth_url = '{}?{}'.format(authUri, urlencode(params))
+
+        return Response(auth_url, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {'42_authpage error': f"{type(e).__name__}: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['POST']) #TODO I don't think I need the GET in here...
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
 
     try:
         urls = 'https://api.intra.42.fr/oauth/token'
-        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://localhost/callback/'})
+        x = requests.post(urls, data={'grant_type': 'authorization_code', 'client_id': os.environ.get("ID_API"), 'client_secret': os.environ.get("SECRET_API"), 'code': request.data, 'redirect_uri': 'https://' + request.get_host() + '/callback/'})
         token = x.json()['access_token']
 
         urls = 'https://api.intra.42.fr/v2/me'
         x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
+        #TODO Maybe manually sanitize the data...
         player, created = Player.objects.get_or_create(
             username = x.json()['login'] + "_42",
             first_name = x.json()['first_name'],
             last_name = x.json()['last_name'],
             email = x.json()['email']
-            #avatar = x.json()['image'],
-            #player.token42 = x.json()['token'],
         )
         #print (x.json())
         if not created and player.online:
@@ -123,7 +148,6 @@ def authorize_fortytwo(request):
             "last_name": str(player.last_name),
             "refresh": str(refresh),
             "access": str(refresh.access_token)
-                         #"token42": str(player.token)
             }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(

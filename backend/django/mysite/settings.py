@@ -18,11 +18,9 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 ALLOWED_HOSTS_HTTPS = ["https://localhost", f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
                         f"https://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":443"]
-ALLOWED_HOSTS_HTTP = ["http://localhost", f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS"),
-                        f"http://" + os.environ.get("DJANGO_ALLOWED_HOSTS") + ":443"]
 
-CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
-CSRF_ALLOWED_ORIGINS = ALLOWED_HOSTS_HTTPS + ALLOWED_HOSTS_HTTP
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS_HTTPS
+CSRF_ALLOWED_ORIGINS = ALLOWED_HOSTS_HTTPS
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -63,7 +61,7 @@ REST_FRAMEWORK = {
             ),
         }
 
-SIMPLE_JWT = {
+SIMPLE_JWT = { #TODO check that the monitoring of refresh tokens take into account ROTATE_REFRESH_TOKENS and BLACKLIST_AFTER_ROTATION.
         'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=5),
         'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
         'ROTATE_REFRESH_TOKENS' : True,

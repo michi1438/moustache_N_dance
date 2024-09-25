@@ -1,5 +1,4 @@
 echo " POST_INIT.SH"
-pwd
 
 pg_ctl start -D /home/post_user/postDB/
 

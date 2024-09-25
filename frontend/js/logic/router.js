@@ -231,8 +231,8 @@ async function handleLogout() {
 
 		const init = {
 			method: "POST",
-			headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json'},
-			body: JSON.stringify(inputValues,),
+			headers: { 'Authorization': `Bearer ${inputValues.access}`, 'Content-Type': 'application/json'},
+			body: JSON.stringify(inputValues)
 		}
 
 		try {
