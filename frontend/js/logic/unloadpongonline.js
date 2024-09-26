@@ -1,6 +1,6 @@
 import router from "./router.js"
 
-export function unloadScript() {
+export function unloadScriptO() {
 	console.log("PongOnline script unloaded");
     // Désactiver les scripts chargés dynamiquement
     document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
@@ -42,7 +42,7 @@ export function listenerPongOnline() {
 		loadPongOnline();
 
 	if (sessionStorage.getItem("gameOverO") == "true"){
-		unloadScript();
+		unloadScriptO();
 		sessionStorage.setItem("gameOverO", "");
 		loadPongOnline();
 	}

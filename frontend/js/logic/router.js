@@ -6,6 +6,7 @@ import render404_error from "../views/view404_error.js"
 import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
+import { unloadScriptO} from "./unloadpongonline.js"
 
 // Importe le script de chaque page qui gere le load et listener
 import handlePongLocal from "./ponglocallogic.js"
@@ -90,6 +91,7 @@ const routes = {
 */
 export default async function router(value) {
 	unloadScript();
+	unloadScriptO();
 
 	var page = routes[value];
 	

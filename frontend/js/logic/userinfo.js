@@ -51,8 +51,7 @@ async function updateNickname(nicknameForm) {
 			msgElement.textContent = "Nickname changed";
 			msgElement.classList.remove("text-danger");
 			msgElement.classList.add("text-success");
-
-			window.location.reload();
+			document.getElementById("update__nickname--big").textContent = sessionStorage.getItem("nickname");
 		}
 
 	} catch (e) {
@@ -111,8 +110,7 @@ async function updateUsername(usernameForm) {
 			msgElement.textContent = "Username changed";
 			msgElement.classList.remove("text-danger");
 			msgElement.classList.add("text-success");
-
-			window.location.reload();
+			document.getElementById("update__username--big").textContent = sessionStorage.getItem("username");
 		}
 
 	} catch (e) {
@@ -170,8 +168,7 @@ async function updateEmail(emailForm) {
 			msgElement.textContent = "Email changed";
 			msgElement.classList.remove("text-danger");
 			msgElement.classList.add("text-success");
-
-			window.location.reload();
+			document.getElementById("update__email--big").textContent = sessionStorage.getItem("email");
 		}
 
 	} catch (e) {
@@ -277,8 +274,8 @@ async function updateAvatar() {
 			msgElement.textContent = "Avatar changed";
 			msgElement.classList.remove("text-danger");
 			msgElement.classList.add("text-success");
-
-			window.location.reload();
+			document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?
+				sessionStorage.getItem("avatar") : "/frontend/img/avatar.png";
 		}
 	} catch (e) {
 		console.error(e);
@@ -470,6 +467,8 @@ async function loadFriend() {
 			else {
 				sessionStorage.setItem("friend1_id", "");
 				sessionStorage.setItem("friend1_status", "");
+				document.getElementById("friend1__nickname--big").textContent = sessionStorage.getItem("friend1_id");
+				document.getElementById("friend1__status--big").textContent = sessionStorage.getItem("friend1_status");
 			}
 			if (data[1]) {
 				sessionStorage.setItem("friend2_id", data[1].username);
@@ -483,6 +482,8 @@ async function loadFriend() {
 			else {
 				sessionStorage.setItem("friend2_id", "");
 				sessionStorage.setItem("friend2_status", "");
+				document.getElementById("friend2__nickname--big").textContent = sessionStorage.getItem("friend2_id");
+				document.getElementById("friend2__status--big").textContent = sessionStorage.getItem("friend2_status");
 			}
 			if (data[2]) {
 				sessionStorage.setItem("friend3_id", data[2].username);
@@ -496,6 +497,8 @@ async function loadFriend() {
 			else {
 				sessionStorage.setItem("friend3_id", "");
 				sessionStorage.setItem("friend3_status", "");
+				document.getElementById("friend3__nickname--big").textContent = sessionStorage.getItem("friend3_id");
+				document.getElementById("friend3__status--big").textContent = sessionStorage.getItem("friend3_status");
 			}
 
 		}
@@ -559,7 +562,6 @@ async function acceptFriend(friend_id) {
 		if (response.status === 200) {
 			const data = await response.json();
 			loadFriend();
-			window.location.reload();
 		}
 
 	} catch (e) {
@@ -594,7 +596,6 @@ async function rejectFriend(friend_id) {
 		if (response.status === 200) {
 			const data = await response.json();
 			loadFriend();
-			window.location.reload();
 		}
 
 	} catch (e) {
@@ -628,7 +629,6 @@ async function deleteFriend(friend_id) {
 		}
 		if (response.status === 200) {
 			loadFriend();
-			window.location.reload();
 		}
 
 	} catch (e) {

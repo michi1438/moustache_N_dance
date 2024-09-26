@@ -206,7 +206,6 @@ def verify_otp(request):
             "username": str(player.username),
             "nickname": str(player.nickname),
             "email": str(player.email),
-            "email": str(player.email),
             "wins": str(player.wins),
             "losses": str(player.losses),
             "avatar": player.avatar.url if player.avatar else None,
