@@ -24,7 +24,7 @@ let isConfigReady = false;
 let go = false;
 let ballSpeed = { x: 0.2, z: 0.2 };
 let paddleSpeed = 0.2;
-let playerID = uuidv4();
+let playerID = sessionStorage.getItem('id');
 
 
 let gameID;
@@ -616,6 +616,7 @@ function connectWebSocket(config) {
         console.log('WebSocket connection opened');
         ws.send(JSON.stringify({ type: 'config', config }));
         console.log('Sending configuration:', config);
+        ws.send(JSON.stringify({ type: 'id', playerID: playerID }));
     };
 
     ws.onmessage = (event) => {

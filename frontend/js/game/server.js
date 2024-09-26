@@ -54,7 +54,7 @@ wss.on('connection', (ws) => {
                     }
                 });
                 console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
-                if (matchingPlayers.length == 2) {
+                if (matchingPlayers.length == 2 && players[matchingPlayers[0]].id != players[matchingPlayers[1]].id) {
                     gameID = uuidv4();
                     players[matchingPlayers[0]].gameID = gameID;
                     players[matchingPlayers[1]].gameID = gameID;
@@ -66,6 +66,8 @@ wss.on('connection', (ws) => {
             } else if(data.type === 'nickname') {
                 //renvoie a l'autre joueur(sur le meme gameID) le playerID de l'autre joueur
                 broadcast(ws, { type: 'nickname', nickname: data.nickname });
+            } else if (data.type === 'id'){
+                players.id = data.playerID;
             } else if (data.type === 'winner') {
                 console.log('Winner:', data.winner);
                 gameID = data.gameID;
