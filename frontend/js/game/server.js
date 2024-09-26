@@ -90,6 +90,8 @@ wss.on('connection', (ws) => {
                     gamePromise.resolve();
                     gamePromises = gamePromises.filter(p => p.gameID !== gameID);
                 }
+            } else if (data.type === 'left') {
+                ws.send(JSON.stringify({ type: 'left'}));
             } else if (data.type === 'positionTournament') {
                 position.push(data.playerID);
             } else if (data.type === 'tournoi') {
@@ -108,16 +110,6 @@ wss.on('connection', (ws) => {
             players.splice(playerIndex, 1);
             playerConfigs.splice(playerIndex, 1);
         });
-
-        // Vérifiez si le nombre de clients connectés est égal à 2
-        // if (wss.clients.size === 2) {
-        //     const message = JSON.stringify({ type: 'clientCount', count: wss.clients.size });
-        //     wss.clients.forEach(client => {
-        //         if (client.readyState === WebSocket.OPEN) {
-        //             client.send(message);
-        //         }
-        //     });
-        // }
     } else {
         ws.send(JSON.stringify({ type: 'error', message: 'Server is full' }));
         ws.close();

@@ -28,7 +28,7 @@ let playerID = sessionStorage.getItem('id');
 
 
 let gameID;
-let ws;
+// window.ws = null;
 let playerNumber;
 let connectedPlayers = 0;
 
@@ -41,7 +41,7 @@ function initGame () {
 
     //console.log(scene);
 
-//Lights & shadows
+//Lights & shadowindow.ws
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
@@ -112,7 +112,7 @@ function initGame () {
         sound3.setVolume( 0.1 );
     });
 
-    //Shadows
+    //Shadowindow.ws
     plane.material.color.set(0x000);
     plane.material.receiveShadow = true;
     plane.receiveShadow = true;
@@ -159,7 +159,7 @@ function initGameSimpson () {
     
         //console.log(scene);
     
-    //Lights & shadows
+    //Lights & shadowindow.ws
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         let dirLight = new THREE.DirectionalLight( 0xfffff0, 1 );
@@ -231,7 +231,7 @@ function initGameSimpson () {
             sound3.setVolume( 0.1 );
         });
     
-        //Shadows
+        //Shadowindow.ws
         //plane.material.color.set(0x000);
         plane.material.receiveShadow = true;
         plane.receiveShadow = true;
@@ -605,20 +605,20 @@ function selectOption(option) {
 }
 
 function connectWebSocket(config) {
-    if (ws) {
+    if (window.ws) {
         console.log('WebSocket already connected');
         return;
     }
     console.log('location.host', location.host);
-    ws = new WebSocket('wss://'+ location.host + ':3000');
+    window.ws = new WebSocket('wss://'+ location.host + ':3000');
 
-    ws.onopen = () => {
+    window.ws.onopen = () => {
         console.log('WebSocket connection opened');
-        ws.send(JSON.stringify({ type: 'config', config, playerID: playerID }));
+        window.ws.send(JSON.stringify({ type: 'config', config, playerID: playerID }));
         console.log('Sending configuration:', config);
     };
 
-    ws.onmessage = (event) => {
+    window.ws.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
             // if (message.type === 'player') {
@@ -631,12 +631,13 @@ function connectWebSocket(config) {
         }
     };
 
-    ws.onclose = () => {
+    window.ws.onclose = () => {
+        //sendAPIWL(0);
         console.log('WebSocket connection closed');
-        ws = null;
+        //window.ws = null;
     };
 
-    ws.onerror = (error) => {
+    window.ws.onerror = (error) => {
         console.error('WebSocket error:', error);
         alert('WebSocket connection failed. Please check the server status.');
     };
@@ -659,11 +660,15 @@ function handleWebSocketMessage(message, config) {
         case 'nickname':
             sessionStorage.setItem("opponent", message.nickname);
             break;
+        case 'left':
+            sendAPIWL(0);
+            ws.close();
+            break;
         case 'start':
             playerNumber = message.playerNumber;
             console.log('Player number:', playerNumber);
             console.log('Starting game with configuration:', message.config);
-            ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
+            window.ws.send(JSON.stringify({ type: 'nickname', nickname: sessionStorage.getItem("nickname") }));
             window.startGame(message.config);
         case 'paddle':
             if (message.player === 1) {
@@ -700,7 +705,7 @@ function handleWebSocketMessage(message, config) {
         case 'join':
             if (message.gameID !== gameID) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
-                ws.close();
+                window.ws.close();
             }
         case 'errorID':
             handleGameOver();
@@ -741,12 +746,12 @@ function handleGameOver() {
         if (boardTwo && boardTwo.contains(renderer.domElement)) {
             boardTwo.removeChild(renderer.domElement);
             console.log("Game stopped and board_three cleared.");
+            cancelAnimationFrame(animationID);
             setTimeout(() => {
                 listenerPongOnline();
                 // Fermer la connexion WebSocket
-                cancelAnimationFrame(animationID);
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.close();
+                if (window.ws && window.ws.readyState === WebSocket.OPEN) {
+                    window.ws.close();
                     console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
                 }
             }, 3000);
@@ -758,7 +763,7 @@ function handleGameOver() {
 
 
 function sendPaddlePosition(playerNumber) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (window.ws && window.ws.readyState === WebSocket.OPEN) {
         let position;
         if (playerNumber === 1) {
             position = paddle1.position.z;
@@ -772,32 +777,32 @@ function sendPaddlePosition(playerNumber) {
             position: position
         };
         
-        ws.send(JSON.stringify(message));
+        window.ws.send(JSON.stringify(message));
         //console.log('Sending paddle position:', message);
     } 
     else {
-        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
     
     }
 }
 
 function sendBallPosition() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (window.ws && window.ws.readyState === WebSocket.OPEN) {
         const message = {
             type: 'ball',
             position: { x: ball.position.x, z: ball.position.z },
             speed: { x: ballSpeed.x, z: ballSpeed.z }
         };
         
-        ws.send(JSON.stringify(message));
+        window.ws.send(JSON.stringify(message));
         //console.log('Sending ball position:', message);
     } else {
-        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
     }
 }
 
 function sendScore(playerNumber) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (window.ws && window.ws.readyState === WebSocket.OPEN) {
         const message = {
             type: 'score',
             player: playerNumber,
@@ -805,10 +810,10 @@ function sendScore(playerNumber) {
             scoreP2: scoreP2
         };
         console.log('Sending score:', message);
-        ws.send(JSON.stringify(message));
+        window.ws.send(JSON.stringify(message));
         //console.log('Sending score:', message);
     } else {
-        console.warn('WebSocket is not open. ReadyState:', ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
     }
 }
 

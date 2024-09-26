@@ -4,6 +4,9 @@ export function unloadScript() {
     document.querySelectorAll('script[type="module"][data-pong="dynamic"]').forEach(script => {
         script.setAttribute('data-disabled', 'true');
         script.removeAttribute('type');
+        if (window.ws && window.ws.readyState === WebSocket.OPEN) {
+            window.ws.send(JSON.stringify({ type: 'left' }));
+        }
         if (window.gameSocket) {
             window.gameSocket.close();
         }
