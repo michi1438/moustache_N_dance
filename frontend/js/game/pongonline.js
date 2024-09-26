@@ -702,7 +702,7 @@ function handleWebSocketMessage(message, config) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
                 ws.close();
             }
-        case 'error':
+        case 'errorID':
             handleGameOver();
             break;
         case 'deco':

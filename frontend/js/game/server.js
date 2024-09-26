@@ -61,7 +61,7 @@ wss.on('connection', (ws) => {
                         }
                         else if (matchingPlayers.length == 1 && playerConfigs[matchingPlayers[0]].id == data.playerID) {
                             //envoie un message au client pour lui dire qu'il ne peut pas jouer avec le même id
-                            ws.send(JSON.stringify({ type: 'error', message: 'Vous ne pouvez pas jouer contre vous même' }));
+                            ws.send(JSON.stringify({ type: 'errorID', message: 'Vous ne pouvez pas jouer contre vous même' }));
                         }
                     }
                 });
@@ -101,7 +101,7 @@ wss.on('connection', (ws) => {
             }
         });
     
-
+        //on close on envoie un message au client contre qui on jouait (celui qui partage le même gameID) pour lui dire qu'il a gagné
         ws.on('close', () => {
             broadcast(ws, { type: 'deco', player: players.indexOf(ws) });
             const playerIndex = players.indexOf(ws);
