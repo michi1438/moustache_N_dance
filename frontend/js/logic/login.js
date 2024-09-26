@@ -66,7 +66,6 @@ async function verifyOTP(loginForm) {
 			sessionStorage.setItem("access", data["access"]);
 			sessionStorage.setItem("refresh", data["refresh"]);
 			
-
 			// // Manually call the hide function of the boostrap Modal element
 			// var modal = bootstrap.Modal.getOrCreateInstance('#modal__login');
 			// await modal.hide();

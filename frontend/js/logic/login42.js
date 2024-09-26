@@ -36,9 +36,10 @@ async function call_local_api(init) {
 
 			document.getElementById("login").textContent = "Logout";
 			document.getElementById("login").value = "logout";
+			document.querySelectorAll(".log__item").forEach(btn => {
+				btn.disabled = false;
+			});
 			router("index");
-			document.getElementById("welcometxt").textContent = "Welcome " + sessionStorage.getItem("username");
-
 		} else {
 			const errorMsg = await response.json();
 			

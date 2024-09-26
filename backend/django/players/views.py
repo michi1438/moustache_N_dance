@@ -116,7 +116,7 @@ def fetch_authpage(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-@api_view(['POST']) #TODO I don't think I need the GET in here...
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def authorize_fortytwo(request):
 
@@ -127,14 +127,15 @@ def authorize_fortytwo(request):
 
         urls = 'https://api.intra.42.fr/v2/me'
         x = requests.get(urls, headers={'Authorization': 'Bearer ' + token})
-        #TODO Maybe manually sanitize the data...
         player, created = Player.objects.get_or_create(
             username = x.json()['login'] + "_42",
             first_name = x.json()['first_name'],
             last_name = x.json()['last_name'],
             email = x.json()['email']
         )
-        #print (x.json())
+        
+        if created:
+            player.nickname = player.username
         if not created and player.online:
             return Response({"error": "Player is already logged in."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,6 +145,7 @@ def authorize_fortytwo(request):
         refresh = RefreshToken.for_user(player)
         return Response({"username": str(player.username),
             "email": str(player.email),
+            "nickname": str(player.nickname),
             "first_name": str(player.first_name),
             "last_name": str(player.last_name),
             "refresh": str(refresh),
