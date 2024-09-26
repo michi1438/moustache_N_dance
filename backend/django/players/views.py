@@ -140,7 +140,9 @@ def authorize_fortytwo(request):
         player.save()
 
         refresh = RefreshToken.for_user(player)
-        return Response({"username": str(player.username),
+        return Response({
+            "id": str(player.id),
+            "username": str(player.username),
             "email": str(player.email),
             "nickname": str(player.nickname),
             "first_name": str(player.first_name),
@@ -154,7 +156,6 @@ def authorize_fortytwo(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-# TODO autoriser uniquement si la personne est pas deja loguee
 # LOGIN (debut d'authentification et envoi de l'OTP)
 @api_view(['POST'])
 def login_view(request):

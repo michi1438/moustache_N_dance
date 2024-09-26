@@ -26,6 +26,7 @@ async function call_local_api(init) {
 			const data = await response.json();
 
 			sessionStorage.setItem("username", data["username"]);
+			sessionStorage.setItem("id", data["id"]);
 			sessionStorage.setItem("email", data["email"]);
 			if (data["avatar"])
 				sessionStorage.setItem("avatar", data["avatar"]);
