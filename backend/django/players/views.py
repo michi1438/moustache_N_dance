@@ -14,20 +14,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import *
 from .serializers import *
 
-@api_view(['GET', 'POST'])
-def getPlayers(request):
-
-    if request.method == 'GET':
-        players = Player.objects.all()
-        serializer = PlayerSerializer(players, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = PlayerSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 # LISTER LES JOUEURS
 @api_view(['GET'])
 def list_players(request):
@@ -37,21 +23,22 @@ def list_players(request):
 
 # CREER UN JOUEUR
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def create_player(request):
     try:
+
         serializer = PlayerSerializer(data=request.data)
         if serializer.is_valid():
             player = Player(**serializer.validated_data)
             player.set_password(serializer.validated_data['password'])
-            try:
-                player.save()
-            except Exception:
-                return Response({"username": ["This username is already used"]}, status=status.HTTP_400_BAD_REQUEST)
+            player.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     except Exception as e:
-        return Response({"Error": "Fields are unvalid"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'error': f"{type(e).__name__}: {str(e)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 # LISTER LES DETAILS, MODIFIER LES INFOS, SUPPRIMER UN JOUEUR (accessible par le joueur lui-meme uniquement)
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
