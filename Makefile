@@ -6,7 +6,7 @@
 #    By: robin <robin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/09/25 14:10:14 by robin            ###   ########.fr        #
+#    Updated: 2024/09/26 13:27:08 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ clean:
 		-@docker network rm $$(docker network ls -q) 2>/dev/null
 
 fclean: clean
-		sudo rm -rf $(HOME)/data
+	#	rm -rf $(HOME)/data
 
 ps:
 		@docker ps -a 
