@@ -23,6 +23,7 @@ let tournoiSize;
 let configTournoi = {};
 let gamePromises = [];
 let position = [];
+let matchingPlayers = [];
 let avancement = ['Huitieme', 'Quart', 'Demi', 'Finale'];
 let j = 0;
 let gamePromise;
@@ -41,20 +42,31 @@ wss.on('connection', (ws) => {
             if (data.type === 'config') {
                 const playerIndex = players.indexOf(ws);
                 playerConfigs[playerIndex] = data.config;
+                playerConfigs[playerIndex].id = data.playerID;
                 ws.config = data.config;
         
                 console.log('Received configuration:', playerConfigs);
                 console.log('Nbr de configs:', playerConfigs.filter(config => config).length);
         
                 // Chercher des configurations correspondantes
-                const matchingPlayers = [];
+                
                 playerConfigs.forEach((config, index) => {
                     if (config && JSON.stringify(config) === JSON.stringify(data.config)) {
-                        matchingPlayers.push(index);
+                        //le premier id est accepté ensuite tous les autres sont vérifiés pour ne pas lancer une partie avec le même id
+                        if (matchingPlayers.length == 0) {
+                            matchingPlayers.push(index);
+                        }
+                        else if(matchingPlayers.length == 1 && playerConfigs[matchingPlayers[0]].id != data.playerID){
+                            matchingPlayers.push(index);
+                        }
+                        else if (matchingPlayers.length == 1 && playerConfigs[matchingPlayers[0]].id == data.playerID) {
+                            //envoie un message au client pour lui dire qu'il ne peut pas jouer avec le même id
+                            ws.send(JSON.stringify({ type: 'error', message: 'Vous ne pouvez pas jouer contre vous même' }));
+                        }
                     }
                 });
-                console.log('Matching players:', matchingPlayers[0], matchingPlayers[1]);
-                if (matchingPlayers.length == 2 && players[matchingPlayers[0]].id != players[matchingPlayers[1]].id) {
+                console.log('Matching players:', matchingPlayers);
+                if (matchingPlayers.length == 2) {
                     gameID = uuidv4();
                     players[matchingPlayers[0]].gameID = gameID;
                     players[matchingPlayers[1]].gameID = gameID;
@@ -62,12 +74,12 @@ wss.on('connection', (ws) => {
                     players[matchingPlayers[1]].send(JSON.stringify({ type: 'start', gameID: gameID, playerNumber: 2, config: playerConfigs[matchingPlayers[1]]}));
                     playerConfigs[matchingPlayers[0]] = null;
                     playerConfigs[matchingPlayers[1]] = null;
+                    matchingPlayers = [];
+                    console.log('Game started with players:', matchingPlayers);
                 }
             } else if(data.type === 'nickname') {
                 //renvoie a l'autre joueur(sur le meme gameID) le playerID de l'autre joueur
                 broadcast(ws, { type: 'nickname', nickname: data.nickname });
-            } else if (data.type === 'id'){
-                players.id = data.playerID;
             } else if (data.type === 'winner') {
                 console.log('Winner:', data.winner);
                 gameID = data.gameID;

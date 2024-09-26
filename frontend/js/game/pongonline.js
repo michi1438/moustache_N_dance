@@ -614,9 +614,8 @@ function connectWebSocket(config) {
 
     ws.onopen = () => {
         console.log('WebSocket connection opened');
-        ws.send(JSON.stringify({ type: 'config', config }));
+        ws.send(JSON.stringify({ type: 'config', config, playerID: playerID }));
         console.log('Sending configuration:', config);
-        ws.send(JSON.stringify({ type: 'id', playerID: playerID }));
     };
 
     ws.onmessage = (event) => {
@@ -703,6 +702,9 @@ function handleWebSocketMessage(message, config) {
                 console.warn('Mismatched game ID', message.gameID, gameID);
                 ws.close();
             }
+        case 'error':
+            handleGameOver();
+            break;
         case 'deco':
             console.log('Player', message.player, 'disconnected');
             if(message.player == 0) {
