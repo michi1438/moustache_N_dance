@@ -321,6 +321,36 @@ async function loadGameStat() {
 					i++
 				}
 			}
+			var xValues = ["Wins", "Losses"];
+			var wins = sessionStorage.getItem("wins")
+			var losses = sessionStorage.getItem("losses") 
+			if (losses == 0 && wins == 0) {
+				losses = 50;
+				wins = 50;
+			}
+			var yValues = [wins, losses];
+			console.log("YVALUES", yValues);
+			var barColors = [
+			"#1e7145",
+			"#fe8d63",
+			];
+		
+			new Chart("StatChart", {
+			type: "pie",
+			data: {
+				labels: xValues,
+				datasets: [{
+				backgroundColor: barColors,
+				data: yValues
+				}]
+			},
+			options: {
+				title: {
+				display: false,
+				text: "Stat"
+				}
+			}
+			});
 			
 		}
 	} catch (e) {
@@ -632,37 +662,6 @@ async function listenerUserInfo() {
 		document.getElementById("btn__updateUserName").disabled = true;
 		document.getElementById("btn__updateEmail").disabled = true;
 	}
-
-	var xValues = ["Wins", "Losses"];
-	var wins = sessionStorage.getItem("wins")
-	var losses = sessionStorage.getItem("losses") 
-	if (losses == 0 && wins == 0) {
-		losses = 50;
-		wins = 50;
-	}
-	var yValues = [wins, losses];
-	console.log("YVALUES", yValues);
-	var barColors = [
-	"#1e7145",
-	"#fe8d63",
-	];
-
-	new Chart("StatChart", {
-	type: "pie",
-	data: {
-		labels: xValues,
-		datasets: [{
-		backgroundColor: barColors,
-		data: yValues
-		}]
-	},
-	options: {
-		title: {
-		display: false,
-		text: "Stat"
-		}
-	}
-	});
 
 	// Reset all fields (input and error) from the form when the modal pass to hidden
 	document.getElementById("modal__updateAvatar").addEventListener("hidden.bs.modal", e => {
