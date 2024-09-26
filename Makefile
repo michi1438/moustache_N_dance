@@ -6,7 +6,7 @@
 #    By: robin <robin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/14 12:00:04 by mguerga           #+#    #+#              #
-#    Updated: 2024/09/26 16:11:31 by robin            ###   ########.fr        #
+#    Updated: 2024/09/26 22:12:09 by mguerga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ clean:
 		-@docker network rm $$(docker network ls -q) 2>/dev/null
 
 fclean: clean
-		-@rm -rf $(HOME)/data/db
+	# On en veut pas du rm -rf @Robinounet le gros boulet signe BLERIM 
 ps:
 		@docker ps -a 
 
