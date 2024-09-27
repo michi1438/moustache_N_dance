@@ -202,11 +202,9 @@ def verify_otp(request):
             refresh = RefreshToken.for_user(player)
             serializer = PlayerSerializer(player)
             return Response({
-                #TODO a nettoyer en fin de projet (pareil pour toutes les Responses)
                 "message": "OTP is valid",
                 "username": str(player.username),
                 "nickname": str(player.nickname),
-                "email": str(player.email),
                 "email": str(player.email),
                 "wins": str(player.wins),
                 "losses": str(player.losses),

@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJ_SECRETKEY')                                                                                                                                 
                                                                                                                                                                                                                   
 # SECURITY WARNING: don't run with debug turned on in production!                                                                                                                                                 
-DEBUG = True 
+DEBUG = False 
                                                                                                                                                                                                                   
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
@@ -61,7 +61,7 @@ REST_FRAMEWORK = {
             ),
         }
 
-SIMPLE_JWT = { #TODO check that the monitoring of refresh tokens take into account ROTATE_REFRESH_TOKENS and BLACKLIST_AFTER_ROTATION.
+SIMPLE_JWT = {
         'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=5),
         'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
         'ROTATE_REFRESH_TOKENS' : True,

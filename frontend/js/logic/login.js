@@ -245,7 +245,6 @@ async function createUser(createAccountForm) {
 	}
 };
 
-// TODO lzit : a quoi sert cette fonction, pourquoi aucune verification de status d'erreur? voir les autres appels API pour faire pareil si possible
 async function connectUser42() {
 
 	try {

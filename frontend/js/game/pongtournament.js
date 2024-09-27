@@ -647,9 +647,6 @@ function selectOption(option) {
 
     if (currentQuestionIndex === 0 && option === "Rejoindre le tournoi") {
 
-		// TODO recuperer le status de la requete pour savoir
-		// si on peut effectivement ajouter le player ou si on renvoie une erreur
-		// (pareil pour les autres appels API)
         sendAPIjoin(); 
 
         // If the first question's answer is "Rejoindre", skip the remaining questions but display list of tournaments
