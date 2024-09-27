@@ -30,7 +30,10 @@ def create_player(request):
         if serializer.is_valid():
             player = Player(**serializer.validated_data)
             player.set_password(serializer.validated_data['password'])
-            player.save()
+            try:
+                player.save()
+            except Exception:
+                return Response({"username": ["This username is already used"]}, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
