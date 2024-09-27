@@ -1,4 +1,5 @@
 import { monitorTokenExpiration } from "./router.js"
+import router from "./router.js"
 
 async function updateNickname(nicknameForm) {
 
@@ -326,7 +327,6 @@ async function loadGameStat() {
 				wins = 50;
 			}
 			var yValues = [wins, losses];
-			console.log("YVALUES", yValues);
 			var barColors = [
 			"#1e7145",
 			"#fe8d63",
@@ -642,6 +642,11 @@ async function listenerUserInfo() {
 		const loadF = await loadFriend().then(() => {
 			loadGameStat();
 		});
+	}
+	
+	if (!sessionStorage.getItem("username")) {
+		router("index");
+		return;
 	}
 
 	document.getElementById("update__avatar--big").src = sessionStorage.getItem("avatar") !== null ?

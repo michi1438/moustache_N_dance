@@ -131,6 +131,10 @@ async function initializeTournamentPage(){
 }
 
 export function listenerPongTournament() {
+	if (!sessionStorage.getItem("username")) {
+		router("index");
+		return;
+	}
 
 	initializeTournamentPage();
 
