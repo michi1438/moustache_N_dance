@@ -6,7 +6,6 @@ import render404_error from "../views/view404_error.js"
 import renderUserInfo from "../views/viewUserInfo.js"
 import renderPongTournament from "../views/viewPongTournament.js"
 import { unloadScript } from "./ponglocallogic.js"
-import { unloadScriptO} from "./unloadpongonline.js"
 
 // Importe le script de chaque page qui gere le load et listener
 import handlePongLocal from "./ponglocallogic.js"
@@ -91,7 +90,6 @@ const routes = {
 */
 export default async function router(value) {
 	unloadScript();
-	unloadScriptO();
 
 	var page = routes[value];
 	
@@ -209,7 +207,7 @@ export async function monitorTokenExpiration() {
         const decodedToken = parseJwt(accessToken);
         const currentTime = Math.floor(Date.now() / 1000);
         const timeUntilExpiration = decodedToken.exp - currentTime;
-		console.log("time until expir", timeUntilExpiration);	
+		// console.log("time until expir", timeUntilExpiration);	
 
         // Déclenche le rafraîchissement 1 minutes avant l'expiration
         const refreshThreshold = 60; // 1 minutes

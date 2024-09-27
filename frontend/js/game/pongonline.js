@@ -520,11 +520,11 @@ function animate(vitesse) {
                     } 
                 }
                 if(playerNumber == 1) {
-                    if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+                    if (keys['q'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
                         paddle1.position.z -= paddleSpeed;
                         sendPaddlePosition(1);
                     } 
-                    if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+                    if (keys['a'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
                         paddle1.position.z += paddleSpeed;
                         sendPaddlePosition(1);
                     }

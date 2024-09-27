@@ -470,10 +470,10 @@ function animate(vitesse) {
 				if (keys['l'] && paddle2.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
 					paddle2.position.z += paddleSpeed;
 				} 
-				if (keys['a'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
+				if (keys['q'] && paddle1.position.z - 2 - paddleSpeed > topWall.position.z + 0.5) {
 					paddle1.position.z -= paddleSpeed;
 				} 
-				if (keys['q'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
+				if (keys['a'] && paddle1.position.z + 2 + paddleSpeed < bottomWall.position.z - 0.5) {
 					paddle1.position.z += paddleSpeed;
 				}
 			}
