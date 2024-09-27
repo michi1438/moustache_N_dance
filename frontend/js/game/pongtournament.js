@@ -846,6 +846,10 @@ function handleGameOver(player) {
             ws.send(JSON.stringify(message));
         }
         cancelAnimationFrame(animationID);
+        if (labelRenderer && labelRenderer.domElement) {
+            document.body.removeChild(labelRenderer.domElement);
+            console.log('labelRenderer removed.');
+        }
         resetGameVariables();
         clearScene();
         // setTimeout(() => {
@@ -886,6 +890,10 @@ function handleGameOver(player) {
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.close();
                         console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
+                    }
+                    if (labelRenderer && labelRenderer.domElement) {
+                        document.body.removeChild(labelRenderer.domElement);
+                        console.log('labelRenderer removed.');
                     }
                 }, 3000);
             }
