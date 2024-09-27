@@ -15,7 +15,7 @@ const gameEvents = new EventEmitter();
 const wss = new WebSocket.Server({ server });
 
 let players = [];
-let gameID;
+let gameID, playerIndex;
 let playerConfigs = [];
 let playersID = [];
 let tabSize;
@@ -31,7 +31,7 @@ let gamePromise;
 
 wss.on('connection', (ws) => {
     console.log('Total connected clients:', wss.clients.size);
-
+    console.log('olayerIndex:', players.indexOf(ws));
     if (players.length < 50) {
         players.push(ws);
         
@@ -40,7 +40,7 @@ wss.on('connection', (ws) => {
             //console.log('Received message:', data);
             //console.log('data.type:', data.type);
             if (data.type === 'config') {
-                const playerIndex = players.indexOf(ws);
+                playerIndex = players.indexOf(ws);
                 playerConfigs[playerIndex] = data.config;
                 playerConfigs[playerIndex].id = data.playerID;
                 ws.config = data.config;
@@ -52,16 +52,9 @@ wss.on('connection', (ws) => {
                 
                 playerConfigs.forEach((config, index) => {
                     if (config && JSON.stringify(config) === JSON.stringify(data.config)) {
-                        //le premier id est accepté ensuite tous les autres sont vérifiés pour ne pas lancer une partie avec le même id
-                        if (matchingPlayers.length == 0) {
+                        //si on trouve une config correspondante, on ajoute l'index du joueur dans le tableau matchingPlayers sauf si cet index existe deja
+                        if (matchingPlayers.includes(index) === false) {
                             matchingPlayers.push(index);
-                        }
-                        else if(matchingPlayers.length == 1 && playerConfigs[matchingPlayers[0]].id != data.playerID){
-                            matchingPlayers.push(index);
-                        }
-                        else if (matchingPlayers.length == 1 && playerConfigs[matchingPlayers[0]].id == data.playerID) {
-                            //envoie un message au client pour lui dire qu'il ne peut pas jouer avec le même id
-                            ws.send(JSON.stringify({ type: 'errorID', message: 'Vous ne pouvez pas jouer contre vous même' }));
                         }
                     }
                 });
@@ -91,6 +84,7 @@ wss.on('connection', (ws) => {
                     gamePromises = gamePromises.filter(p => p.gameID !== gameID);
                 }
             } else if (data.type === 'left') {
+                matchingPlayers = matchingPlayers.filter(player => player !== players.indexOf(ws));
                 ws.send(JSON.stringify({ type: 'left'}));
             } else if (data.type === 'positionTournament') {
                 position.push(data.playerID);

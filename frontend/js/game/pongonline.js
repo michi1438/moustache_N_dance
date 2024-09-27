@@ -407,7 +407,7 @@ window.startGame = function(config) {
 
 
 function animate(vitesse) {
-    if (sessionStorage.getItem("gameOverO") == "false") {
+    if (sessionStorage.getItem("gameOverO") == "false" && (window.ws && window.ws.readyState === WebSocket.OPEN)) {
         animationID = requestAnimationFrame(() => animate(vitesse));
         controls.update();
         if (ball && paddle1 && paddle2 ) {
@@ -634,7 +634,7 @@ function connectWebSocket(config) {
     window.ws.onclose = () => {
         //sendAPIWL(0);
         console.log('WebSocket connection closed');
-        //window.ws = null;
+        window.ws = null;
     };
 
     window.ws.onerror = (error) => {
@@ -662,7 +662,11 @@ function handleWebSocketMessage(message, config) {
             break;
         case 'left':
             sendAPIWL(0);
-            ws.close();
+            if (labelRenderer && labelRenderer.domElement) {
+                document.body.removeChild(labelRenderer.domElement);
+                console.log('labelRenderer removed.');
+            }
+            window.ws.close();
             break;
         case 'start':
             playerNumber = message.playerNumber;
@@ -732,6 +736,7 @@ function handleWebSocketMessage(message, config) {
                 scoreP2object[scoreP2].visible = true;
                 scoreP1object[scoreP1].visible = true;
             }
+
             break;
 
         default:
@@ -741,18 +746,22 @@ function handleWebSocketMessage(message, config) {
 
 function handleGameOver() {
     // Gérer la fin de la partie ici
+    cancelAnimationFrame(animationID);
     setTimeout(() => {
         const boardTwo = document.getElementById('board_three');
         if (boardTwo && boardTwo.contains(renderer.domElement)) {
             boardTwo.removeChild(renderer.domElement);
             console.log("Game stopped and board_three cleared.");
-            cancelAnimationFrame(animationID);
             setTimeout(() => {
                 listenerPongOnline();
                 // Fermer la connexion WebSocket
                 if (window.ws && window.ws.readyState === WebSocket.OPEN) {
                     window.ws.close();
                     console.log('WebSocket connection closed at game over. Connected players: ', connectedPlayers);
+                }
+                if (labelRenderer && labelRenderer.domElement) {
+                    document.body.removeChild(labelRenderer.domElement);
+                    console.log('labelRenderer removed.');
                 }
             }, 3000);
         }
@@ -781,7 +790,7 @@ function sendPaddlePosition(playerNumber) {
         //console.log('Sending paddle position:', message);
     } 
     else {
-        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:');
     
     }
 }
@@ -797,7 +806,7 @@ function sendBallPosition() {
         window.ws.send(JSON.stringify(message));
         //console.log('Sending ball position:', message);
     } else {
-        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:');
     }
 }
 
@@ -813,7 +822,7 @@ function sendScore(playerNumber) {
         window.ws.send(JSON.stringify(message));
         //console.log('Sending score:', message);
     } else {
-        console.warn('WebSocket is not open. ReadyState:', window.ws.readyState);
+        console.warn('WebSocket is not open. ReadyState:');
     }
 }
 
